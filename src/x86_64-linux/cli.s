@@ -3,4 +3,4 @@
 .global cli
 cli:
 	# TODO
-	j cli
+	jmp cli

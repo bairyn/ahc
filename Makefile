@@ -28,7 +28,9 @@ LD ?= ld
 
 LD_FLAGS ?= $(BASE_LD_FLAGS) $(PROJECT_LD_FLAGS) $(EXTRA_LD_FLAGS)
 
-PROJECT_LD_FLAGS =
+PROJECT_LD_FLAGS = \
+	-e _entry \
+	#
 
 BASE_LD_FLAGS ?=
 EXTRA_LD_FLAGS ?=
@@ -87,8 +89,12 @@ $(DIST_DIR) $(OBJ_DIR): | $(BUILD_DIR)
 .PHONY: executable
 executable: $(BUILD_DIR)/$(EXECUTABLE) | $(BUILD_DIR)
 
+# TODO (external): fix binutil's as and ld's handling of ‘--’.
 $(OBJS): $(OBJ_DIR)/%.o: $(SRC_SYSTEM_DIR)/%.s | $(BUILD_DIRS)
-	$(AS) $(AS_FLAGS) -o "$@" -- "$^"
+	printf '%s\n' "WARNING: gas seems broken with ‘--’.  Bug?"
+	#$(AS) $(AS_FLAGS) -o "$@" -- $^
+	$(AS) $(AS_FLAGS) -o "$@" $^
 
 $(BUILD_DIR)/$(EXECUTABLE): $(OBJS)
-	$(LD) $(LD_FLAGS) -o "$@" -- "$^"
+	#$(LD) $(LD_FLAGS) -o "$@" -- $^
+	$(LD) $(LD_FLAGS) -o "$@" $^

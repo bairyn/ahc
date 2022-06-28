@@ -1,5 +1,7 @@
 .code64
 .text
 .global main
+.global _entry
+_entry:
 main:
-	j cli
+	jmp cli
