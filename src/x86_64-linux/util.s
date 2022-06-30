@@ -17,6 +17,7 @@ ns_util_err_msg_not_writeable_end:
 .text
 
 # Can we return?
+# 	%rdi: return
 .global ns_ahc_can_cont
 ns_ahc_can_cont:
 	jmp *%rdi
@@ -25,8 +26,13 @@ ns_ahc_can_cont:
 #
 # For segv handling, only call this once per process instantion (maybe this
 # requirement may be removed with further enhancements in the future).
+# 	%rdi: return
 .global ns_ahc_system_verify_writeable
 ns_ahc_system_verify_writeable:
+	# Backup return.
+	subq $8, %rsp
+	movq %rdi, (%rsp)
+
 	# First, trap SEGV to print our error message instead just aborting with
 	# SEGV.
 	leaq 0f(%rip), %rsi
@@ -70,6 +76,10 @@ ns_ahc_system_verify_writeable:
 	# restored:)
 	#movq $0, %rdi
 	#movq (%rdi), %rdi
+
+	# Restore return.
+	movq (%rsp), %rdi
+	addq $8, %rsp
 
 	# Return.
 	jmp *%rdi
