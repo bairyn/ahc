@@ -100,7 +100,9 @@ ns_system_x86_64_linux_exit_custom:
 # ‘ns_system_x86_64_linux_sigaction_static_set_segv_data’
 ns_system_x86_64_linux_trap_middleman:
 	leaq ns_system_x86_64_linux_sigaction_static_set_segv_data(%rip), %rdi
+	movq (%rdi), %rdi
 	leaq ns_system_x86_64_linux_sigaction_static_set_segv_cont(%rip), %rsi
+	movq (%rsi), %rsi
 	jmp *%rsi
 
 # Call a callback on segfault.  Only use this once per process instantiation.
