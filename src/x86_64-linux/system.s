@@ -4,6 +4,9 @@
 # See ‘arch/x86/entry/syscalls/syscall_64.tbl’ (thanks,
 # https://unix.stackexchange.com/a/499016).
 
+# See also the Intel(R) 64 and IA-32 Architectures Software Developer's Manual,
+# Combined Volumes: 1, 2A, 2B, 2C, 2D, 3A, 3B, 3C, 3D, and 4 PDF document.
+
 # Configure the platform.
 .code64
 
@@ -192,7 +195,38 @@ ns_system_x86_64_linux_verify_errno:
 	jmp 8b
 7:
 
-	# TODO: encode the error code.
+	# Encode the error code (%rsi) into offsets 13 through 17 of %rdi.
+	not %rsi
+	inc %rsi  # %rsi = -%rsi
+
+	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rdi
+	addq $13, %rdi  # Base.
+	movq $4, %rcx  # Size.
+	movq %rsi, %r8  # Current dividend.
+6:
+	# Break if out of space.
+	testq %rcx, %rcx
+	jz 5f
+	dec %rcx
+
+	# Divide by 10 to get the least significant digit.
+	movq $0, %rdx
+	movq %r8, %rax
+	movq $10, %r9
+	divq %r9
+	# mod (remainder) is %rdx, quotient is %rax.
+	# Use %rdx to write another digit, starting from the right.
+	addq $'0, %rdx
+	addq %rcx, %rdi
+	movb %dl, (%rdi)
+	subq %rcx, %rdi
+	# The next dividend will be %rax.
+	movq %rax, %r8
+
+	# Loop back unless %r8 is 0.
+	testq %r8, %r8
+	jnz 6b
+5:
 
 	# Hand over control to exit_custom().
 	movq $3, %rdi
