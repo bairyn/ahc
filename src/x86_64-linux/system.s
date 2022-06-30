@@ -28,6 +28,35 @@ ns_system_x86_64_linux_sigaction_static_set_segv_cont:
 ns_system_x86_64_linux_sigaction_static_set_segv_data:
 	.quad 0x0
 
+ns_system_x86_64_linux_err_msg_segv_trap_set_size:
+	.quad (ns_system_x86_64_linux_err_msg_segv_trap_set_end - ns_system_x86_64_linux_err_msg_segv_trap_set)
+ns_system_x86_64_linux_err_msg_segv_trap_set:
+	.ascii "segv trap set error: rt_sigaction failed!  Could not trap SIGSEGV.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_segv_trap_set_end:
+
+ns_system_x86_64_linux_err_msg_segv_trap_restore_size:
+	.quad (ns_system_x86_64_linux_err_msg_segv_trap_restore_end - ns_system_x86_64_linux_err_msg_segv_trap_restore)
+ns_system_x86_64_linux_err_msg_segv_trap_restore:
+	.ascii "segv trap set error: rt_sigaction failed!  Could not restore SIGSEGV handler.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_segv_trap_restore_end:
+
+# Mutate at most once, static only for ns_system_x86_64_linux_verify_errno, to
+# be set before quitting with an error.
+ns_system_x86_64_linux_syscall_verify_builder_size:
+	.quad (ns_system_x86_64_linux_syscall_verify_builder_end - ns_system_x86_64_linux_syscall_verify_builder)
+ns_system_x86_64_linux_syscall_verify_builder:
+	.rept 1024
+	.byte 0x00
+	.endr
+ns_system_x86_64_linux_syscall_verify_builder_end:
+
+# Utility: digits
+ns_system_x86_64_linux_util_digits:
+.ascii "0123456789ABCDEF"
+.byte 0x00
+
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
 # and shell support.  Also add a few other utilities as needed.
@@ -95,6 +124,87 @@ ns_system_x86_64_linux_exit_custom:
 	jmp ns_system_x86_64_linux_exit_custom
 	nop
 
+# Simple utility to verify a syscall was successful or else fail with an error
+# message.
+# 	%rdi: return
+# 	%rsi: the errno to check (syscall return %rax value, actually)
+# 	%rdx: an error message to print after our prefix of ‘Error (errno %d): ’
+# 	%rcx: size of the error message
+ns_system_x86_64_linux_verify_errno:
+	# Return normally if the syscall return value is not in [-4095, -1] (https://stackoverflow.com/a/2538212).
+	cmpq $-4095, %rsi  # if %rsi < -4095
+	jl   0f            # return
+
+	cmpq $-1, %rsi  # if %rsi > -1
+	jg   0f         # return
+
+	# We have an error.  Prepare the message.
+	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rdi
+# 	%rdx: an error message to print after our prefix of ‘Error (errno %d): ’
+	movb $'E, 0(%rdi)
+	movb $'r, 1(%rdi)
+	movb $'r, 2(%rdi)
+	movb $'o, 3(%rdi)
+	movb $'r, 4(%rdi)
+	movb $' , 5(%rdi)
+	movb $'(, 6(%rdi)
+	movb $'e, 7(%rdi)
+	movb $'r, 8(%rdi)
+	movb $'r, 9(%rdi)
+	movb $'n, 10(%rdi)
+	movb $'o, 11(%rdi)
+	movb $' , 12(%rdi)
+	movb $' , 13(%rdi)
+	movb $' , 14(%rdi)
+	movb $' , 15(%rdi)
+	movb $' , 16(%rdi)
+	movb $'), 17(%rdi)
+	movb $':, 18(%rdi)
+	movb $' , 19(%rdi)
+
+	movq %rdx, %r8
+
+	# If %rcx > ns_system_x86_64_linux_syscall_verify_builder_size + 20, %rcx = … + 20.
+	leaq ns_system_x86_64_linux_syscall_verify_builder_size(%rip), %rdx
+	movq (%rdx), %rdx
+	addq $20, %rdx
+	cmpq %rdx, %rcx
+	jna 9f
+	movq %rdx, %rcx  # %rcx <- …_size + 20
+9:
+
+	# Append the error message.
+	addq $20, %rdi
+8:
+	# Break if size reaches 0.# or we reach a null byte.
+	testq %rcx, %rcx
+	jz 7f
+	#movq (%rdi), %rdx
+	#testq %rdx, %rdx
+	#jz 7f
+
+	movb (%r8), %r9b
+	movb %r9b, (%rdi)
+	dec %rcx
+	inc %rdi
+	inc %r8
+
+	jmp 8b
+7:
+
+	# TODO: encode the error code.
+
+	# Hand over control to exit_custom().
+	movq $3, %rdi
+	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rsi
+	leaq ns_system_x86_64_linux_syscall_verify_builder_size(%rip), %rdx
+	movq (%rdx), %rdx
+	jmp ns_system_x86_64_linux_exit_custom
+
+0:
+	# Return normally.
+	jmp *%rdi
+
 # An optional segv trap handler that hands off execution to what was statically
 # set in ‘ns_system_x86_64_linux_sigaction_static_set_segv_cont’ and
 # ‘ns_system_x86_64_linux_sigaction_static_set_segv_data’
@@ -134,6 +244,15 @@ ns_system_x86_64_linux_trap_segv:
 	movq $13, %rax  # rt_sigaction
 	syscall
 
+	# Verify.
+	movq %rax, %rsi
+	leaq ns_system_x86_64_linux_err_msg_segv_trap_set(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_segv_trap_set_size(%rip), %rcx
+	movq (%rcx), %rcx
+	lea 5(%rip), %rdi
+	jmp ns_system_x86_64_linux_verify_errno
+	nop
+
 	# Return.
 	movq %r8, %rdi
 	jmp *%rdi
@@ -154,6 +273,15 @@ ns_system_x86_64_linux_restore_trap_segv:
 	movq $0, %r10
 	movq $13, %rax  # rt_sigaction
 	syscall
+
+	# Verify.
+	movq %rax, %rsi
+	leaq ns_system_x86_64_linux_err_msg_segv_trap_restore(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_segv_trap_restore_size(%rip), %rcx
+	movq (%rcx), %rcx
+	lea 5(%rip), %rdi
+	jmp ns_system_x86_64_linux_verify_errno
+	nop
 
 	# Return.
 	movq %r8, %rdi
