@@ -249,6 +249,12 @@ ns_system_x86_64_linux_trap_middleman:
 	movq (%rsi), %rsi
 	jmp *%rsi
 
+	# Redundantly after a jump (never executed), adapt to the signal handler's
+	# expectation of a conventional return.
+	movq (%rsp), %rdi
+	addq $8, %rsp
+	jmp *%rdi
+
 # Call a callback on segfault.  Only use this once per process instantiation.
 #
 # Note this is called before self-modifying-code support is verified.
@@ -274,7 +280,7 @@ ns_system_x86_64_linux_trap_segv:
 	movq $11, %rdi  # signum for SEGV is 11.
 	leaq ns_system_x86_64_linux_sigaction_static_set_segv(%rip), %rsi
 	movq $0, %rdx
-	movq $128, %r10  # sizeof sigset_t: 128
+	movq $0, %r10  # sizeof sigset_t: 128, but we'll just use 0.
 	movq $13, %rax  # rt_sigaction
 	syscall
 
@@ -304,7 +310,7 @@ ns_system_x86_64_linux_restore_trap_segv:
 	movq $11, %rdi  # signum for SEGV is 11.
 	leaq ns_system_x86_64_linux_sigaction_restore_segv(%rip), %rsi
 	movq $0, %rdx
-	movq $128, %r10  # sizeof sigset_t: 128
+	movq $0, %r10  # sizeof sigset_t: 128, but we'll just use 0.
 	movq $13, %rax  # rt_sigaction
 	syscall
 
