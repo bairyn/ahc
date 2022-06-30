@@ -8,8 +8,10 @@
 ns_util_err_msg_not_writeable_size:
 	.quad (ns_util_err_msg_not_writeable_end - ns_util_err_msg_not_writeable)
 ns_util_err_msg_not_writeable:
-.ascii "Error: AHC machine code cannot change itself!  Verify compilation and system configuration for self-modifying code.\n"
-.byte 0x00
+	.ascii "Error:\n"
+	.ascii "	AHC machine code cannot change itself!  Verify compilation and system\n"
+	.ascii "	configuration for self-modifying code.\n"
+	.byte 0x00
 ns_util_err_msg_not_writeable_end:
 
 .text
