@@ -1,6 +1,9 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
+# See ‘arch/x86/entry/syscalls/syscall_64.tbl’ (thanks,
+# https://unix.stackexchange.com/a/499016).
+
 # Configure the platform.
 .code64
 
@@ -46,10 +49,26 @@ ns_system_x86_64_linux_exit_failure:
 	jmp ns_system_x86_64_linux_exit_failure
 	nop
 
+# Exit with a code and error message.
+# 	%rdi: Error code.
+# 	%rsi: Error message.
+# 	%rdx: Error message size.
+#
+# 	(Note: this brings into play Linux's blocking mechanisms.)
 .global ns_system_x86_64_linux_exit_custom
 ns_system_x86_64_linux_exit_custom:
+	movq %rdi, %r10
+
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq $2, %rdi
+	movq $1, %rax  # write
+	syscall
+
+	movq %r10, %rdi
+
 	movq $60, %rax  # exit
-	# TODO
+	movq %rdi, %rdi
 	syscall
 
 	jmp ns_system_x86_64_linux_exit_custom
