@@ -29,7 +29,7 @@ LD ?= ld
 LD_FLAGS ?= $(BASE_LD_FLAGS) $(PROJECT_LD_FLAGS) $(EXTRA_LD_FLAGS)
 
 PROJECT_LD_FLAGS = \
-	-e _entry \
+	-e _ns_main_entry \
 	#
 
 BASE_LD_FLAGS ?=
