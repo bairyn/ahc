@@ -28,8 +28,10 @@ LD ?= ld
 
 LD_FLAGS ?= $(BASE_LD_FLAGS) $(PROJECT_LD_FLAGS) $(EXTRA_LD_FLAGS)
 
+# --omagic: support self-modifying code via writeable text sections.
 PROJECT_LD_FLAGS = \
 	-e _ns_main_entry \
+	--omagic \
 	#
 
 BASE_LD_FLAGS ?=
