@@ -274,7 +274,11 @@ ns_system_x86_64_linux_trap_segv:
 	movq %rsi, (%rdi)
 	leaq ns_system_x86_64_linux_sigaction_static_set_segv_data(%rip), %rdi
 	movq %rdx, (%rdi)
+	# Set the first 8 bytes in our static data.
 	leaq ns_system_x86_64_linux_trap_middleman(%rip), %rdi
+	leaq ns_system_x86_64_linux_sigaction_static_set_segv(%rip), %rsi
+	movq %rdi, (%rsi)
+	#movq $ns_system_x86_64_linux_trap_middleman, (%rsi)
 
 	# rt_sigaction(…)
 	movq $11, %rdi  # signum for SEGV is 11.
@@ -290,7 +294,7 @@ ns_system_x86_64_linux_trap_segv:
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_set_size(%rip), %rcx
 	movq (%rcx), %rcx
 	lea 5(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno
+	jmp ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
 	nop
 
 	# Return.
