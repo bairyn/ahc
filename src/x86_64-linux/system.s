@@ -20,7 +20,7 @@ ns_system_x86_64_linux_sigaction_restore_segv:
 	.endr
 # 152 bytes of data (per-process-instantation) to set segv trap.
 ns_system_x86_64_linux_sigaction_static_set_segv:
-	.quad 0x0  # SIG_DFL = 0
+	.quad 0x0  # Will be overwritten exactly once per process instantiation.
 	.rept (152-8)
 	.byte 0x00
 	.endr
@@ -281,7 +281,7 @@ ns_system_x86_64_linux_trap_segv:
 	#movq $ns_system_x86_64_linux_trap_middleman, (%rsi)
 
 	# rt_sigaction(…)
-	movq $11, %rdi  # signum for SEGV is 11.
+	movq $11, %rdi  # signum for SEGV is 11.  (INT is 2, and USR1 is 10.)
 	leaq ns_system_x86_64_linux_sigaction_static_set_segv(%rip), %rsi
 	movq $0, %rdx
 	movq $8, %r10  # sizeof sigset_t: 128, but we'll just use 0.  Weird, disas glibc .so has this set to 8, and that made it progress further.  Whatever, so it's 8, not 0 or 128.
@@ -293,9 +293,22 @@ ns_system_x86_64_linux_trap_segv:
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_set(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_set_size(%rip), %rcx
 	movq (%rcx), %rcx
-	lea 5(%rip), %rdi
+	leaq 5(%rip), %rdi
 	jmp ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
 	nop
+
+	# TODO: FIXME: have:
+	# 	5:
+	# 		jmp 5b
+	# here (optionally also at the beginning of trap_middleman()), adjust
+	# SIGSEGV1 to USR1, then start ahc, then ‘pkill -USR1 ahc’, and then ahc
+	# will segfault.  It seems correctly to me: glibc seems to do it as I set
+	# it up (objdump -d libc.so), and a C ‘rt_sigaction’ experiment with a
+	# null-initialized buffer except the first 8 bytes point to the handler
+	# worked on my sistem.  I don't know why this thing is segfaulting.  Oh
+	# well, we can worry about this later.  Until this gets fixed, the user
+	# will see a segfault instead of an error message if code sections are
+	# unwriteabl.
 
 	# Return.
 	movq %r8, %rdi
@@ -323,7 +336,7 @@ ns_system_x86_64_linux_restore_trap_segv:
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_restore(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_restore_size(%rip), %rcx
 	movq (%rcx), %rcx
-	lea 5(%rip), %rdi
+	leaq 5(%rip), %rdi
 	jmp ns_system_x86_64_linux_verify_errno
 	nop
 

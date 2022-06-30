@@ -31,7 +31,7 @@ ns_ahc_system_verify_writeable:
 	# SEGV.
 	leaq 0f(%rip), %rsi
 	movq $0, %rdx
-	lea 5(%rip), %rdi
+	leaq 5(%rip), %rdi
 	jmp ns_system_x86_64_linux_trap_segv
 	nop
 
@@ -62,7 +62,7 @@ ns_ahc_system_verify_writeable:
 1:
 
 	# Okay, now restore the default SEGV trap.
-	lea 5(%rip), %rdi
+	leaq 5(%rip), %rdi
 	jmp ns_system_x86_64_linux_restore_trap_segv
 	nop
 
