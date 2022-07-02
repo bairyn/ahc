@@ -28,10 +28,12 @@ ns_system_x86_64_linux_module_size:
 #
 # Parameters:
 # 	%rax:
-# 		The offset relative to ‘begin’ of the module action to call.
-#
-# 		You can set this to e.g. ‘ns_system_x86_64_linux_fork_require - ns_system_x8_64_linux_fork_begin’.
-# 		See also https://stackoverflow.com/a/43768528 .
+# 		The offset relative to ‘begin’ of the module action to call, e.g. with
+# 			movq $ns_system_x86_64_linux_fork_require, %rax
+# 		Using %rdi instead of %rax followed by remaining arguments would have
+# 		been more consistent, but this helps avoid shuffling around the order
+# 		of the arguments with a rotation.  So we're just using a different
+# 		convention from our own for convenience.
 #
 # Clobbers %r11 (plus anything the module action clobbers).
 #
@@ -41,6 +43,12 @@ ns_system_x86_64_linux_module_size:
 # perform our own run-time linking.
 #
 # However, the ‘system’ module itself does not depend on other modules.
+#
+# Note: other modules can then access this module through the ‘module_begin’
+# (that is, ‘ns_system_x86_64_linux_module_route’) symbol.  For portability
+# (e.g. maybe you want to copy a module instance somewhere else), it helps to
+# only refer to ‘module_begin’ for other modules in one place, so that when
+# re-linking things, you only have one spot to update.
 ns_system_x86_64_linux_module_route:
 	leaq ns_system_x86_64_linux_module_begin(%rip), %r11
 	addq %r11, %rax
