@@ -10,14 +10,19 @@
 
 .global ns_util_module_begin  # This jumps to ‘route’ too if you call it.
 ns_util_module_begin:
-	.byte 0xEB, 0x1E  # skip 30 bytes (jump) if execution begins here.
+	.byte 0xEB, 0x36  # skip 54 bytes (jump) if execution begins here.
 	.byte 0x90, 0xF4, 0x00, 0x0E  # Pad to 8 bytes, and 0x0E is like a version.
 	.byte 0x00, 0x00
-	.quad 0
-	.quad 0
-.global ns_util_module_size  # Should be at offset 8 relative to ‘begin’!
-ns_util_module_size:
-	.quad (ns_util_module_end - ns_util_module_begin)
+.global ns_util_module_size
+.set ns_util_module_size, (ns_util_module_end - ns_util_module_begin)
+.global ns_util_module_size_field  # Should be at offset 8 relative to ‘begin’!
+ns_util_module_size_field:
+	.quad (ns_util_module_end - ns_util_module_begin)  # Size.
+	.quad 0x1324ABBC  # ABI.
+	.quad 0  # Module hash.
+	.quad 0  # Size of the module name string.
+	.quad 0  # Module-relative offset to the siz of the module name string.
+	.quad 0  # Header terminating null.
 # Indirectly call an action in this module.
 #
 # Parameters:
@@ -43,7 +48,7 @@ ns_util_module_size:
 # (e.g. maybe you want to copy a module instance somewhere else), it helps to
 # only refer to ‘module_begin’ for other modules in one place, so that when
 # re-linking things, you only have one spot to update.
-ns_util_module_route:
+ns_util_module_route:  # Must be at offset 54.
 	leaq ns_util_module_begin(%rip), %r11
 	addq %r11, %rax
 	jmpq *%rax
@@ -54,8 +59,10 @@ ns_util_module_route:
 _system:
 	jmp ns_system_x86_64_linux_module_begin
 	nop
+	hlt
 
 _mod_dep_end:
+.quad 0x12342345
 .quad 0
 
 # Now the .data stuffs.
