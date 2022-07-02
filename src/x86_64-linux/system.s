@@ -27,7 +27,7 @@ ns_system_x86_64_linux_module_begin:
 ns_system_x86_64_linux_module_size_field:
 	.quad (ns_system_x86_64_linux_module_end - ns_system_x86_64_linux_module_begin)  # Size.
 	.quad 0x1324ABBC  # ABI.
-	.quad 0  # Module hash.
+	.quad 0  # Module hash, sha256sum of module string with a NULL hash field and NULL external module references.  TODO; just 0 until implemented.
 	.quad 0  # Size of the module name string.
 	.quad 0  # Module-relative offset to the siz of the module name string.
 	.quad 0  # Header terminating null.
