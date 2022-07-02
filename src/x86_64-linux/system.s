@@ -1140,7 +1140,7 @@ ns_system_x86_64_linux_monotonic_nanosleep:
 	movq %r8, %rdx  # const struct timespec *request
 	movq $0, %rsi  # int flags = 0
 	movq $1, %rdi  # clockid_t clockid = CLOCK_MONOTONIC
-	movq $227, %rax  # clock_nanosleep
+	movq $230, %rax  # clock_nanosleep
 	syscall
 
 	# Verify.

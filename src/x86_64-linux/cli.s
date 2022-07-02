@@ -116,6 +116,22 @@ ns_cli_cli:
 9:
 	nop
 
+	# Make sure we can sleep for a nanosecond.
+	movq $1, %rdx  # 1ns
+	movq $0, %rsi
+	leaq 9f(%rip), %rdi
+	jmp ns_system_x86_64_linux_monotonic_nanosleep  # TODO
+9:
+	nop
+
+	# Make sure we can sleep for 0 nanoseconds.
+	movq $0, %rdx  # 0ns
+	movq $0, %rsi
+	leaq 9f(%rip), %rdi
+	jmp ns_system_x86_64_linux_monotonic_nanosleep  # TODO
+9:
+	nop
+
 	# Uncomment the jmp to sleep for 2.5 seconds.
 	movq $500000000, %rdx  # 500ms
 	movq $2, %rsi
