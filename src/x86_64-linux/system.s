@@ -1523,7 +1523,7 @@ _ns_system_x86_64_linux_trap_segv:
 	leaq ns_system_x86_64_linux_sigaction_static_set_segv(%rip), %rsi
 	movq $0, %rdx
 	movq $8, %r10  # sizeof sigset_t: 128, but we'll just use 0.  Weird, disas glibc .so has this set to 8, and that made it progress further.  Whatever, so it's 8, not 0 or 128.
-	movq $13, %rax  # rt_sigaction
+	movq $13, %rax  # rt_sigaction  (x32 has a different number.)
 	syscall
 
 	# Verify.
@@ -1568,7 +1568,7 @@ _ns_system_x86_64_linux_restore_trap_segv:
 	leaq ns_system_x86_64_linux_sigaction_restore_segv(%rip), %rsi
 	movq $0, %rdx
 	movq $8, %r10  # sizeof sigset_t: 128, but we'll just use 0.  Weird, disas glibc .so has this set to 8, and that made it progress further.  Whatever, so it's 8, not 0 or 128.
-	movq $13, %rax  # rt_sigaction
+	movq $13, %rax  # rt_sigaction  (x32 has a different number.)
 	syscall
 
 	# Verify.
