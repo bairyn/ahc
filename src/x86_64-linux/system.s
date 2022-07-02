@@ -10,11 +10,44 @@
 # Configure the platform.
 .code64
 
-# TODO: move .data to .text and let system module be exported, possibly useful
-# as part of a compiled RTS.  ‘For portable use of this module, don't call
-# anything here directly, but only use it through X(TODO).’.
+# We could have ‘.data’ here, but for modularity and portability, put all of
+# this module in the same section, so it can be e.g. copied and referenced from
+# a common base point, ‘module_begin’, with ‘module_size’.  (E.g. possibly use
+# this as part of a compiled RTS.)
+#.data
+.text
+.global ns_system_x86_64_linux_module_begin  # This jumps to ‘route’ too if you call it.
+ns_system_x86_64_linux_module_begin:
+	.byte 0xEB, 0x0E  # skip 14 bytes (jump) if execution begins here.
+	.byte 0x90, 0x00, 0x00, 0x00  # Pad to 8 bytes.
+	.byte 0x00, 0x00
+.global ns_system_x86_64_linux_module_size  # Should be at offset 8 relative to ‘begin’!
+ns_system_x86_64_linux_module_size:
+	.quad (ns_system_x86_64_linux_module_end - ns_system_x86_64_linux_module_begin)
+# Indirectly call an action in this module.
+#
+# Parameters:
+# 	%rax:
+# 		The offset relative to ‘begin’ of the module action to call.
+#
+# 		You can set this to e.g. ‘ns_system_x86_64_linux_fork_require - ns_system_x8_64_linux_fork_begin’.
+# 		See also https://stackoverflow.com/a/43768528 .
+#
+# Clobbers %r11 (plus anything the module action clobbers).
+#
+# This implementation is simple enough that you could probably reproduce it on
+# the caller's side.  However, this pattern might be extended to provide
+# arguments to other modules (other modules' ‘module_begin’s) so that we may
+# perform our own run-time linking.
+#
+# However, the ‘system’ module itself does not depend on other modules.
+ns_system_x86_64_linux_module_route:
+	leaq ns_system_x86_64_linux_module_begin(%rip), %r11
+	addq %r11, %rax
+	jmp *%rax
+	nop
 
-.data
+# Now the .data stuffs.
 
 # 152 bytes of data to restore segv trap.
 ns_system_x86_64_linux_sigaction_restore_segv:
@@ -1359,3 +1392,6 @@ ns_system_x86_64_linux_restore_trap_segv:
 	movq %r8, %rdi
 	jmp *%rdi
 	nop
+
+.global ns_system_x86_64_linux_module_end
+ns_system_x86_64_linux_module_end:

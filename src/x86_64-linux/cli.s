@@ -37,7 +37,14 @@ ns_cli_cli:
 	movq $8388608, %rsi  # Get 1MiB.
 	#movq $8388607, %rsi  # Uncomment to a not-divisible-by-8 error.
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_base_malloc_require
+	# Here, we just illustrate how ‘module_begin’ can be used to redirect
+	# relative calls.  For now we'll probably just leave the other calls as
+	# they are.
+	#jmp ns_system_x86_64_linux_base_malloc_require  # Just calling directly.
+	leaq ns_system_x86_64_linux_base_malloc_require(%rip), %rax
+	leaq ns_system_x86_64_linux_module_begin(%rip), %rdx
+	subq %rdx, %rax
+	jmp *%rdx
 9:
 	nop
 
