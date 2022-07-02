@@ -55,6 +55,13 @@ ns_system_x86_64_linux_module_route:
 	jmpq *%rax
 	nop
 
+# Module dependencies.  Run-time re-linking and relocation will need to handle
+# this.
+# (‘system’ depends on no other module.)
+
+_mod_dep_end:
+.quad 0
+
 # Now the .data stuffs.
 
 # 152 bytes of data to restore segv trap.

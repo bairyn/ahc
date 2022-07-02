@@ -47,6 +47,15 @@ ns_util_module_route:
 	jmpq *%rax
 	nop
 
+# Module dependencies.  Run-time re-linking and relocation will need to handle
+# this.
+_system:
+	jmp ns_system_x86_64_linux_module_begin
+	nop
+
+_mod_dep_end:
+.quad 0
+
 # Now the .data stuffs.
 
 ns_util_err_msg_not_writeable_size:
@@ -94,7 +103,7 @@ _ns_util_system_verify_writeable:
 	movq $0, %rdx
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_trap_segv, %rax
-	jmp ns_system_x86_64_linux_module_begin
+	jmp _system
 9:
 	nop
 
@@ -120,7 +129,7 @@ _ns_util_system_verify_writeable:
 	leaq ns_util_err_msg_not_writeable_size(%rip), %rdx
 	movq (%rdx), %rdx
 	movq $ns_system_x86_64_linux_exit_custom, %rax
-	jmp ns_system_x86_64_linux_module_begin
+	jmp _system
 	nop
 	hlt
 1:
@@ -128,7 +137,7 @@ _ns_util_system_verify_writeable:
 	# Okay, now restore the default SEGV trap.
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_restore_trap_segv, %rax
-	jmp ns_system_x86_64_linux_module_begin
+	jmp _system
 9:
 	nop
 
