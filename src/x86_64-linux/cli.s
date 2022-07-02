@@ -83,7 +83,7 @@ todo:
 ns_cli_err_msg_memory_preliminary_checks_size:
 	.quad (ns_cli_err_msg_memory_preliminary_checks_end - ns_cli_err_msg_memory_preliminary_checks)
 ns_cli_err_msg_memory_preliminary_checks:
-	.ascii "cli startup error: prelimary base malloc and mfree checks failed; could not validate we have a working memory management system.\n"
+	.ascii "Error: cli startup error: prelimary base malloc and mfree checks failed; could not validate we have a working memory management system.\n"
 	.byte 0x00
 ns_cli_err_msg_memory_preliminary_checks_end:
 

@@ -104,6 +104,7 @@ ns_system_x86_64_linux_sigaction_static_set_segv_data:
 ns_system_x86_64_linux_err_msg_segv_trap_set_size:
 	.quad (ns_system_x86_64_linux_err_msg_segv_trap_set_end - ns_system_x86_64_linux_err_msg_segv_trap_set)
 ns_system_x86_64_linux_err_msg_segv_trap_set:
+	# (Will get an ‘Error: ’-like prefix.)
 	.ascii "segv trap set error: rt_sigaction failed!  Could not trap SIGSEGV.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_segv_trap_set_end:
@@ -111,6 +112,7 @@ ns_system_x86_64_linux_err_msg_segv_trap_set_end:
 ns_system_x86_64_linux_err_msg_segv_trap_restore_size:
 	.quad (ns_system_x86_64_linux_err_msg_segv_trap_restore_end - ns_system_x86_64_linux_err_msg_segv_trap_restore)
 ns_system_x86_64_linux_err_msg_segv_trap_restore:
+	# (Will get an ‘Error: ’-like prefix.)
 	.ascii "segv trap set error: rt_sigaction failed!  Could not restore SIGSEGV handler.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_segv_trap_restore_end:
@@ -138,28 +140,29 @@ ns_system_x86_64_linux_syscall_verify_builder_end:
 ns_system_x86_64_linux_err_msg_fork_join_unknown_code_size:
 	.quad (ns_system_x86_64_linux_err_msg_fork_join_unknown_code_end - ns_system_x86_64_linux_err_msg_fork_join_unknown_code)
 ns_system_x86_64_linux_err_msg_fork_join_unknown_code_u_offset:
-	.quad 22
+	.quad 29
 ns_system_x86_64_linux_err_msg_fork_join_unknown_code_u_size:
 	.quad 10
 ns_system_x86_64_linux_err_msg_fork_join_unknown_code:
-	.ascii "fork join error (code           ): the ‘waitid’ syscall gave us a ‘code’ siginfo_t attribute that we don't recognize.\n"
+	.ascii "Error: fork join error (code           ): the ‘waitid’ syscall gave us a ‘code’ siginfo_t attribute that we don't recognize.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_fork_join_unknown_code_end:
 
 ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_size:
 	.quad (ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_end - ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch)
 ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch:
-	.ascii "fork join error: the return address or %rip-based location appears to be clobbered after the ‘waitid’ syscall!\n"
+	.ascii "Error: fork join error: the return address or %rip-based location appears to be clobbered after the ‘waitid’ syscall!\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_end:
 
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure_size:
 	.quad (ns_system_x86_64_linux_err_msg_fork_join_exited_failure_end - ns_system_x86_64_linux_err_msg_fork_join_exited_failure)
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_offset:
-	.quad 22
+	.quad 29
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_size:
 	.quad 3
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure:
+	# (Will get an ‘Error: ’-like prefix.)
 	.ascii "fork join error (code    ): the ‘waitid’ syscall revealed a child process exited with a non-zero exit code!\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure_end:
@@ -167,17 +170,18 @@ ns_system_x86_64_linux_err_msg_fork_join_exited_failure_end:
 ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_size:
 	.quad (ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_end - ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo)
 ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_u_offset:
-	.quad 23
+	.quad 30
 ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_u_size:
 	.quad 3
 ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo:
-	.ascii "fork join error (signo    ): the ‘waitid’ syscall gave us a signo we don't recognize!  Should be SIGCHLD = 17.\n"
+	.ascii "Error: fork join error (signo    ): the ‘waitid’ syscall gave us a signo we don't recognize!  Should be SIGCHLD = 17.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_end:
 
 ns_system_x86_64_linux_err_msg_fork_join_waitid_size:
 	.quad (ns_system_x86_64_linux_err_msg_fork_join_waitid_end - ns_system_x86_64_linux_err_msg_fork_join_waitid)
 ns_system_x86_64_linux_err_msg_fork_join_waitid:
+	# (Will get an ‘Error: ’-like prefix.)
 	.ascii "fork join error: the ‘waitid’ syscall failed!\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_fork_join_waitid_end:
@@ -185,6 +189,7 @@ ns_system_x86_64_linux_err_msg_fork_join_waitid_end:
 ns_system_x86_64_linux_err_msg_clock_nanosleep_size:
 	.quad (ns_system_x86_64_linux_err_msg_clock_nanosleep_end - ns_system_x86_64_linux_err_msg_clock_nanosleep)
 ns_system_x86_64_linux_err_msg_clock_nanosleep:
+	# (Will get an ‘Error: ’-like prefix.)
 	.ascii "monotonic_nanosleep error: the ‘clock_nanosleep’ syscall failed!  Failed to sleep.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_clock_nanosleep_end:
@@ -213,6 +218,7 @@ ns_system_x86_64_linux_memory_pointer:
 ns_system_x86_64_linux_err_msg_base_malloc_error_size:
 	.quad (ns_system_x86_64_linux_err_msg_base_malloc_error_end - ns_system_x86_64_linux_err_msg_base_malloc_error)
 ns_system_x86_64_linux_err_msg_base_malloc_error:
+	# (Will get an ‘Error: ’-like prefix.)
 	.ascii "base malloc error: mmap() failed!  Could not allocate memory.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_base_malloc_error_end:
@@ -220,6 +226,7 @@ ns_system_x86_64_linux_err_msg_base_malloc_error_end:
 ns_system_x86_64_linux_err_msg_base_mfree_error_size:
 	.quad (ns_system_x86_64_linux_err_msg_base_mfree_error_end - ns_system_x86_64_linux_err_msg_base_mfree_error)
 ns_system_x86_64_linux_err_msg_base_mfree_error:
+	# (Will get an ‘Error: ’-like prefix.)
 	.ascii "base mfree error: munmap() failed!  Could not free memory.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_base_mfree_error_end:
@@ -227,14 +234,14 @@ ns_system_x86_64_linux_err_msg_base_mfree_error_end:
 ns_system_x86_64_linux_err_msg_base_malloc_4th_size:
 	.quad (ns_system_x86_64_linux_err_msg_base_malloc_4th_end - ns_system_x86_64_linux_err_msg_base_malloc_4th)
 ns_system_x86_64_linux_err_msg_base_malloc_4th:
-	.ascii "base malloc argument error: the 4th argument must be zero!  Could not allocate memory.\n"
+	.ascii "Error: base malloc argument error: the 4th argument must be zero!  Could not allocate memory.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_base_malloc_4th_end:
 
 ns_system_x86_64_linux_err_msg_base_mfree_5th_size:
 	.quad (ns_system_x86_64_linux_err_msg_base_mfree_5th_end - ns_system_x86_64_linux_err_msg_base_mfree_5th)
 ns_system_x86_64_linux_err_msg_base_mfree_5th:
-	.ascii "base mfree argument error: the 5th argument must be zero!  Could not free memory.\n"
+	.ascii "Error: base mfree argument error: the 5th argument must be zero!  Could not free memory.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_base_mfree_5th_end:
 
@@ -248,14 +255,14 @@ ns_system_x86_64_linux_err_msg_base_malloc_enomem_end:
 ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size:
 	.quad (ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_end - ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible)
 ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible:
-	.ascii "base malloc error: invalid base_malloc arguments: the requested bits must be divisible by 8; be sure to specify length in bits, not bytes!  Could not allocate memory.\n"
+	.ascii "Error: base malloc error: invalid base_malloc arguments: the requested bits must be divisible by 8; be sure to specify length in bits, not bytes!  Could not allocate memory.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_end:
 
 ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_size:
 	.quad (ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_end - ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible)
 ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible:
-	.ascii "base mfree error: invalid base_mfree arguments: the requested bits must be divisible by 8; be sure to specify length in bits, not bytes!  Could not free memory.\n"
+	.ascii "Error: base mfree error: invalid base_mfree arguments: the requested bits must be divisible by 8; be sure to specify length in bits, not bytes!  Could not free memory.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_end:
 
@@ -265,6 +272,72 @@ ns_system_x86_64_linux_err_msg_fork:
 	.ascii "fork error: the ‘fork()’ syscall failed!  Could not fork.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_fork_end:
+
+ns_system_x86_64_linux_err_msg_new_writer_r8_not_zero_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_r8_not_zero_end - ns_system_x86_64_linux_err_msg_new_writer_r8_not_zero)
+ns_system_x86_64_linux_err_msg_new_writer_r8_not_zero:
+	.ascii "Error: ‘new_writer’ error: %r8 should be 0 but is not!  Please set the arguments correctly.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_r8_not_zero_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_end - ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero)
+ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero:
+	.ascii "Error: ‘new_reader’ error: %r8 should be 0 but is not!  Please set the arguments correctly.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_end:
+
+ns_system_x86_64_linux_err_msg_new_writer_open_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_open_failed_end - ns_system_x86_64_linux_err_msg_new_writer_open_failed)
+ns_system_x86_64_linux_err_msg_new_writer_open_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_writer’ error: the ‘open’ syscall failed!  Could not create the new writer.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_open_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_open_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_open_failed_end - ns_system_x86_64_linux_err_msg_new_reader_open_failed)
+ns_system_x86_64_linux_err_msg_new_reader_open_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ error: the ‘open’ syscall failed!  Could not create the new reader.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_open_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_end - ns_system_x86_64_linux_err_msg_new_writer_unsupported_options)
+ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_offset:
+	.quad 16
+ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_size:
+	.quad 20
+ns_system_x86_64_linux_err_msg_new_writer_unsupported_options:
+	.ascii "Error (bitfield                     ): ‘new_writer’ error: %rcx has unsupported options bits enabled!  Please set the arguments correctly.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_end - ns_system_x86_64_linux_err_msg_new_reader_unsupported_options)
+ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_offset:
+	.quad 16
+ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_size:
+	.quad 20
+ns_system_x86_64_linux_err_msg_new_reader_unsupported_options:
+	.ascii "Error (bitfield                     ): ‘new_reader’ error: %rcx has unsupported options bits enabled!  Please set the arguments correctly.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_end:
+
+ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_end - ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated)
+ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated:
+	.ascii "Error: ‘new_writer’ error: the pathname should be null-terminated but is not!  Please set the arguments correctly.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated_end - ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated)
+ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated:
+	.ascii "Error: ‘new_reader’ error: the pathname should be null-terminated but is not!  Please set the arguments correctly.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated_end:
 
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
@@ -1084,6 +1157,8 @@ ns_system_x86_64_linux_fork_join:
 # 					      timeout, 1 to enable timeout.
 # 					%rsi: Seconds for the timeout (i64).
 # 					%rdx: Nanoseconds for the timeout (i64).
+# 					%rcx: Please set to 0, to make future enhancements more
+# 					      convenient.
 # 				%rsi: User data.
 # 			%rcx: user data supplied to %rdx as a closure
 # 			%r8: Number of bytes to request a write for (i.e., the size).
@@ -1091,11 +1166,177 @@ ns_system_x86_64_linux_fork_join:
 # 		%r8: currently 0, in case future versions want to add functionality.
 # 	%rsi: Size of filepath.
 # 	%rdx: Pointer to filepath.
-# 	%rcx: Please set to 0, so that future versions can accept an extra
-# 	      parameter if needed, e.g. for I/O options.
+# 	%rcx: Options bitfield:
+# 		Bit 0: autoclose: 0 does nothing, and 1 overrides other conflicting
+# 		                  options for handling already-existing files and
+# 		                  automatically closes the writer if the file already
+# 		                  exists.  The ‘noclobber’ flag.
+# 		Bit 1: append: if the file already exists, append writes instead of
+# 		               overwriting or discarding the original file, if 1;
+# 		               if 0, work as though this writer replaces anything
+# 		               already there.
+# 		Rest: set to 0.
+# 	%r8: Please set to 0, so that future versions can accept an extra
+# 	     parameter if needed, e.g. for I/O options.
+#
+# Since the stack is used, this preserves (but would otherwise clobber) all
+# syscall registers (%rax, %rcx, %r11, %r10) and parameter registers (%rdi,
+# %rsi, %rdx, %rcx, %r8, %r9):
+# 	- %rax
+# 	- %rcx
+# 	- %r11
+# 	- %r10 (syscall parameter)
+# 	- %rdi
+# 	- %rsi
+# 	- %rdx
+# 	- %rcx
+# 	- %r8
+# 	- %r9
+#
+# This action requires the stack in order for its memory requirements.
 .global ns_system_x86_64_linux_new_writer
 .set ns_system_x86_64_linux_new_writer, (_ns_system_x86_64_linux_new_writer - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_new_writer:
+	# TODO
+	nop
+	jmp _ns_system_x86_64_linux_exit_failure
+	nop
+	hlt
+
+	# First backup the input arguments and what we clobber onto the stack.
+
+	subq $16, %rsp
+	movq %rax, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	subq $16, %rsp
+	movq %r11, 8(%rsp)
+	movq %r10, 0(%rsp)
+
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	subq $16, %rsp
+	movq %r8, 8(%rsp)
+	movq %r9, 0(%rsp)
+
+	# Next just perform a few checks.
+
+	# Make sure %r8 is 0.
+	testq %r8, %r8
+	jz 0f
+	# Error: invalid arguments.
+	movq $2, %rdi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rdx
+	movq (%rdx), %rdx
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# Now we can clear %r8, discard it and use it for our own purposes, since
+	# we can restore it to $0.
+	movq %r8, %r8
+
+	# Make sure unsupported bits in the options bitfield are 0, to aid in
+	# future enhancements.
+	testq $0xFFFFFFFFFFFFFFFC, %rcx
+	jz 0f
+
+	# Error: invalid arguments.
+
+	# First, write to this instance's error message storage to print the
+	# exit code, so that the last code gets written.
+	movq %rdi, %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_size(%rip), %rdx
+	movq (%rdx), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_offset(%rip), %rsi
+	movq (%rsi), %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_print_u64
+9:
+	nop
+
+	# Error.
+	movq $2, %rdi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_size(%rip), %rdx
+	movq (%rdx), %rdx
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# Ensure the filepath is null-terminated.
+	movq 24(%rsp), %rdx  # Data.
+	movq 32(%rsp), %rsi  # Size.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_is_null_terminated
+9:
+	testq %rdi, %rdi
+	jnz 0f
+1:
+	# Error: the filepath is not null-terminated.
+	movq $2, %rdi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rdx
+	movq (%rdx), %rdx
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# TODO
+
+	# Perform the syscall.
+	# TODO
+	#movq %r10, %r10  # struct timespec *remain
+	#movq %r8, %rdx  # const struct timespec *request
+	#movq $0, %rsi  # int flags = 0
+	#movq $1, %rdi  # clockid_t clockid = CLOCK_MONOTONIC
+	movq $2, %rax  # open
+	syscall
+
+	# Verify.
+	movq %rax, %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_open_failed(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_open_failed_size(%rip), %rcx
+	movq (%rcx), %rcx
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Restore the working storage units and the stack.
+
+	movq 0(%rsp), %r9
+	movq 8(%rsp), %r8
+	addq $16, %rsp
+
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rdx
+	addq $16, %rsp
+
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	movq 0(%rsp), %r10
+	movq 8(%rsp), %r11
+	addq $16, %rsp
+
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rax
+	addq $16, %rsp
+
+	# TODO: Return.
+
 	# TODO
 	nop
 	jmp _ns_system_x86_64_linux_exit_failure
@@ -1176,6 +1417,8 @@ _ns_system_x86_64_linux_new_writer:
 # 					      timeout, 1 to enable timeout.
 # 					%rsi: Seconds for the timeout (i64).
 # 					%rdx: Nanoseconds for the timeout (i64).
+# 					%rcx: Please set to 0, to make future enhancements more
+# 					      convenient.
 # 				%rsi: User data.
 # 			%rcx: user data supplied to %rdx as a closure
 # 			%r8: Tuple for remaining read parameters, with parameters:
@@ -1191,11 +1434,161 @@ _ns_system_x86_64_linux_new_writer:
 # 		%r8: currently 0, in case future versions want to add functionality.
 # 	%rsi: Size of filepath.
 # 	%rdx: Pointer to filepath.
-# 	%rcx: Please set to 0, so that future versions can accept an extra
-# 	      parameter if needed, e.g. for I/O options.
+# 	%rcx: Options bitfield:
+# 		(Nothing.)
+# 		Rest: set to 0.
+# 	%r8: Please set to 0, so that future versions can accept an extra
+# 	     parameter if needed, e.g. for I/O options.
+#
+# Since the stack is used, this preserves (but would otherwise clobber) all
+# syscall registers (%rax, %rcx, %r11, %r10) and parameter registers (%rdi,
+# %rsi, %rdx, %rcx, %r8, %r9):
+# 	- %rax
+# 	- %rcx
+# 	- %r11
+# 	- %r10 (syscall parameter)
+# 	- %rdi
+# 	- %rsi
+# 	- %rdx
+# 	- %rcx
+# 	- %r8
+# 	- %r9
+#
+# This action requires the stack in order for its memory requirements.
 .global ns_system_x86_64_linux_new_reader
 .set ns_system_x86_64_linux_new_reader, (_ns_system_x86_64_linux_new_reader - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_new_reader:
+	# TODO
+	nop
+	jmp _ns_system_x86_64_linux_exit_failure
+	nop
+	hlt
+
+	# First backup the input arguments and what we clobber onto the stack.
+
+	subq $16, %rsp
+	movq %rax, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	subq $16, %rsp
+	movq %r11, 8(%rsp)
+	movq %r10, 0(%rsp)
+
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	subq $16, %rsp
+	movq %r8, 8(%rsp)
+	movq %r9, 0(%rsp)
+
+	# Next just perform a few checks.
+
+	# Make sure %r8 is 0.
+	testq %r8, %r8
+	jz 0f
+	# Error: invalid arguments.
+	movq $2, %rdi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rdx
+	movq (%rdx), %rdx
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# Now we can clear %r8, discard it and use it for our own purposes, since
+	# we can restore it to $0.
+	movq %r8, %r8
+
+	# Make sure unsupported bits in the options bitfield are 0, to aid in
+	# future enhancements.
+	testq $0xFFFFFFFFFFFFFFFF, %rcx
+	jz 0f
+	# Error: invalid arguments.
+
+	# First, write to this instance's error message storage to print the
+	# exit code, so that the last code gets written.
+	movq %rdi, %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_size(%rip), %rdx
+	movq (%rdx), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_offset(%rip), %rsi
+	movq (%rsi), %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_print_u64
+9:
+	nop
+
+	# Error.
+	movq $2, %rdi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_size(%rip), %rdx
+	movq (%rdx), %rdx
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# Ensure the filepath is null-terminated.
+	movq 24(%rsp), %rdx  # Data.
+	movq 32(%rsp), %rsi  # Size.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_is_null_terminated
+9:
+	testq %rdi, %rdi
+	jnz 0f
+1:
+	# Error: the filepath is not null-terminated.
+	movq $2, %rdi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rdx
+	movq (%rdx), %rdx
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# Perform the syscall.
+	# TODO
+
+	# Verify.
+	movq %rax, %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_open_failed(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_open_failed_size(%rip), %rcx
+	movq (%rcx), %rcx
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Restore the working storage units and the stack.
+
+	movq 0(%rsp), %r9
+	movq 8(%rsp), %r8
+	addq $16, %rsp
+
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rdx
+	addq $16, %rsp
+
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	movq 0(%rsp), %r10
+	movq 8(%rsp), %r11
+	addq $16, %rsp
+
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rax
+	addq $16, %rsp
+
+	# TODO: Return.
+
 	# TODO
 	nop
 	jmp _ns_system_x86_64_linux_exit_failure
@@ -1640,6 +2033,49 @@ _ns_system_x86_64_linux_verify_errno:
 0:
 	# Return normally.
 	jmpq *%rdi
+	nop
+
+# Utility to determine whether a string is null-terminated.
+#
+# Parameters:
+# 	%rdi: Return, with parameters:
+# 		%rdi: 0 if not null-terminated, 1 if null-terminated.
+# 		%rsi: if null-terminated, what the offset is to the null byte.
+# 	%rsi: Size of data to scan.
+# 	%rdx: Data to scan (pointer to a string).
+#
+# This clobbers %rdi, %rsi, %rdx, %rcx, and %r8.
+.global ns_system_x86_64_linux_is_null_terminated
+.set ns_system_x86_64_linux_is_null_terminated, (_ns_system_x86_64_linux_is_null_terminated - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_is_null_terminated:
+	# Back up original size.
+	movq %rsi, %r8
+
+1:
+	# Finished scanning without a detection?
+	testq %rsi, %rsi
+	jz 0f
+
+	# Null byte detected here?
+	movq (%rdx), %rcx
+	testq %rcx, %rcx
+	jnz 2f
+3:
+	# Not a null byte here; keep scanning.
+	dec %rsi
+	inc %rdx
+2:
+	# We found a null byte here.
+	subq %rsi, %r8
+	movq %r8, %rsi  # Got offset.
+	movq $1, %rdx  # 1: it's null-terminated.
+	xchgq %rdx, %rdi
+	jmpq *%rdx
+0:
+	# No null byte found.
+	movq $0, %rsi
+	xchgq %rsi, %rdi
+	jmpq *%rsi
 	nop
 
 # An optional segv trap handler that hands off execution to what was statically
