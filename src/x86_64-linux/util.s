@@ -18,6 +18,8 @@ ns_util_err_msg_not_writeable_end:
 
 # Can we return?
 # 	%rdi: return
+#
+# Clobbers nothing.
 .global ns_ahc_can_cont
 ns_ahc_can_cont:
 	jmp *%rdi
@@ -27,6 +29,12 @@ ns_ahc_can_cont:
 # For segv handling, only call this once per process instantion (maybe this
 # requirement may be removed with further enhancements in the future).
 # 	%rdi: return
+#
+# (I'm trying to keep dependence on the stack at a minimum, but %rsp is used
+# here mainly because it was convenient to have more storage space, so this
+# procedure assumes at least that %rsp maintains a valid stack.)
+#
+# Clobbers TODO.
 .global ns_ahc_system_verify_writeable
 ns_ahc_system_verify_writeable:
 	# Backup return.
@@ -37,8 +45,9 @@ ns_ahc_system_verify_writeable:
 	# SEGV.
 	leaq 0f(%rip), %rsi
 	movq $0, %rdx
-	leaq 5(%rip), %rdi
+	leaq 9f(%rip), %rdi
 	jmp ns_system_x86_64_linux_trap_segv
+9:
 	nop
 
 	# Patch the machine code between local symbols 0 and 1 (see
@@ -63,13 +72,14 @@ ns_ahc_system_verify_writeable:
 	leaq ns_util_err_msg_not_writeable_size(%rip), %rdx
 	movq (%rdx), %rdx
 	jmp ns_system_x86_64_linux_exit_custom
-	hlt
 	nop
+	hlt
 1:
 
 	# Okay, now restore the default SEGV trap.
-	leaq 5(%rip), %rdi
+	leaq 9f(%rip), %rdi
 	jmp ns_system_x86_64_linux_restore_trap_segv
+9:
 	nop
 
 	# (Uncomment this to trigger a segfault to make sure it's actually being
