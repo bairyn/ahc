@@ -149,6 +149,13 @@ ns_system_x86_64_linux_err_msg_fork_join_waitid:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_fork_join_waitid_end:
 
+ns_system_x86_64_linux_err_msg_clock_nanosleep_size:
+	.quad (ns_system_x86_64_linux_err_msg_clock_nanosleep_end - ns_system_x86_64_linux_err_msg_clock_nanosleep)
+ns_system_x86_64_linux_err_msg_clock_nanosleep:
+	.ascii "monotonic_nanosleep error: the ‘clock_nanosleep’ syscall failed!  Failed to sleep.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_clock_nanosleep_end:
+
 # Utility: digits
 ns_system_x86_64_linux_util_digits:
 .ascii "0123456789ABCDEF"
@@ -1067,6 +1074,140 @@ ns_system_x86_64_linux_cc_call_stack_return:
 	#addq $8, %rsp
 	#jmp *%rdi
 	#nop
+
+# clock_nanosleep the given number of nanoseconds against the CLOCK_MONOTONIC=1
+# clock.
+#
+# Parameters:
+# 	%rdi: Return.
+# 	%rsi: i64 seconds.
+# 	%rdx: i64 nanoseconds.
+#
+# Note: this depends on a working stack and uses stack space to give the kernel
+# a place to store timespec output we need.
+#
+# For convenience, since the stack is used, it is also used to preserve all
+# registers.  (Not required, since conventionally the registers we use here are
+# all caller-preserved.)
+#
+# This clobbers nothing.
+.global ns_system_x86_64_linux_monotonic_nanosleep
+ns_system_x86_64_linux_monotonic_nanosleep:
+	# timespec is a pair of signed longs: seconds and nanoseconds.
+
+	# Backup %rax.
+	subq $16, %rsp
+	# 8(%rsp): padding.
+	movq %rax, 0(%rsp)
+
+	# Backup %rcx and %r11.
+	subq $16, %rsp
+	movq %rcx, 8(%rsp)
+	movq %r11, 0(%rsp)
+
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+
+	# Backup %rdx and %r10.
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %r10, 0(%rsp)
+
+	# Backup %r8.
+	subq $16, %rsp
+	# 8(%rsp): padding.
+	movq %r8, 0(%rsp)
+
+	# Get non-register working storage units for the request timespec struct
+	# too.
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)  # i64 nanoseconds.
+	movq %rsi, 0(%rsp)  # i64 seconds.
+	movq %rsp, %r8      # Request.
+
+	# Clobber buffer cushion.
+	subq $16, %rsp
+
+	# Reserve space for the syscall's time remaining output.
+	subq $16, %rsp
+	movq %rsp, %r10  # Track struct to hold remaining sleep.
+
+1:
+	# Perform the syscall.
+	movq %r10, %r10  # struct timespec *remain
+	movq %r8, %rdx  # const struct timespec *request
+	movq $0, %rsi  # int flags = 0
+	movq $1, %rdi  # clockid_t clockid = CLOCK_MONOTONIC
+	movq $227, %rax  # clock_nanosleep
+	syscall
+
+	# Verify.
+	movq %rax, %rsi
+	leaq ns_system_x86_64_linux_err_msg_clock_nanosleep(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_clock_nanosleep_size(%rip), %rcx
+	movq (%rcx), %rcx
+	leaq 9f(%rip), %rdi
+	jmp ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# The syscall returns 0 when it's successfully completed the duration of
+	# sleep.  Otherwise it was interrupted and we'll need to resume the sleep.
+	#
+	# So check %rax.
+	testq %rax, %rax
+	jz 0f
+
+	# Okay, copy ‘remain’ into ‘request’ and resume the sleep.
+	movq 0(%r10), %rdi
+	movq 8(%r10), %rsi
+	movq %rdi, 0(%r8)
+	movq %rsi, 8(%r8)
+
+	jmp 1b
+0:
+
+	# Restore stack and storage units.
+
+	# Clear time remaining space.
+	addq $16, %rsp
+
+	# Pop the clobber buffer.
+	addq $16, %rsp
+
+	# Pop request.
+	addq $16, %rsp
+
+	# Restore %r8.
+	# 8(%rsp): padding.
+	movq 0(%rsp), %r8
+	addq $16, %rsp
+
+	# Restore %r10 and %rdx.
+	movq 0(%rsp), %r10
+	movq 8(%rsp), %rdx
+	addq $16, %rsp
+
+	# Restore %rsi and %rdi.
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	# Restore %r11 and %rcx.
+	movq 0(%rsp), %r11
+	movq 8(%rsp), %rcx
+	addq $16, %rsp
+
+	# Restore %rax.
+	# 8(%rsp): padding.
+	movq 0(%rsp), %rax
+	addq $16, %rsp
+
+	# Return.
+	jmp *%rdi
+	nop
 
 # Utility to write a u64 in ascii.
 #

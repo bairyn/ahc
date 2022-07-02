@@ -38,8 +38,9 @@ ns_ahc_can_cont:
 .global ns_ahc_system_verify_writeable
 ns_ahc_system_verify_writeable:
 	# Backup return.
-	subq $8, %rsp
-	movq %rdi, (%rsp)
+	subq $16, %rsp
+	movq $0, 8(%rsp)  # Padding.
+	movq %rdi, 0(%rsp)
 
 	# First, trap SEGV to print our error message instead just aborting with
 	# SEGV.
@@ -88,8 +89,9 @@ ns_ahc_system_verify_writeable:
 	#movq (%rdi), %rdi
 
 	# Restore return.
-	movq (%rsp), %rdi
-	addq $8, %rsp
+	movq 0(%rsp), %rdi
+	# 8(%rsp): padding.
+	addq $16, %rsp
 
 	# Return.
 	jmp *%rdi
