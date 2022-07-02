@@ -16,6 +16,9 @@ ns_cli_err_msg_memory_preliminary_checks:
 ns_cli_err_msg_memory_preliminary_checks_end:
 
 .text
+# A front-end: the CLI.
+#
+# This doesn't return.
 .global ns_cli_cli
 ns_cli_cli:
 	# Make sure we can return.
@@ -37,14 +40,8 @@ ns_cli_cli:
 	movq $8388608, %rsi  # Get 1MiB.
 	#movq $8388607, %rsi  # Uncomment to a not-divisible-by-8 error.
 	leaq 9f(%rip), %rdi
-	# Here, we just illustrate how ‘module_begin’ can be used to redirect
-	# relative calls.  For now we'll probably just leave the other calls as
-	# they are.
-	#jmp ns_system_x86_64_linux_base_malloc_require  # Just calling directly.
-	leaq ns_system_x86_64_linux_base_malloc_require(%rip), %rax
-	leaq ns_system_x86_64_linux_module_begin(%rip), %rdx
-	subq %rdx, %rax
-	jmp *%rdx
+	movq $ns_system_x86_64_linux_base_malloc_require, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -60,7 +57,8 @@ ns_cli_cli:
 	leaq ns_cli_err_msg_memory_preliminary_checks(%rip), %rsi
 	leaq ns_cli_err_msg_memory_preliminary_checks_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	movq $ns_system_x86_64_linux_exit_custom, %rax
+	jmp ns_system_x86_64_linux_module_begin
 	nop
 	hlt
 1:
@@ -89,7 +87,8 @@ ns_cli_cli:
 	movq %rsi, %rdx
 	movq $8388608, %rsi  # Free our 1MiB allocation.
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_base_malloc_require
+	movq $ns_system_x86_64_linux_base_malloc_require, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -97,7 +96,8 @@ ns_cli_cli:
 1:
 	# A child thread will run this briefly.
 	#jmp 1b  # Uncomment to instead let the thread join hang forever.
-	jmp ns_system_x86_64_linux_exit_success
+	movq $ns_system_x86_64_linux_exit_success, %rax
+	jmp ns_system_x86_64_linux_module_begin
 	nop
 0:
 
@@ -105,7 +105,8 @@ ns_cli_cli:
 	movq $0, %rdx
 	leaq 1b(%rip), %rsi
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_fork_require
+	movq $ns_system_x86_64_linux_fork_require, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -120,7 +121,8 @@ ns_cli_cli:
 	movq $1, %rdx  # 1ns
 	movq $0, %rsi
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_monotonic_nanosleep  # TODO
+	movq $ns_system_x86_64_linux_monotonic_nanosleep, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -128,7 +130,8 @@ ns_cli_cli:
 	movq $0, %rdx  # 0ns
 	movq $0, %rsi
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_monotonic_nanosleep  # TODO
+	movq $ns_system_x86_64_linux_monotonic_nanosleep, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -136,7 +139,8 @@ ns_cli_cli:
 	movq $500000000, %rdx  # 500ms
 	movq $2, %rsi
 	leaq 9f(%rip), %rdi
-	#jmp ns_system_x86_64_linux_monotonic_nanosleep
+	movq $ns_system_x86_64_linux_monotonic_nanosleep, %rax
+	#jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -146,7 +150,8 @@ ns_cli_cli:
 	leaq todo(%rip), %rsi
 	addq $16, %rsi
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_print_u64
+	movq $ns_system_x86_64_linux_print_u64, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -158,7 +163,8 @@ ns_cli_cli:
 	movq $23, %rdx
 	syscall
 
-	jmp ns_system_x86_64_linux_exit_success
+	movq $ns_system_x86_64_linux_exit_success, %rax
+	jmp ns_system_x86_64_linux_module_begin
 	nop
 
 	jmp ns_cli_cli

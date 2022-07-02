@@ -47,7 +47,8 @@ ns_ahc_system_verify_writeable:
 	leaq 0f(%rip), %rsi
 	movq $0, %rdx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_trap_segv
+	movq $ns_system_x86_64_linux_trap_segv, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 
@@ -72,14 +73,16 @@ ns_ahc_system_verify_writeable:
 	leaq ns_util_err_msg_not_writeable(%rip), %rsi
 	leaq ns_util_err_msg_not_writeable_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	movq $ns_system_x86_64_linux_exit_custom, %rax
+	jmp ns_system_x86_64_linux_module_begin
 	nop
 	hlt
 1:
 
 	# Okay, now restore the default SEGV trap.
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_restore_trap_segv
+	movq $ns_system_x86_64_linux_restore_trap_segv, %rax
+	jmp ns_system_x86_64_linux_module_begin
 9:
 	nop
 

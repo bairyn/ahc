@@ -5,3 +5,5 @@
 _ns_main_entry:
 ns_main_main:
 	jmp ns_cli_cli
+	nop
+	hlt

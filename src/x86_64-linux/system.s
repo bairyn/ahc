@@ -247,7 +247,8 @@ ns_system_x86_64_linux_err_msg_fork_end:
 # Parameters:
 # 	%rdi: return
 .global ns_system_x86_64_linux_nop
-ns_system_x86_64_linux_nop:
+.set ns_system_x86_64_linux_nop, (_ns_system_x86_64_linux_nop - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_nop:
 	jmp *%rdi
 	nop
 
@@ -333,7 +334,8 @@ ns_system_x86_64_linux_nop:
 # (However, currently %rsi does happen to be preserved, but this is for the
 # current implementation.)
 .global ns_system_x86_64_linux_base_malloc
-ns_system_x86_64_linux_base_malloc:
+.set ns_system_x86_64_linux_base_malloc, (_ns_system_x86_64_linux_base_malloc - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_base_malloc:
 	# Verify the 4th argument is 0.
 	testq %rcx, %rcx
 	jz 1f
@@ -342,7 +344,12 @@ ns_system_x86_64_linux_base_malloc:
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
+	# The next two lines are equivalent to the jump.  The intel manual says a
+	# 16-byte relative is ‘N.S.’ in 64-bit mode, but 32-bit relative jumps are
+	# ‘Valid’ in 64-bit mode.
+	#.byte 0xE9
+	#.long _ns_system_x86_64_linux_exit_custom - . - 4
 	nop
 	hlt
 1:
@@ -363,7 +370,7 @@ ns_system_x86_64_linux_base_malloc:
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 1:
@@ -411,7 +418,7 @@ ns_system_x86_64_linux_base_malloc:
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_error_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno
+	jmp _ns_system_x86_64_linux_verify_errno
 9:
 	nop
 
@@ -457,7 +464,8 @@ ns_system_x86_64_linux_base_malloc:
 #
 # (Although %rdi happens to be preserved.)
 .global ns_system_x86_64_linux_base_mfree
-ns_system_x86_64_linux_base_mfree:
+.set ns_system_x86_64_linux_base_mfree, (_ns_system_x86_64_linux_base_mfree - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_base_mfree:
 	# Verify the 5th argument is 0.
 	testq %r8, %r8
 	jz 1f
@@ -466,7 +474,7 @@ ns_system_x86_64_linux_base_mfree:
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 1:
@@ -485,7 +493,7 @@ ns_system_x86_64_linux_base_mfree:
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 1:
@@ -506,7 +514,7 @@ ns_system_x86_64_linux_base_mfree:
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno
+	jmp _ns_system_x86_64_linux_verify_errno
 9:
 	nop
 
@@ -551,7 +559,8 @@ ns_system_x86_64_linux_base_mfree:
 # 	- %r9
 # 	- %rax
 .global ns_system_x86_64_linux_base_malloc_require
-ns_system_x86_64_linux_base_malloc_require:
+.set ns_system_x86_64_linux_base_malloc_require, (_ns_system_x86_64_linux_base_malloc_require - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_base_malloc_require:
 	# (Technically, internally, we would do a real wrapper, but since the mmap
 	# syscall leaves us with limited working storage space from registers
 	# alone, we'll just copy it and modify it under the hood, to avoid
@@ -565,7 +574,7 @@ ns_system_x86_64_linux_base_malloc_require:
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 1:
@@ -586,7 +595,7 @@ ns_system_x86_64_linux_base_malloc_require:
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 1:
@@ -616,7 +625,7 @@ ns_system_x86_64_linux_base_malloc_require:
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_error_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno
+	jmp _ns_system_x86_64_linux_verify_errno
 9:
 	nop
 
@@ -678,7 +687,8 @@ ns_system_x86_64_linux_fork:
 # (Technically, the clobbering can be exploited in the current implementation
 # such that %r9 can pass user data to the child thread.)
 .global ns_system_x86_64_linux_fork_require
-ns_system_x86_64_linux_fork_require:
+.set ns_system_x86_64_linux_fork_require, (_ns_system_x86_64_linux_fork_require - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_fork_require:
 	# Note: I would use the clone syscall (56) to be more explicit but only use
 	# the fork syscall (57) for convenience because it requires fewer storage
 	# units.
@@ -703,7 +713,7 @@ ns_system_x86_64_linux_fork_require:
 	leaq ns_system_x86_64_linux_err_msg_fork_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
+	jmp _ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
 9:
 	nop
 	xchgq %rax, %rsi
@@ -804,7 +814,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_waitid_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno
+	jmp _ns_system_x86_64_linux_verify_errno
 9:
 	nop
 
@@ -828,7 +838,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 3:
@@ -848,7 +858,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_u_offset(%rip), %rsi
 	movq (%rsi), %rsi
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_print_u64
+	jmp _ns_system_x86_64_linux_print_u64
 9:
 	nop
 
@@ -857,7 +867,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 1:
@@ -895,7 +905,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_u_offset(%rip), %rsi
 	movq (%rsi), %rsi
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_print_u64
+	jmp _ns_system_x86_64_linux_print_u64
 9:
 	nop
 
@@ -904,7 +914,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 1:
@@ -927,7 +937,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_offset(%rip), %rsi
 	movq (%rsi), %rsi
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_print_u64
+	jmp _ns_system_x86_64_linux_print_u64
 9:
 	nop
 
@@ -936,7 +946,7 @@ ns_system_x86_64_linux_fork_join:
 	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure(%rip), %rsi
 	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 0:
@@ -992,10 +1002,12 @@ ns_system_x86_64_linux_fork_join:
 # 	TODO: futures?
 # 	TODO
 .global ns_system_x86_64_linux_write
-ns_system_x86_64_linux_write:
+.set ns_system_x86_64_linux_write, (_ns_system_x86_64_linux_write - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_write:
 	# TODO
 	nop
-	jmp ns_system_x86_64_linux_exit_failure
+	jmp _ns_system_x86_64_linux_exit_failure
+	nop
 
 # ################################################################
 # Shell calls.
@@ -1008,21 +1020,23 @@ ns_system_x86_64_linux_write:
 # ################################################################
 
 .global ns_system_x86_64_linux_exit_success
-ns_system_x86_64_linux_exit_success:
+.set ns_system_x86_64_linux_exit_success, (_ns_system_x86_64_linux_exit_success - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_exit_success:
 	movq $60, %rax  # exit
 	movq $0, %rdi
 	syscall
 
-	jmp ns_system_x86_64_linux_exit_success
+	jmp _ns_system_x86_64_linux_exit_success
 	nop
 
 .global ns_system_x86_64_linux_exit_failure
-ns_system_x86_64_linux_exit_failure:
+.set ns_system_x86_64_linux_exit_failure, (_ns_system_x86_64_linux_exit_failure - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_exit_failure:
 	movq $60, %rax  # exit
 	movq $1, %rdi
 	syscall
 
-	jmp ns_system_x86_64_linux_exit_failure
+	jmp _ns_system_x86_64_linux_exit_failure
 	nop
 
 # Exit with a code and error message.
@@ -1035,7 +1049,8 @@ ns_system_x86_64_linux_exit_failure:
 # (TODO: allow callbacks and greater configurability for such errors, to let
 # higher levels cleanup and such.)
 .global ns_system_x86_64_linux_exit_custom
-ns_system_x86_64_linux_exit_custom:
+.set ns_system_x86_64_linux_exit_custom, (_ns_system_x86_64_linux_exit_custom - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_exit_custom:
 	movq %rdi, %r10
 
 	movq %rdx, %rdx
@@ -1050,7 +1065,7 @@ ns_system_x86_64_linux_exit_custom:
 	movq %rdi, %rdi
 	syscall
 
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 
@@ -1067,7 +1082,8 @@ ns_system_x86_64_linux_exit_custom:
 # If you have the shadow stack enabled on your system, you will need to use
 # ‘net; nop’ variant instead, which doesn't clobber %rdi.
 .global ns_system_x86_64_linux_cc_call_stack_return
-ns_system_x86_64_linux_cc_call_stack_return:
+.set ns_system_x86_64_linux_cc_call_stack_return, (_ns_system_x86_64_linux_cc_call_stack_return - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_cc_call_stack_return:
 	ret
 	nop
 	#movq (%rsp), %rdi
@@ -1092,7 +1108,8 @@ ns_system_x86_64_linux_cc_call_stack_return:
 #
 # This clobbers nothing.
 .global ns_system_x86_64_linux_monotonic_nanosleep
-ns_system_x86_64_linux_monotonic_nanosleep:
+.set ns_system_x86_64_linux_monotonic_nanosleep, (_ns_system_x86_64_linux_monotonic_nanosleep - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_monotonic_nanosleep:
 	# timespec is a pair of signed longs: seconds and nanoseconds.
 
 	# Backup %rax.
@@ -1149,7 +1166,7 @@ ns_system_x86_64_linux_monotonic_nanosleep:
 	leaq ns_system_x86_64_linux_err_msg_clock_nanosleep_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
 	nop
 
@@ -1233,7 +1250,8 @@ ns_system_x86_64_linux_monotonic_nanosleep:
 # 	- %r8
 # 	- %r9
 .global ns_system_x86_64_linux_print_u64
-ns_system_x86_64_linux_print_u64:
+.set ns_system_x86_64_linux_print_u64, (_ns_system_x86_64_linux_print_u64 - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_print_u64:
 	movq %rdx, %r11  # Size.
 
 	#movq %rsi, %rsi  # Base.
@@ -1318,7 +1336,9 @@ ns_system_x86_64_linux_print_u64:
 #
 # If this procedure action returns with no error detected, no storage units are
 # clobbered.
-ns_system_x86_64_linux_verify_errno:
+.global ns_system_x86_64_linux_verify_errno
+.set ns_system_x86_64_linux_verify_errno, (_ns_system_x86_64_linux_verify_errno - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_verify_errno:
 	# Return normally if the syscall return value is not in [-4095, -1] (https://stackoverflow.com/a/2538212).
 	cmpq $-4095, %rsi  # if %rsi < -4095
 	jl   0f            # return
@@ -1418,7 +1438,7 @@ ns_system_x86_64_linux_verify_errno:
 	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rsi
 	leaq ns_system_x86_64_linux_syscall_verify_builder_size(%rip), %rdx
 	movq (%rdx), %rdx
-	jmp ns_system_x86_64_linux_exit_custom
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
 
@@ -1449,7 +1469,8 @@ ns_system_x86_64_linux_trap_middleman:
 # 	%rsi: callback continuation, where to jump.
 # 	%rdx: callback pointer / user data.
 .global ns_system_x86_64_linux_trap_segv
-ns_system_x86_64_linux_trap_segv:
+.set ns_system_x86_64_linux_trap_segv, (_ns_system_x86_64_linux_trap_segv - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_trap_segv:
 	# Backup the continuation.
 	movq %rdi, %r8
 
@@ -1481,7 +1502,7 @@ ns_system_x86_64_linux_trap_segv:
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_set_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
+	jmp _ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
 9:
 	nop
 
@@ -1507,7 +1528,8 @@ ns_system_x86_64_linux_trap_segv:
 # non-default setting with the default handler.
 # 	%rdi: return
 .global ns_system_x86_64_linux_restore_trap_segv
-ns_system_x86_64_linux_restore_trap_segv:
+.set ns_system_x86_64_linux_restore_trap_segv, (_ns_system_x86_64_linux_restore_trap_segv - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_restore_trap_segv:
 	# Backup the continuation.
 	movq %rdi, %r8
 
@@ -1525,7 +1547,7 @@ ns_system_x86_64_linux_restore_trap_segv:
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_restore_size(%rip), %rcx
 	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
-	jmp ns_system_x86_64_linux_verify_errno
+	jmp _ns_system_x86_64_linux_verify_errno
 9:
 	nop
 
