@@ -295,18 +295,6 @@ _ns_system_x86_64_linux_nop:
 
 # We basically just make our own heap here.
 
-# TODO flesh out; going to bed; but 2022-06-30 I had an insight, after thinking
-# this through: I know you were trying to think of a quick and simple
-# implementation (rather than spending extra time trying to design it *well*
-# right now), e.g. allocations with the base allocations, but actually try to
-# keep the platform-specific memory handling stuff as simple as possible, e.g.
-# just have base allocations of large e.g. 1GiB allocations, and then
-# optionally put a layer above it that's less tied to the platform that can
-# make managing lots of small and big allocations and freeing easier.  (Plus,
-# memory is a resource; it might be interesting to think about economic
-# principles or maybe feedback to help restrict memory allocation as memory
-# usage increases enough.)
-
 # Get a chunk of memory, of largeish size, e.g. ~1GiB per allocation.
 #
 # You must track the metadata (especially the bytes reserved to pass onto the
