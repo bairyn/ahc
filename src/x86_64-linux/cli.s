@@ -113,7 +113,7 @@ ns_cli_cli:
 	# Now join.
 	leaq 9f(%rip), %rdx
 	xchgq %rdi, %rdx
-	jmp *%rdx
+	jmpq *%rdx
 9:
 	nop
 

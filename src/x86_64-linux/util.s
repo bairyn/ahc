@@ -22,7 +22,7 @@ ns_util_err_msg_not_writeable_end:
 # Clobbers nothing.
 .global ns_ahc_can_cont
 ns_ahc_can_cont:
-	jmp *%rdi
+	jmpq *%rdi
 
 # Make sure that the code can rewrite itself.
 #
@@ -97,5 +97,5 @@ ns_ahc_system_verify_writeable:
 	addq $16, %rsp
 
 	# Return.
-	jmp *%rdi
+	jmpq *%rdi
 	nop

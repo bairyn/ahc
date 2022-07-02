@@ -44,7 +44,7 @@ ns_system_x86_64_linux_module_size:
 ns_system_x86_64_linux_module_route:
 	leaq ns_system_x86_64_linux_module_begin(%rip), %r11
 	addq %r11, %rax
-	jmp *%rax
+	jmpq *%rax
 	nop
 
 # Now the .data stuffs.
@@ -249,7 +249,7 @@ ns_system_x86_64_linux_err_msg_fork_end:
 .global ns_system_x86_64_linux_nop
 .set ns_system_x86_64_linux_nop, (_ns_system_x86_64_linux_nop - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_nop:
-	jmp *%rdi
+	jmpq *%rdi
 	nop
 
 # ################################################################
@@ -403,7 +403,7 @@ _ns_system_x86_64_linux_base_malloc:
 	movq $0, %rdi
 
 	movq %r8, %rcx
-	jmp *%rcx
+	jmpq *%rcx
 	nop
 1:
 
@@ -430,7 +430,7 @@ _ns_system_x86_64_linux_base_malloc:
 	movq $1, %rdi
 
 	movq %r8, %rcx
-	jmp *%rcx
+	jmpq *%rcx
 	nop
 
 # At a low-level, free an allocation made by
@@ -520,7 +520,7 @@ _ns_system_x86_64_linux_base_mfree:
 
 	# Return.
 	movq %r8, %rdi
-	jmp *%rdi
+	jmpq *%rdi
 	nop
 
 # Simple utility to wrap around base_malloc but require successful allocation,
@@ -636,7 +636,7 @@ _ns_system_x86_64_linux_base_malloc_require:
 	shl $3, %rdi
 
 	movq %r8, %rdx
-	jmp *%rdx
+	jmpq *%rdx
 	nop
 
 # ################################################################
@@ -721,7 +721,7 @@ _ns_system_x86_64_linux_fork_require:
 	# If we're the child, go to the child continuation.
 	testq %rax, %rax
 	jnz 0f
-	jmp *%rsi
+	jmpq *%rsi
 	nop
 0:
 
@@ -729,7 +729,7 @@ _ns_system_x86_64_linux_fork_require:
 	movq %rax, %rsi
 	leaq ns_system_x86_64_linux_fork_join(%rip), %rdi
 	movq %r8, %rdx
-	jmp *%rdx
+	jmpq *%rdx
 	nop
 
 # Used by ‘ns_system_x86_64_linux_fork_join’; the action part of the closure.
@@ -977,7 +977,7 @@ ns_system_x86_64_linux_fork_join:
 	addq $16, %rsp  # Another %rdi.
 
 	# Return.
-	jmp *%rdi
+	jmpq *%rdi
 	nop
 
 # TODO
@@ -1088,7 +1088,7 @@ _ns_system_x86_64_linux_cc_call_stack_return:
 	nop
 	#movq (%rsp), %rdi
 	#addq $8, %rsp
-	#jmp *%rdi
+	#jmpq *%rdi
 	#nop
 
 # clock_nanosleep the given number of nanoseconds against the CLOCK_MONOTONIC=1
@@ -1223,7 +1223,7 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 	addq $16, %rsp
 
 	# Return.
-	jmp *%rdi
+	jmpq *%rdi
 	nop
 
 # Utility to write a u64 in ascii.
@@ -1324,7 +1324,7 @@ _ns_system_x86_64_linux_print_u64:
 
 	# Return.
 	movq %rcx, %rcx
-	jmp *%rcx
+	jmpq *%rcx
 	nop
 
 # Simple utility to verify a syscall was successful or else fail with an error
@@ -1444,7 +1444,8 @@ _ns_system_x86_64_linux_verify_errno:
 
 0:
 	# Return normally.
-	jmp *%rdi
+	jmpq *%rdi
+	nop
 
 # An optional segv trap handler that hands off execution to what was statically
 # set in ‘ns_system_x86_64_linux_sigaction_static_set_segv_cont’ and
@@ -1454,13 +1455,15 @@ ns_system_x86_64_linux_trap_middleman:
 	movq (%rdi), %rdi
 	leaq ns_system_x86_64_linux_sigaction_static_set_segv_cont(%rip), %rsi
 	movq (%rsi), %rsi
-	jmp *%rsi
+	jmpq *%rsi
+	nop
 
 	# Redundantly after a jump (never executed), adapt to the signal handler's
 	# expectation of a conventional return.
 	movq (%rsp), %rdi
 	addq $8, %rsp
-	jmp *%rdi
+	jmpq *%rdi
+	nop
 
 # Call a callback on segfault.  Only use this once per process instantiation.
 #
@@ -1521,7 +1524,7 @@ _ns_system_x86_64_linux_trap_segv:
 
 	# Return.
 	movq %r8, %rdi
-	jmp *%rdi
+	jmpq *%rdi
 	nop
 
 # Restore default segfault trap behaviour, but override any previous
@@ -1553,7 +1556,7 @@ _ns_system_x86_64_linux_restore_trap_segv:
 
 	# Return.
 	movq %r8, %rdi
-	jmp *%rdi
+	jmpq *%rdi
 	nop
 
 .global ns_system_x86_64_linux_module_end
