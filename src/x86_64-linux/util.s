@@ -10,9 +10,11 @@
 
 .global ns_util_module_begin  # This jumps to ‘route’ too if you call it.
 ns_util_module_begin:
-	.byte 0xEB, 0x0E  # skip 14 bytes (jump) if execution begins here.
-	.byte 0x90, 0x00, 0x00, 0x00  # Pad to 8 bytes.
+	.byte 0xEB, 0x1E  # skip 30 bytes (jump) if execution begins here.
+	.byte 0x90, 0xF4, 0x00, 0x0E  # Pad to 8 bytes, and 0x0E is like a version.
 	.byte 0x00, 0x00
+	.quad 0
+	.quad 0
 .global ns_util_module_size  # Should be at offset 8 relative to ‘begin’!
 ns_util_module_size:
 	.quad (ns_util_module_end - ns_util_module_begin)
