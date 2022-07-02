@@ -20,8 +20,8 @@ ns_util_module_size_field:
 	.quad (ns_util_module_end - ns_util_module_begin)  # Size.
 	.quad 0x1324ABBC  # ABI.
 	.quad 0  # Module hash, sha256sum of module string with a NULL hash field and NULL external module references.  TODO; just 0 until implemented.
-	.quad 0  # Size of the module name string.
-	.quad 0  # Module-relative offset to the siz of the module name string.
+	.quad (_module_name_end - _module_name)  # Size of the module name string.
+	.quad (_module_name - ns_util_module_begin)  # Module-relative offset to the siz of the module name string.
 	.quad 0  # Header terminating null.
 # Indirectly call an action in this module.
 #
@@ -66,6 +66,10 @@ _mod_dep_end:
 .quad 0
 
 # Now the .data stuffs.
+
+_module_name:
+	.ascii "util"
+_module_name_end:
 
 ns_util_err_msg_not_writeable_size:
 	.quad (ns_util_err_msg_not_writeable_end - ns_util_err_msg_not_writeable)
