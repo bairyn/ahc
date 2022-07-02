@@ -1,6 +1,12 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
+# TODO ‘exec’ after system
+# TODO ‘networking’ after exec
+# TODO probably for join, maybe add an option to override failing exit codes
+# than crashing yourself.
+# TODO how to handle networking?
+
 # See ‘arch/x86/entry/syscalls/syscall_64.tbl’ (thanks,
 # https://unix.stackexchange.com/a/499016).
 
@@ -995,34 +1001,208 @@ ns_system_x86_64_linux_fork_join:
 	jmpq *%rdi
 	nop
 
-# TODO
-
 # ################################################################
 # Reading and writing.
 # ################################################################
 
-# TODO
+# The read/write API provided here uses non-blocking IO.
 
-# Write to a file.  The FRP time context is an implicit parameter.
-# 	%rdi: AHC runtime environment pointer.
-# 	%rsi: return
-# 	%rdx: pointer to filepath
-# 	%rcx: size of filepath
-# 	%r8:  pointer to data to write
-# 	%r9:  size of data to write
+# WARNING: in this low-level API, there is no enforcement against resource
+# leaks (creating without closing) or multiple destructions from duplications
+# (closing more than once), so you must handle this responsibility yourself.
+# Be sure to consume resources created by calling one the callbacks.
+
+# Linear types is a good way for the compiler to ensure that in any otherwise
+# successful program execution, each creation of a resource leads to exactly
+# one destruction of a resource.  There are other constraints for resources to
+# follow, but this is a common one.  (Thanks for the inspiration, Rust and
+# ‘Linear Types Can Change the World’!)
+
+# Create a new writer, an instance capable of writing to a filepath.
 #
-# 	Callback called with:
-# 	%rdi: Type of write result (success or failure; 0: failure; 1: success)
-# 	%TODO: bytes blah
-# 	TODO: futures?
-# 	TODO
-.global ns_system_x86_64_linux_write
-.set ns_system_x86_64_linux_write, (_ns_system_x86_64_linux_write - ns_system_x86_64_linux_module_begin)
-_ns_system_x86_64_linux_write:
+# The FRP time context is an implicit parameter.
+#
+# ‘new_writer’ will call return with multiple callbacks.  You must call exactly
+# one, at which point the original callbacks are considered consumed and must
+# not be re-used since they have been destroyed, but you must instead only use
+# any new callbacks that are provided.  Most callbacks will return a new set of
+# callbacks with the same or with a compatible API.  The close callbacks do not
+# return a new set of callbacks.  (Responsibility for managing resources is not
+# dealt with here, as this is meant to be a low-level API.)
+#
+# This tree may be easier to parse if you configure your vim to visually
+# display tabs and spaces differently, as I have.  Tabs are used for
+# indentation, and spaces for alignment here.
+#
+# Parameters:
+# 	%rdi: Return with single-use-only (consumes the entire set at that level)
+# 	      callbacks, with parameters:
+# 		%rdi: User data as part of a returned closure.  You pass it to %rsi or
+# 		      any other callback so that it has data to work with.  Under the
+# 		      hood, this is just the file descriptor.
+# 		%rsi: Close callback to destroy the resource and discard any pending
+# 		      reads or writes, with parameters:
+# 			%rdi: Return.
+# 		%rdx: Query status callback, with parameters:
+# 			%rdi: Return, with parameters:
+# 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
+# 				                      corresponding to the original
+# 				                      [%rdi, %rsi, …, %r8] arguments.  Don't
+# 				                      use the old ones, because by now they are
+# 				                      already consumed (although the new ones
+# 				                      may refer to the same address).
+# 				%r9: zero if not ready for writing, 1 if ready.
+# 		%rcx: Attempt to write optionally with timeout callback, with parameters:
+# 			%rdi: Return on non-fatal error (basically EAGAIN; means it would
+# 			      block and is not available for the write or read), with
+# 			      parameters:
+# 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
+# 				                      corresponding to the original
+# 				                      [%rdi, %rsi, …, %r8] arguments.  Don't
+# 				                      use the old ones, because by now they are
+# 				                      already consumed (although the new ones
+# 				                      may refer to the same address).
+# 				%r9: status code: 0 in the general case, 1 if the resource is
+# 				     exhausted (e.g. we've detected that it's closed or
+# 				     otherwise won't be available for any writes in the
+# 				     future), as a platform-specific convenience hint.
+# 			%rsi: Return on success, with parameters:
+# 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
+# 				                      corresponding to the original
+# 				                      [%rdi, %rsi, …, %r8] arguments.  Don't
+# 				                      use the old ones, because by now they are
+# 				                      already consumed (although the new ones
+# 				                      may refer to the same address).
+# 				%r9: Number of bytes written.
+# 			%rdx: tuple callback to get options and timeout, with parameters
+# 			      (we use a tuple instead of direct parameters to compress
+# 			      parameters into fewer parameters (3 into 2) so we don't
+# 			      depend on a stack as much):
+# 				%rdi: Return (please return back to this address when done),
+# 				      with parameters:
+# 					%rdi: Options bitfield: bit 0 is boolean for 0 to disable
+# 					      timeout, 1 to enable timeout.
+# 					%rsi: Seconds for the timeout (i64).
+# 					%rdx: Nanoseconds for the timeout (i64).
+# 				%rsi: User data.
+# 			%rcx: user data supplied to %rdx as a closure
+# 			%r8: Number of bytes to request a write for (i.e., the size).
+# 			%r9: The data to request a write for (i.e., the data).
+# 		%r8: currently 0, in case future versions want to add functionality.
+# 	%rsi: Size of filepath.
+# 	%rdx: Pointer to filepath.
+# 	%rcx: Please set to 0, so that future versions can accept an extra
+# 	      parameter if needed, e.g. for I/O options.
+.global ns_system_x86_64_linux_new_writer
+.set ns_system_x86_64_linux_new_writer, (_ns_system_x86_64_linux_new_writer - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_new_writer:
 	# TODO
 	nop
 	jmp _ns_system_x86_64_linux_exit_failure
 	nop
+	hlt
+
+# Create a new reader, an instance capable of reading from a filepath.
+#
+# ‘new_reader’ will call the provided return continuation with multiple
+# callbacks (see the tree).  You must call exactly one of these callbacks, at
+# which point the original callbacks are considered consumed and must not be
+# re-used since they have been destroyed, but you must instead only use any new
+# callbacks that are provided.  Most callbacks will return a new set of
+# callbacks with the same or with a compatible API.  The closing callbacks do
+# not return a new set of callbacks.  (Responsibility for managing resources is
+# not dealt with here, as this is meant to be a low-level API.)
+#
+# This tree may be easier to parse if you configure your vim to visually
+# display tabs and spaces differently, as I have.  Tabs are used for
+# indentation, and spaces for alignment here.
+#
+# Note that read actions require memory to work (it needs to put what it reads
+# somewhere) and lets you handle how to manage it.  You will need to provide a
+# pointer to to the read operation action to the beginning of working storage
+# available exclusively for that ‘read’ call, and it must have size at least
+# the number of bytes requested to be read (or otherwise specified by the
+# operation's description).
+#
+# Parameters:
+# 	%rdi: Return with a single-use-only set (consumes the entire set at that
+# 	      level) of callbacks, with parameters:
+# 		%rdi: User data as part of a returned closure.  You pass it to %rsi or
+# 		      any other callback so that it has data to work with.  Under the
+# 		      hood, this is just the file descriptor.
+# 		%rsi: Close callback to destroy the resource and discard any pending
+# 		      reads or writes, with parameters:
+# 			%rdi: Return.
+# 		%rdx: Query status callback, with parameters:
+# 			%rdi: Return, with parameters:
+# 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
+# 				                      corresponding to the original
+# 				                      [%rdi, %rsi, …, %r8] arguments.  Don't
+# 				                      use the old ones, because by now they are
+# 				                      already consumed (although the new ones
+# 				                      may refer to the same address).
+# 				%r9: zero if not ready for writing, 1 if ready.
+# 		%rcx: Callback to attempt to read, optionally with a timeout, with
+# 		      parameters:
+# 			%rdi: Return on non-fatal error (basically EAGAIN; means it would
+# 			      block and is not available for the write or read), with
+# 			      parameters:
+# 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
+# 				                      corresponding to the original
+# 				                      [%rdi, %rsi, …, %r8] arguments.  Don't
+# 				                      use the old ones, because by now they are
+# 				                      already consumed (although the new ones
+# 				                      may refer to the same address).
+# 				%r9: status code: 0 in the general case, 1 if the resource is
+# 				     exhausted (e.g. we've detected that it's closed or
+# 				     otherwise won't be available for any reads in the
+# 				     future, e.g. all a file has been comprehensively read), as
+# 				     a platform-specific convenience hint.
+# 			%rsi: Return on success, with parameters:
+# 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
+# 				                      corresponding to the original
+# 				                      [%rdi, %rsi, …, %r8] arguments.  Don't
+# 				                      use the old ones, because by now they are
+# 				                      already consumed (although the new ones
+# 				                      may refer to the same address).
+# 				%r9: Number of bytes read.
+# 			%rdx: tuple callback to get options and timeout, with parameters
+# 			      (we use a tuple instead of direct parameters to compress
+# 			      parameters into fewer parameters (3 into 2) so we don't
+# 			      depend on a stack as much):
+# 				%rdi: Return (please return back to this address when done),
+# 				      with parameters:
+# 					%rdi: Options bitfield: bit 0 is boolean for 0 to disable
+# 					      timeout, 1 to enable timeout.
+# 					%rsi: Seconds for the timeout (i64).
+# 					%rdx: Nanoseconds for the timeout (i64).
+# 				%rsi: User data.
+# 			%rcx: user data supplied to %rdx as a closure
+# 			%r8: Tuple for remaining read parameters, with parameters:
+# 				%rdi: Return (please return back to this address when done),
+# 				      with parameters:
+# 					%rdi: Number of bytes to request reading, and also the
+# 					      maximum number of bytes to read.
+# 					%rsi: As noted, memory for a successful read to output to.
+# 					%rdx: Please set to 0, so that future versions can add
+# 					      functionality more conveniently.
+# 				%rsi: User data.
+# 			%r9: User data to provide to the tuple continuation.
+# 		%r8: currently 0, in case future versions want to add functionality.
+# 	%rsi: Size of filepath.
+# 	%rdx: Pointer to filepath.
+# 	%rcx: Please set to 0, so that future versions can accept an extra
+# 	      parameter if needed, e.g. for I/O options.
+.global ns_system_x86_64_linux_new_reader
+.set ns_system_x86_64_linux_new_reader, (_ns_system_x86_64_linux_new_reader - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_new_reader:
+	# TODO
+	nop
+	jmp _ns_system_x86_64_linux_exit_failure
+	nop
+	hlt
+
+# TODO
 
 # ################################################################
 # Shell calls.
