@@ -570,10 +570,10 @@ _ns_system_x86_64_linux_base_malloc:
 	movq %rax, %rax
 
 	# Verify, unless it was due to insufficient resources.
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_error(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_error_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_error(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_error_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno
 9:
@@ -666,10 +666,10 @@ _ns_system_x86_64_linux_base_mfree:
 	syscall
 
 	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno
 9:
@@ -777,10 +777,10 @@ _ns_system_x86_64_linux_base_malloc_require:
 	movq %rax, %rax
 
 	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_error(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_error_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_error(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_error_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno
 9:
@@ -858,17 +858,17 @@ _ns_system_x86_64_linux_fork_require:
 
 	# Backup input arguments.
 	movq %rdi, %r8
-	#movq %rsi, %r9  # Just use xchngq at beginning of the Verify step instead.  Saves us a register.
+	#movq %rsi, %r9  # Just use xchngq in the Verify step instead.  Saves us a register.
 
 	# Fork.
 	movq $57, %rax  # fork  #  (First 32 bits are 0.)
 	syscall
 
-	# Verify.
+	# Verify and backup %rsi.
+	leaq ns_system_x86_64_linux_err_msg_fork(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_fork_size(%rip), %rdx
+	movq (%rdx), %rdx
 	xchgq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_fork(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_fork_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
 9:
@@ -966,10 +966,10 @@ ns_system_x86_64_linux_fork_join:
 	syscall
 
 	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_fork_join_waitid(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_waitid_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_waitid(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_fork_join_waitid_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno
 9:
@@ -1440,10 +1440,10 @@ _ns_system_x86_64_linux_new_writer:
 	syscall
 
 	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_new_writer_open_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_open_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_writer_open_failed(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_open_failed_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
@@ -1510,14 +1510,14 @@ _ns_system_x86_64_linux_new_writer_close:
 	movq $0x3, %rax  # close
 	syscall
 
-	# Verify.
+	# Verify and restore ‘return’.
 	movq %rax, %rsi
 
 	movq %rdx, %rax  # Restore ‘return’.
 
-	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size(%rip), %rcx
-	movq (%rcx), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
@@ -1809,10 +1809,10 @@ _ns_system_x86_64_linux_new_reader:
 	syscall
 
 	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_open_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_open_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_reader_open_failed(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_new_reader_open_failed_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
@@ -1879,14 +1879,14 @@ _ns_system_x86_64_linux_new_reader_close:
 	movq $0x3, %rax  # close
 	syscall
 
-	# Verify.
+	# Verify and restore ‘return’.
 	movq %rax, %rsi
 
 	movq %rdx, %rax  # Restore ‘return’.
 
-	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size(%rip), %rcx
-	movq (%rcx), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
@@ -2058,10 +2058,10 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 	syscall
 
 	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_clock_nanosleep(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_clock_nanosleep_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_clock_nanosleep(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_clock_nanosleep_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
@@ -2440,10 +2440,10 @@ _ns_system_x86_64_linux_trap_segv:
 	syscall
 
 	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_segv_trap_set(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_segv_trap_set_size(%rip), %rdx
+	movq (%rdx), %rdx
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_err_msg_segv_trap_set(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_segv_trap_set_size(%rip), %rcx
-	movq (%rcx), %rcx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (If this doesn't exit, it doesn't clobber %r8.)
 9:
@@ -2485,10 +2485,10 @@ _ns_system_x86_64_linux_restore_trap_segv:
 	syscall
 
 	# Verify.
-	movq %rax, %rsi
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_restore(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_segv_trap_restore_size(%rip), %rcx
 	movq (%rcx), %rcx
+	movq %rax, %rsi
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno
 9:
