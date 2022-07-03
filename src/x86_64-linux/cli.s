@@ -253,12 +253,12 @@ _ns_cli_cli:
 
 	# Make sure we can open and close /dev/stdout.
 	movq $0, %rcx
-	leaq ns_cli_err_msg_memory_preliminary_checks(%rip), %rdx
-	leaq ns_cli_err_msg_memory_preliminary_checks_size(%rip), %rsi
+	leaq ns_cli_path_dev_stdout(%rip), %rdx
+	leaq ns_cli_path_dev_stdout_size(%rip), %rsi
 	movq (%rdx), %rsi
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_new_writer, %rax
-	#jmp _system  # FIXME: This creates an empty file in the current directory!  What?
+	jmp _system
 9:
 	nop
 
@@ -269,7 +269,7 @@ _ns_cli_cli:
 	movq %rsi, %rdx      # Get close callback.
 	movq %rdi, %rsi      # Get user data.
 	leaq 9f(%rip), %rdi  # Get return address.
-	#jmpq *%rdx  # TODO: fix then uncomment.
+	jmpq *%rdx
 9:
 	nop
 
