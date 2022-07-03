@@ -137,10 +137,10 @@ _ns_util_system_verify_writeable:
 	# If this machine code is unchanged, it prints an error message about
 	# self-modifiability.
 0:
+	leaq ns_util_err_msg_not_writeable(%rip), %rdx
+	leaq ns_util_err_msg_not_writeable_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_util_err_msg_not_writeable(%rip), %rsi
-	leaq ns_util_err_msg_not_writeable_size(%rip), %rdx
-	movq (%rdx), %rdx
 	movq $ns_system_x86_64_linux_exit_custom, %rax
 	jmp _system
 	nop

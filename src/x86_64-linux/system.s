@@ -497,10 +497,10 @@ _ns_system_x86_64_linux_base_malloc:
 	testq %rcx, %rcx
 	jz 1f
 0:
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	# The next two lines are equivalent to the jump.  The intel manual says a
 	# 16-byte relative is ‘N.S.’ in 64-bit mode, but 32-bit relative jumps are
@@ -523,10 +523,10 @@ _ns_system_x86_64_linux_base_malloc:
 	jz 1f
 0:
 	# Error: bits not divisible by 8!
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -627,10 +627,10 @@ _ns_system_x86_64_linux_base_mfree:
 	testq %r8, %r8
 	jz 1f
 0:
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -646,10 +646,10 @@ _ns_system_x86_64_linux_base_mfree:
 	jz 1f
 0:
 	# Error: bits not divisible by 8!
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -727,10 +727,10 @@ _ns_system_x86_64_linux_base_malloc_require:
 	testq %rcx, %rcx
 	jz 1f
 0:
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -748,10 +748,10 @@ _ns_system_x86_64_linux_base_malloc_require:
 	jz 1f
 0:
 	# Error: bits not divisible by 8!
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -991,10 +991,10 @@ ns_system_x86_64_linux_fork_join:
 	jmp 3f
 2:
 	# Error: We don't recognize the code.
+	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1020,10 +1020,10 @@ ns_system_x86_64_linux_fork_join:
 	nop
 
 	# Error: We don't recognize the code.
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1067,10 +1067,10 @@ ns_system_x86_64_linux_fork_join:
 	nop
 
 	# Error: We don't recognize the code.
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1099,10 +1099,10 @@ ns_system_x86_64_linux_fork_join:
 	nop
 
 	# Error: a thread failed.
+	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1316,10 +1316,10 @@ _ns_system_x86_64_linux_new_writer:
 	testq %r8, %r8
 	jz 0f
 	# Error: invalid arguments.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1349,10 +1349,10 @@ _ns_system_x86_64_linux_new_writer:
 	nop
 
 	# Error.
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1368,10 +1368,10 @@ _ns_system_x86_64_linux_new_writer:
 	jnz 0f
 1:
 	# Error: the filepath is not null-terminated.
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1710,10 +1710,10 @@ _ns_system_x86_64_linux_new_reader:
 	testq %r8, %r8
 	jz 0f
 	# Error: invalid arguments.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1742,10 +1742,10 @@ _ns_system_x86_64_linux_new_reader:
 	nop
 
 	# Error.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1761,10 +1761,10 @@ _ns_system_x86_64_linux_new_reader:
 	jnz 0f
 1:
 	# Error: the filepath is not null-terminated.
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $2, %rdi
-	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rsi
-	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -1938,8 +1938,8 @@ _ns_system_x86_64_linux_exit_failure:
 
 # Exit with a code and error message.
 # 	%rdi: Error code.
-# 	%rsi: Error message.
-# 	%rdx: Error message size.
+# 	%rsi: Error message size.
+# 	%rdx: Error message.
 #
 # (Note: this brings into play Linux's blocking mechanisms.)
 #
@@ -2331,10 +2331,10 @@ _ns_system_x86_64_linux_verify_errno:
 4:
 
 	# Hand over control to exit_custom().
+	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rdx
+	leaq ns_system_x86_64_linux_syscall_verify_builder_size(%rip), %rsi
+	movq (%rsi), %rsi
 	movq $3, %rdi
-	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rsi
-	leaq ns_system_x86_64_linux_syscall_verify_builder_size(%rip), %rdx
-	movq (%rdx), %rdx
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
