@@ -146,6 +146,7 @@ _ns_cli_cli:
 	jz 1f
 0:
 	# Error: prelimiary checks failed!
+	movq $0, %rcx
 	leaq ns_cli_err_msg_memory_preliminary_checks(%rip), %rdx
 	leaq ns_cli_err_msg_memory_preliminary_checks_size(%rip), %rsi
 	movq (%rsi), %rsi

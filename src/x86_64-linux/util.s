@@ -137,6 +137,7 @@ _ns_util_system_verify_writeable:
 	# If this machine code is unchanged, it prints an error message about
 	# self-modifiability.
 0:
+	movq $0, %rcx
 	leaq ns_util_err_msg_not_writeable(%rip), %rdx
 	leaq ns_util_err_msg_not_writeable_size(%rip), %rsi
 	movq (%rsi), %rsi

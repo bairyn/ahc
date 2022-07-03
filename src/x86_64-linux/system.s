@@ -60,8 +60,13 @@
 # 			%rdi: Numeric code.
 # 			%rsi: String size.
 # 			%rdx: String.
+# 			%rcx: 0.
 #
-# TODO implement this.
+# TODO finish implementing this: you just need to search for %rsp to make sure
+# stack is handled in good practice.  Basically, at least fork_join,
+# new_writer, new_reader, and monotonic_nanosleep will need their own cleaning
+# sections added.  Check other modules too!  Also add the same module implicit
+# parameters to other modules.
 
 # We could have ‘.data’ here, but for modularity and portability, put all of
 # this module in the same section, so it can be e.g. copied and referenced from
@@ -402,6 +407,13 @@ ns_system_x86_64_linux_err_msg_new_reader_close_close_failed:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_new_reader_close_close_failed_end:
 
+ns_system_x86_64_linux_err_msg_invalid_implicit_args_size:
+	.quad (ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_end - ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible)
+ns_system_x86_64_linux_err_msg_invalid_implicit_args:
+	.ascii "Error: implicit args validation error: invalid implicit arguments: actions in this module required implicit arguments as parameters %r15 and %r14 to be as specified, but they are invalid!  Check the usage of this module, to make sure its procedures are being called correctly; check the documentation.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_invalid_implicit_args_end:
+
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
 # and shell support.  Also add a few other utilities as needed.
@@ -497,6 +509,7 @@ _ns_system_x86_64_linux_base_malloc:
 	testq %rcx, %rcx
 	jz 1f
 0:
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -523,6 +536,7 @@ _ns_system_x86_64_linux_base_malloc:
 	jz 1f
 0:
 	# Error: bits not divisible by 8!
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -627,6 +641,7 @@ _ns_system_x86_64_linux_base_mfree:
 	testq %r8, %r8
 	jz 1f
 0:
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_5th_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -646,6 +661,7 @@ _ns_system_x86_64_linux_base_mfree:
 	jz 1f
 0:
 	# Error: bits not divisible by 8!
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -727,6 +743,7 @@ _ns_system_x86_64_linux_base_malloc_require:
 	testq %rcx, %rcx
 	jz 1f
 0:
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_4th_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -748,6 +765,7 @@ _ns_system_x86_64_linux_base_malloc_require:
 	jz 1f
 0:
 	# Error: bits not divisible by 8!
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_base_malloc_byte_divisible_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -991,6 +1009,7 @@ ns_system_x86_64_linux_fork_join:
 	jmp 3f
 2:
 	# Error: We don't recognize the code.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1020,6 +1039,7 @@ ns_system_x86_64_linux_fork_join:
 	nop
 
 	# Error: We don't recognize the code.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1067,6 +1087,7 @@ ns_system_x86_64_linux_fork_join:
 	nop
 
 	# Error: We don't recognize the code.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1099,6 +1120,7 @@ ns_system_x86_64_linux_fork_join:
 	nop
 
 	# Error: a thread failed.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1310,12 +1332,23 @@ _ns_system_x86_64_linux_new_writer:
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
 
+	# Begin implicit arg validation check.  %rdi is already backed up to 40(%rsp).
+	# Validate.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore original %rdi from 40(%rsp).
+	movq 40(%rsp), %rdi
+	# End implicit arg validation check.
+
 	# Next just perform a few checks.
 
 	# Make sure %r8 is 0.
 	testq %r8, %r8
 	jz 0f
 	# Error: invalid arguments.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1349,6 +1382,7 @@ _ns_system_x86_64_linux_new_writer:
 	nop
 
 	# Error.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1368,6 +1402,7 @@ _ns_system_x86_64_linux_new_writer:
 	jnz 0f
 1:
 	# Error: the filepath is not null-terminated.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1704,12 +1739,23 @@ _ns_system_x86_64_linux_new_reader:
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
 
+	# Begin implicit arg validation check.  %rdi is already backed up to 40(%rsp).
+	# Validate.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore original %rdi from 40(%rsp).
+	movq 40(%rsp), %rdi
+	# End implicit arg validation check.
+
 	# Next just perform a few checks.
 
 	# Make sure %r8 is 0.
 	testq %r8, %r8
 	jz 0f
 	# Error: invalid arguments.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_new_reader_r8_not_zero_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1742,6 +1788,7 @@ _ns_system_x86_64_linux_new_reader:
 	nop
 
 	# Error.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1761,6 +1808,7 @@ _ns_system_x86_64_linux_new_reader:
 	jnz 0f
 1:
 	# Error: the filepath is not null-terminated.
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rdx
 	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -1916,6 +1964,10 @@ _ns_system_x86_64_linux_new_reader_read:
 # Exiting and process maangement.
 # ################################################################
 
+# Exit with a successful status code.
+#
+# Parameters:
+# 	(None.)
 .global ns_system_x86_64_linux_exit_success
 .set ns_system_x86_64_linux_exit_success, (_ns_system_x86_64_linux_exit_success - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_exit_success:
@@ -1936,18 +1988,45 @@ _ns_system_x86_64_linux_exit_failure:
 	jmp _ns_system_x86_64_linux_exit_failure
 	nop
 
-# Exit with a code and error message.
+# Exit with a non-zero code and error message (or 0 with success and _no_ error
+# message).
+#
+# Parameters:
 # 	%rdi: Error code.
 # 	%rsi: Error message size.
 # 	%rdx: Error message.
+# 	%rcx: 0 if non-fatal, 1 if fatal and %r14 can be used if %r14 is enabled.
+# 	      Likely you'll want to set this to ‘0’.  (As explained in the module
+# 	      description, bit 1 in %r15 enables if enabled %r14 to override the
+# 	      default.)
 #
 # (Note: this brings into play Linux's blocking mechanisms.)
 #
 # (TODO: allow callbacks and greater configurability for such errors, to let
 # higher levels cleanup and such.)
+#
+# TODO: handle success too, which is *not* an exception!
 .global ns_system_x86_64_linux_exit_custom
 .set ns_system_x86_64_linux_exit_custom, (_ns_system_x86_64_linux_exit_custom - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_exit_custom:
+	# Before anything else, check if it's successful (zero code) or a failure
+	# (non-zero code).
+	testq %rdi, %rdi
+	jnz 0f
+1:
+	# It's success.
+	jmp _ns_system_x86_64_linux_exit_success
+	nop
+	hlt
+0:
+	# It's an error.
+
+	# Fatal?
+	testq %rcx, %rcx
+	jz 0f
+1:
+	# Fatal, *or* non-fatal but the default error handler is used, which is the
+	# error handler for fatal errors.
 	movq %rdi, %r10
 
 	movq %rdx, %rdx
@@ -1963,6 +2042,28 @@ _ns_system_x86_64_linux_exit_custom:
 	syscall
 
 	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+	# Non-fatal.
+
+	# First, check if we've enabled a non-default error / non-zero-exit handler.
+	testq $0x2, %r15
+	jnz 1b
+0:
+
+	# We have a non-default error handler.
+
+	# So instead we'll call %r14 with parameters:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	movq $0,   %rcx
+	jmp *%r14
 	nop
 	hlt
 
@@ -2149,6 +2250,17 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 .global ns_system_x86_64_linux_print_u64
 .set ns_system_x86_64_linux_print_u64, (_ns_system_x86_64_linux_print_u64 - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_print_u64:
+	# Begin implicit arg validation check.  Backup original %rdi to %r11.
+	movq %rdi, %r11
+	# Validate.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore original %rdi from %r11.
+	movq %r11, %rdi
+	# End implicit arg validation check.
+
 	movq %rdx, %r11  # Size.
 
 	#movq %rsi, %rsi  # Base.
@@ -2331,6 +2443,7 @@ _ns_system_x86_64_linux_verify_errno:
 4:
 
 	# Hand over control to exit_custom().
+	movq $0, %rcx
 	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rdx
 	leaq ns_system_x86_64_linux_syscall_verify_builder_size(%rip), %rsi
 	movq (%rsi), %rsi
@@ -2385,6 +2498,74 @@ _ns_system_x86_64_linux_is_null_terminated:
 	movq $0, %rsi
 	xchgq %rsi, %rdi
 	jmpq *%rsi
+	nop
+
+# Make sure %r15 and %r14 are at least as specified.
+#
+# (Just check the first 3 bytes of %r15.)
+#
+# (Currently, this is just checked in ‘print_u64’, ‘new_writer’, and
+# ‘new_reader’.
+#
+# You can normally check it like this:
+# 		leaq 9f(%rip), %rdi
+# 		movq $ns_system_x86_64_linux_validate_implicit_arguments, %rax
+# 		jmp _system
+# 	9:
+# 		nop
+#
+# Or internally in this module,
+# 		leaq 9f(%rip), %rdi
+# 		jmp _ns_system_x86_64_linux_validate_implicit_arguments
+# 	9:
+# 		nop
+#
+# Parameters:
+# 	%rdi: Return.
+.global ns_system_x86_64_linux_validate_implicit_arguments
+.set ns_system_x86_64_linux_validate_implicit_arguments, (_ns_system_x86_64_linux_validate_implicit_arguments - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_validate_implicit_arguments:
+	# Check the first 7 bytes are the magic code:
+	# 	0xF4 0x0D 0xCA 0x88  0x48 0x2D 0x41 (0xXX)
+	# (Inverted:)
+	# 	0x0B 0xF2 0x35 0x77  0xB7 0xD2 0xBE (0xXX)
+	testq $0x0BF23577B7D2BE00, %r15  # Test no inverted bits are set (‘printf "0x%02X\n" $ complement (0x03 :: Word8)’).
+	jnz 1f
+
+	# Now do unsigned below and above checks to test it's:
+	# 	- > 0xF40DCA88482D41FF, ||
+	# 	- < 0xF40DCA88482D4100
+	cmpq 0xF40DCA88482D41FF, %r15
+	ja 1f
+
+	cmpq 0xF40DCA88482D4100, %r15
+	jb 1f
+
+	jmp 0f
+1:
+	# Error: invalid implicit arguments!
+	#
+	# Make this a fatal error so that exit_custom doesn't try to look at the
+	# implicit paramaters.  Redundantly, on top of this, back up the original
+	# %r15 and %r14 and set our own implicit parameters to one that specifies
+	# the default (fatal) error handler.
+	movq %r15, %r9
+	movq %r14, %r8
+	movq $0xF40DCA88482D4100, %r15
+	leaq _ns_system_x86_64_linux_exit_custom(%rip), %r14
+	movq $1, %rcx
+	leaq ns_system_x86_64_linux_err_msg_invalid_implicit_args(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_invalid_implicit_args_size(%rip), %rsi
+	movq (%rsi), %rsi
+	movq $2, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+	# Tests passed.
+
+	# Return.
+	jmp *%rdi
 	nop
 
 # An optional segv trap handler that hands off execution to what was statically
