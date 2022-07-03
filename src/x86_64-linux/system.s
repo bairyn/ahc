@@ -1204,6 +1204,10 @@ ns_system_x86_64_linux_fork_join:
 # 		                  attribute.
 # 		Bit 4: fallback: use more default bits in case the syscall flags is
 # 		                 giving the kernel issues.
+# 		Bit 5: shared: don't enable O_COEXEC, so that child processes made
+# 		               through ‘exec’ to replace an old process already have
+# 		               this file descriptor opened too, that is it is
+# 		               inherited.
 # 		Rest: set to 0.
 # 	%r8: Please set to 0, so that future versions can accept an extra
 # 	     parameter if needed, e.g. for I/O options.
@@ -1280,7 +1284,7 @@ _ns_system_x86_64_linux_new_writer:
 
 	# Make sure unsupported bits in the options bitfield are 0, to aid in
 	# future enhancements.
-	testq $0xFFFFFFFFFFFFFFE0, %rcx
+	testq $0xFFFFFFFFFFFFFFC0, %rcx
 	jz 0f
 
 	# Error: invalid arguments.
@@ -1334,6 +1338,14 @@ _ns_system_x86_64_linux_new_writer:
 	orq $0x40,  %rsi  # |= (O_CREAT=64 (0x40))
 	orq $0x800, %rsi  # |= (O_NONBLOCK=2048 (0x800))
 	orq $0x0,   %rsi  # |= (O_RDONLY=0 (0x0))
+# O_CLOEXEC=524288 (0x80000)
+
+	# (not) Shared?
+	testq $0x20, %rdi
+	jnz 0f
+1:
+	orq $0x80000, %rsi  # O_CLOEXEC=524288 (0x80000)
+0:
 
 	# (not) Fallback?
 	testq $0x10, %rdi
@@ -1366,7 +1378,7 @@ _ns_system_x86_64_linux_new_writer:
 0:
 
 	# Noclobber?
-	testq $0x02, %rdi
+	testq $0x01, %rdi
 	jz 0f
 1:
 	orq $0x80,   %rsi  # O_EXCL=128 (0x80)
@@ -1580,6 +1592,10 @@ _ns_system_x86_64_linux_new_writer_write:
 # 		                  attribute.
 # 		Bit 4: fallback: use more default bits in case the syscall flags is
 # 		                 giving the kernel issues.
+# 		Bit 5: shared: don't enable O_COEXEC, so that child processes made
+# 		               through ‘exec’ to replace an old process already have
+# 		               this file descriptor opened too, that is it is
+# 		               inherited.
 # 		Rest: set to 0.
 # 	%r8: Please set to 0, so that future versions can accept an extra
 # 	     parameter if needed, e.g. for I/O options.
@@ -1662,7 +1678,7 @@ _ns_system_x86_64_linux_new_reader:
 
 	# Make sure unsupported bits in the options bitfield are 0, to aid in
 	# future enhancements.
-	testq $0xFFFFFFFFFFFFFFE7, %rcx
+	testq $0xFFFFFFFFFFFFFFC7, %rcx
 	jz 0f
 	# Error: invalid arguments.
 
@@ -1715,6 +1731,13 @@ _ns_system_x86_64_linux_new_reader:
 	# (This is a reader; don't worry about O_CREAT.)
 	orq $0x800, %rsi  # |= (O_NONBLOCK=2048 (0x800))
 	orq $0x1,   %rsi  # |= (O_WRONLY=1 (0x1))
+
+	# (not) Shared?
+	testq $0x20, %rdi
+	jnz 0f
+1:
+	orq $0x80000, %rsi  # O_CLOEXEC=524288 (0x80000)
+0:
 
 	# (not) Fallback?
 	testq $0x10, %rdi
