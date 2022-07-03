@@ -87,6 +87,24 @@ ns_cli_err_msg_memory_preliminary_checks:
 	.byte 0x00
 ns_cli_err_msg_memory_preliminary_checks_end:
 
+ns_cli_path_dev_stdout_size:
+	.quad (ns_cli_path_dev_stdout_end - ns_cli_path_dev_stdout)
+ns_cli_path_dev_stdout:
+	.ascii "/dev/stdout"
+	.byte 0x00
+ns_cli_path_dev_stdout_end:
+
+ns_cli_msg_starts_size:
+	.quad (ns_cli_msg_starts_end - ns_cli_msg_starts)  # 23
+ns_cli_msg_starts_u_offset:
+	.quad 16
+ns_cli_msg_starts_u_size:
+	.quad 4
+ns_cli_msg_starts:
+	.ascii "It starts (code     ).\n"
+	.byte 0x00
+ns_cli_msg_starts_end:
+
 .text
 # A front-end: the CLI.
 #
@@ -216,6 +234,42 @@ _ns_cli_cli:
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_monotonic_nanosleep, %rax
 	#jmp _system
+9:
+	nop
+
+	# Test ns_system_x86_64_linux_print_u64.
+	movq $1324, %rcx  # Value.
+	leaq ns_cli_msg_starts_u_size(%rip), %rdx
+	movq (%rdx), %rdx  # Size.
+	leaq ns_cli_msg_starts(%rip), %rdi
+	leaq ns_cli_msg_starts_u_offset(%rip), %rsi
+	movq (%rsi), %rsi
+	addq %rdi, %rsi  # Base.
+	leaq 9f(%rip), %rdi  # Return address.
+	movq $ns_system_x86_64_linux_print_u64, %rax
+	jmp _system
+9:
+	nop
+
+	# Make sure we can open and close /dev/stdout.
+	movq $0, %rcx
+	leaq ns_cli_err_msg_memory_preliminary_checks(%rip), %rdx
+	leaq ns_cli_err_msg_memory_preliminary_checks_size(%rip), %rsi
+	movq (%rdx), %rsi
+	leaq 9f(%rip), %rdi
+	movq $ns_system_x86_64_linux_new_writer, %rax
+	#jmp _system  # FIXME: This creates an empty file in the current directory!  What?
+9:
+	nop
+
+	# Uncomment the jmpq to write a message stdout.
+	# TODO
+
+	# Close /dev/stdout.
+	movq %rsi, %rdx      # Get close callback.
+	movq %rdi, %rsi      # Get user data.
+	leaq 9f(%rip), %rdi  # Get return address.
+	#jmpq *%rdx  # TODO: fix then uncomment.
 9:
 	nop
 

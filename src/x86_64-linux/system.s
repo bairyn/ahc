@@ -339,6 +339,22 @@ ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated_end:
 
+ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_end - ns_system_x86_64_linux_err_msg_new_writer_close_close_failed)
+ns_system_x86_64_linux_err_msg_new_writer_close_close_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_writer’ ‘.close’ error: the ‘close’ syscall failed!  Could not close the writer.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_close_close_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_close_close_failed_end - ns_system_x86_64_linux_err_msg_new_reader_close_close_failed)
+ns_system_x86_64_linux_err_msg_new_reader_close_close_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ ‘.close’ error: the ‘close’ syscall failed!  Could not close the reader.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_close_close_failed_end:
+
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
 # and shell support.  Also add a few other utilities as needed.
@@ -1103,19 +1119,22 @@ ns_system_x86_64_linux_fork_join:
 # return a new set of callbacks.  (Responsibility for managing resources is not
 # dealt with here, as this is meant to be a low-level API.)
 #
+# Symlinks are followed except for noclobber.
+#
 # This tree may be easier to parse if you configure your vim to visually
 # display tabs and spaces differently, as I have.  Tabs are used for
 # indentation, and spaces for alignment here.
 #
 # Parameters:
 # 	%rdi: Return with single-use-only (consumes the entire set at that level)
-# 	      callbacks, with parameters:
+# 	      (clobbering!) callbacks, with parameters:
 # 		%rdi: User data as part of a returned closure.  You pass it to %rsi or
 # 		      any other callback so that it has data to work with.  Under the
 # 		      hood, this is just the file descriptor.
 # 		%rsi: Close callback to destroy the resource and discard any pending
 # 		      reads or writes, with parameters:
 # 			%rdi: Return.
+# 			%rsi: User data.
 # 		%rdx: Query status callback, with parameters:
 # 			%rdi: Return, with parameters:
 # 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
@@ -1125,6 +1144,7 @@ ns_system_x86_64_linux_fork_join:
 # 				                      already consumed (although the new ones
 # 				                      may refer to the same address).
 # 				%r9: zero if not ready for writing, 1 if ready.
+# 			%rsi: User data.
 # 		%rcx: Attempt to write optionally with timeout callback, with parameters:
 # 			%rdi: Return on non-fatal error (basically EAGAIN; means it would
 # 			      block and is not available for the write or read), with
@@ -1164,24 +1184,44 @@ ns_system_x86_64_linux_fork_join:
 # 			%r8: Number of bytes to request a write for (i.e., the size).
 # 			%r9: The data to request a write for (i.e., the data).
 # 		%r8: currently 0, in case future versions want to add functionality.
+# 		     (If the API is extended with APIs, I'd probably make the next
+# 		     addition a tuple to contain, e.g. set %r8 to 1 and then %r9
+# 		     becomes the tuple callback (don't worry, %rdi is already available
+# 		     as the user data).)
 # 	%rsi: Size of filepath.
-# 	%rdx: Pointer to filepath.
+# 	%rdx: Pointer to filepath.  Null-terminate it for the kernel.
 # 	%rcx: Options bitfield:
-# 		Bit 0: autoclose: 0 does nothing, and 1 overrides other conflicting
+# 		Bit 0: noclobber: 0 does nothing, and 1 overrides other conflicting
 # 		                  options for handling already-existing files and
 # 		                  automatically closes the writer if the file already
-# 		                  exists.  The ‘noclobber’ flag.
+# 		                  exists.  The ‘noclobber’ flag.  Autoclose if exists.
 # 		Bit 1: append: if the file already exists, append writes instead of
 # 		               overwriting or discarding the original file, if 1;
 # 		               if 0, work as though this writer replaces anything
 # 		               already there.
+# 		Bit 2: direct: auto-sync and avoid caching where possible if 1.
+# 		Bit 3: incognito: NOATIME: request concealing the access via the ATIME
+# 		                  attribute.
+# 		Bit 4: fallback: use more default bits in case the syscall flags is
+# 		                 giving the kernel issues.
 # 		Rest: set to 0.
 # 	%r8: Please set to 0, so that future versions can accept an extra
 # 	     parameter if needed, e.g. for I/O options.
 #
-# Since the stack is used, this preserves (but would otherwise clobber) all
+# This clobbers all parameter registers, because they are passed to the return
+# continuation, and one extra working storage unit is needed to hold the return
+# continuation itself:
+# 	- %rdi
+# 	- %rsi
+# 	- %rdx
+# 	- %rcx
+# 	- %r8
+# 	- %r9
+#
+# (Since the stack is used, this preserves (but would otherwise clobber) all
 # syscall registers (%rax, %rcx, %r11, %r10) and parameter registers (%rdi,
-# %rsi, %rdx, %rcx, %r8, %r9):
+# %rsi, %rdx, %rcx, %r8, %r9), except the parameter registers used for the
+# callback:)
 # 	- %rax
 # 	- %rcx
 # 	- %r11
@@ -1197,12 +1237,6 @@ ns_system_x86_64_linux_fork_join:
 .global ns_system_x86_64_linux_new_writer
 .set ns_system_x86_64_linux_new_writer, (_ns_system_x86_64_linux_new_writer - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_new_writer:
-	# TODO
-	nop
-	jmp _ns_system_x86_64_linux_exit_failure
-	nop
-	hlt
-
 	# First backup the input arguments and what we clobber onto the stack.
 
 	subq $16, %rsp
@@ -1246,7 +1280,7 @@ _ns_system_x86_64_linux_new_writer:
 
 	# Make sure unsupported bits in the options bitfield are 0, to aid in
 	# future enhancements.
-	testq $0xFFFFFFFFFFFFFFFC, %rcx
+	testq $0xFFFFFFFFFFFFFFE0, %rcx
 	jz 0f
 
 	# Error: invalid arguments.
@@ -1292,14 +1326,57 @@ _ns_system_x86_64_linux_new_writer:
 	hlt
 0:
 
-	# TODO
+	# Calculate the flags, into %rsi.
+	movq $0, %rsi  # Clear flags.
+	movq 16(%rsp), %rdi  # Original %rcx, options bitfield.
+
+	# Base options.
+	orq $0x40,  %rsi  # |= (O_CREAT=64 (0x40))
+	orq $0x800, %rsi  # |= (O_NONBLOCK=2048 (0x800))
+	orq $0x0,   %rsi  # |= (O_RDONLY=0 (0x0))
+
+	# (not) Fallback?
+	testq $0x10, %rdi
+	jnz 0f
+1:
+	orq $0x8000, %rsi  # O_LARGEFILE=32768 (0x8000)
+0:
+
+	# Incognito?
+	testq $0x08, %rdi
+	jz 0f
+1:
+	orq $0x1000000, %rsi  # O_NOATIME=16777216 (0x1000000)
+0:
+
+	# Direct?
+	testq $0x04, %rdi
+	jz 0f
+1:
+	# (O_SYNC pulls in __O_SYNC and O_DSYNC on my system.)
+	orq $0x1000,   %rsi  # O_DSYNC=4096 (0x1000)
+	orq $0x100000, %rsi  # O_SYNC=1048576 (0x100000)
+0:
+
+	# Append?
+	testq $0x02, %rdi
+	jz 0f
+1:
+	orq $0x400,   %rsi  # O_APPEND=1024 (0x400)
+0:
+
+	# Noclobber?
+	testq $0x02, %rdi
+	jz 0f
+1:
+	orq $0x80,   %rsi  # O_EXCL=128 (0x80)
+0:
 
 	# Perform the syscall.
-	# TODO
-	#movq %r10, %r10  # struct timespec *remain
-	#movq %r8, %rdx  # const struct timespec *request
-	#movq $0, %rsi  # int flags = 0
-	#movq $1, %rdi  # clockid_t clockid = CLOCK_MONOTONIC
+	#movq $0o664, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired
+	movq $0x1b4, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired - decimal for this mode is 436
+	movq %rsi, %rsi  # flags
+	movq 24(%rsp), %rdi  # We made sure it was null-terminated, so it's compatible with the syscall interface.
 	movq $2, %rax  # open
 	syscall
 
@@ -1313,33 +1390,89 @@ _ns_system_x86_64_linux_new_writer:
 9:
 	nop
 
-	# Restore the working storage units and the stack.
+	# TODO: permit error handling!
 
-	movq 0(%rsp), %r9
-	movq 8(%rsp), %r8
+	# We have a working file handle in %rax.
+
+	# Build the arguments before we return back to the return continuation.
+
+	# Fortunately, our case is simple enough that we can get by with having the
+	# same callback for every object.
+
+	movq 40(%rsp), %rdi  # Get the original return continuation.  Will eventually jump to this.
+	movq %rax,     %r9   # Right before the jump to return, this will be %rdi.  This is the user data: the file handle.
+
+	# Callbacks.
+	leaq _ns_system_x86_64_linux_new_writer_close(%rip), %rsi
+	leaq _ns_system_x86_64_linux_new_writer_query(%rip), %rdx
+	leaq _ns_system_x86_64_linux_new_writer_write(%rip), %rcx
+	movq $0, %r8
+
+	# Restore the working storage units and the stack, except don't preserve
+	# the arguments we'll pass to the return continuation, as we specified:
+	# 	- %rdi
+	# 	- %rsi
+	# 	- %rdx
+	# 	- %rcx
+	# 	- %r8
+	# 	- %r9
+
+	#movq 0(%rsp), %r9
+	#movq 8(%rsp), %r8
 	addq $16, %rsp
 
-	movq 0(%rsp), %rcx
-	movq 8(%rsp), %rdx
+	#movq 0(%rsp), %rcx
+	#movq 8(%rsp), %rdx
 	addq $16, %rsp
 
-	movq 0(%rsp), %rsi
-	movq 8(%rsp), %rdi
+	#movq 0(%rsp), %rsi
+	#movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	movq 0(%rsp), %r10
 	movq 8(%rsp), %r11
 	addq $16, %rsp
 
-	movq 0(%rsp), %rcx
+	#movq 0(%rsp), %rcx
 	movq 8(%rsp), %rax
 	addq $16, %rsp
 
-	# TODO: Return.
+	# Return.
+	xchgq %rdi, %r9
+	jmpq *%r9
+	nop
 
+_ns_system_x86_64_linux_new_writer_close:
+	# Backup ‘return’.
+	movq %rdi, %rdx
+
+	# Perform the ‘close’ syscall.
+	movq %rsi, %rdi  # int fd
+	movq $0x3, %rax  # close
+	syscall
+
+	# Verify.
+	movq %rax, %rsi
+
+	movq %rdx, %rax  # Restore ‘return’.
+
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size(%rip), %rcx
+	movq (%rcx), %rcx
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Return.
+	jmpq *%rax
+	nop
+_ns_system_x86_64_linux_new_writer_query:
 	# TODO
 	nop
-	jmp _ns_system_x86_64_linux_exit_failure
+	hlt
+_ns_system_x86_64_linux_new_writer_write:
+	# TODO
 	nop
 	hlt
 
@@ -1353,6 +1486,8 @@ _ns_system_x86_64_linux_new_writer:
 # callbacks with the same or with a compatible API.  The closing callbacks do
 # not return a new set of callbacks.  (Responsibility for managing resources is
 # not dealt with here, as this is meant to be a low-level API.)
+#
+# Symlinks are followed except for noclobber.
 #
 # This tree may be easier to parse if you configure your vim to visually
 # display tabs and spaces differently, as I have.  Tabs are used for
@@ -1374,6 +1509,7 @@ _ns_system_x86_64_linux_new_writer:
 # 		%rsi: Close callback to destroy the resource and discard any pending
 # 		      reads or writes, with parameters:
 # 			%rdi: Return.
+# 			%rsi: User data.
 # 		%rdx: Query status callback, with parameters:
 # 			%rdi: Return, with parameters:
 # 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
@@ -1383,6 +1519,7 @@ _ns_system_x86_64_linux_new_writer:
 # 				                      already consumed (although the new ones
 # 				                      may refer to the same address).
 # 				%r9: zero if not ready for writing, 1 if ready.
+# 			%rsi: User data.
 # 		%rcx: Callback to attempt to read, optionally with a timeout, with
 # 		      parameters:
 # 			%rdi: Return on non-fatal error (basically EAGAIN; means it would
@@ -1432,17 +1569,35 @@ _ns_system_x86_64_linux_new_writer:
 # 				%rsi: User data.
 # 			%r9: User data to provide to the tuple continuation.
 # 		%r8: currently 0, in case future versions want to add functionality.
+# 		     (If the API is extended with APIs, I'd probably make the next
+# 		     addition a tuple to contain, e.g. set %r8 to 1 and then %r9
+# 		     becomes the tuple callback (don't worry, %rdi is already available
+# 		     as the user data).)
 # 	%rsi: Size of filepath.
-# 	%rdx: Pointer to filepath.
+# 	%rdx: Pointer to filepath.  Null-terminate it for the kernel.
 # 	%rcx: Options bitfield:
-# 		(Nothing.)
+# 		Bit 3: incognito: NOATIME: request concealing the access via the ATIME
+# 		                  attribute.
+# 		Bit 4: fallback: use more default bits in case the syscall flags is
+# 		                 giving the kernel issues.
 # 		Rest: set to 0.
 # 	%r8: Please set to 0, so that future versions can accept an extra
 # 	     parameter if needed, e.g. for I/O options.
 #
-# Since the stack is used, this preserves (but would otherwise clobber) all
+# This clobbers all parameter registers, because they are passed to the return
+# continuation, and one extra working storage unit is needed to hold the return
+# continuation itself:
+# 	- %rdi
+# 	- %rsi
+# 	- %rdx
+# 	- %rcx
+# 	- %r8
+# 	- %r9
+#
+# (Since the stack is used, this preserves (but would otherwise clobber) all
 # syscall registers (%rax, %rcx, %r11, %r10) and parameter registers (%rdi,
-# %rsi, %rdx, %rcx, %r8, %r9):
+# %rsi, %rdx, %rcx, %r8, %r9), except the parameter registers used for the
+# callback:)
 # 	- %rax
 # 	- %rcx
 # 	- %r11
@@ -1507,7 +1662,7 @@ _ns_system_x86_64_linux_new_reader:
 
 	# Make sure unsupported bits in the options bitfield are 0, to aid in
 	# future enhancements.
-	testq $0xFFFFFFFFFFFFFFFF, %rcx
+	testq $0xFFFFFFFFFFFFFFE7, %rcx
 	jz 0f
 	# Error: invalid arguments.
 
@@ -1552,8 +1707,36 @@ _ns_system_x86_64_linux_new_reader:
 	hlt
 0:
 
+	# Calculate the flags, into %rsi.
+	movq $0, %rsi  # Clear flags.
+	movq 16(%rsp), %rdi  # Original %rcx, options bitfield.
+
+	# Base options.
+	# (This is a reader; don't worry about O_CREAT.)
+	orq $0x800, %rsi  # |= (O_NONBLOCK=2048 (0x800))
+	orq $0x1,   %rsi  # |= (O_WRONLY=1 (0x1))
+
+	# (not) Fallback?
+	testq $0x10, %rdi
+	jnz 0f
+1:
+	orq $0x8000, %rsi  # O_LARGEFILE=32768 (0x8000)
+0:
+
+	# Incognito?
+	testq $0x08, %rdi
+	jz 0f
+1:
+	orq $0x1000000, %rsi  # O_NOATIME=16777216 (0x1000000)
+0:
+
 	# Perform the syscall.
-	# TODO
+	#movq $0o664, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired
+	movq $0x1b4, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired - decimal for this mode is 436
+	movq %rsi, %rsi  # flags
+	movq 24(%rsp), %rdi  # We made sure it was null-terminated, so it's compatible with the syscall interface.
+	movq $2, %rax  # open
+	syscall
 
 	# Verify.
 	movq %rax, %rsi
@@ -1565,33 +1748,89 @@ _ns_system_x86_64_linux_new_reader:
 9:
 	nop
 
-	# Restore the working storage units and the stack.
+	# TODO: permit error handling!
 
-	movq 0(%rsp), %r9
-	movq 8(%rsp), %r8
+	# We have a working file handle in %rax.
+
+	# Build the arguments before we return back to the return continuation.
+
+	# Fortunately, our case is simple enough that we can get by with having the
+	# same callback for every object.
+
+	movq 40(%rsp), %rdi  # Get the original return continuation.  Will eventually jump to this.
+	movq %rax,     %r9   # Right before the jump to return, this will be %rdi.  This is the user data: the file handle.
+
+	# Callbacks.
+	leaq _ns_system_x86_64_linux_new_reader_close(%rip), %rsi
+	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx
+	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx
+	movq $0, %r8
+
+	# Restore the working storage units and the stack, except don't preserve
+	# the arguments we'll pass to the return continuation, as we specified:
+	# 	- %rdi
+	# 	- %rsi
+	# 	- %rdx
+	# 	- %rcx
+	# 	- %r8
+	# 	- %r9
+
+	#movq 0(%rsp), %r9
+	#movq 8(%rsp), %r8
 	addq $16, %rsp
 
-	movq 0(%rsp), %rcx
-	movq 8(%rsp), %rdx
+	#movq 0(%rsp), %rcx
+	#movq 8(%rsp), %rdx
 	addq $16, %rsp
 
-	movq 0(%rsp), %rsi
-	movq 8(%rsp), %rdi
+	#movq 0(%rsp), %rsi
+	#movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	movq 0(%rsp), %r10
 	movq 8(%rsp), %r11
 	addq $16, %rsp
 
-	movq 0(%rsp), %rcx
+	#movq 0(%rsp), %rcx
 	movq 8(%rsp), %rax
 	addq $16, %rsp
 
-	# TODO: Return.
+	# Return.
+	xchgq %rdi, %r9
+	jmpq *%r9
+	nop
 
+_ns_system_x86_64_linux_new_reader_close:
+	# Backup ‘return’.
+	movq %rdi, %rdx
+
+	# Perform the ‘close’ syscall.
+	movq %rsi, %rdi  # int fd
+	movq $0x3, %rax  # close
+	syscall
+
+	# Verify.
+	movq %rax, %rsi
+
+	movq %rdx, %rax  # Restore ‘return’.
+
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size(%rip), %rcx
+	movq (%rcx), %rcx
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Return.
+	jmpq *%rax
+	nop
+_ns_system_x86_64_linux_new_reader_query:
 	# TODO
 	nop
-	jmp _ns_system_x86_64_linux_exit_failure
+	hlt
+_ns_system_x86_64_linux_new_reader_read:
+	# TODO
 	nop
 	hlt
 
