@@ -189,8 +189,8 @@ _ns_cli_cli:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# Backup %r15 and %r14.
@@ -281,8 +281,9 @@ _ns_cli_cli:
 	nop
 
 	# Now join.
+	movq %rsi, %rsi
 	leaq 9f(%rip), %rdx
-	xchgq %rdi, %rdx
+	xchgq %rdx, %rdi
 	jmpq *%rdx
 9:
 	nop

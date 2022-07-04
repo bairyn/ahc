@@ -169,8 +169,8 @@ _ns_util_system_verify_writeable:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# Backup %r15 and %r14.

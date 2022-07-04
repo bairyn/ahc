@@ -912,12 +912,13 @@ _ns_system_x86_64_linux_fork_require:
 
 	# We're the parent.  Set up arguments to return and then return.
 	movq %rax, %rsi
-	leaq ns_system_x86_64_linux_fork_join(%rip), %rdi
+	leaq _ns_system_x86_64_linux_fork_join(%rip), %rdi
 	movq %r8, %rdx
 	jmpq *%rdx
 	nop
 
-# Used by ‘ns_system_x86_64_linux_fork_join’; the action part of the closure.
+# Used by ‘ns_system_x86_64_linux_fork_require’; the action part of the
+# closure.
 #
 # Parameters:
 # 	%rdi: Return after joining, blocking and waiting until the thread finishes.  (And fail with an error instead if the joined thread failed with an error.)
@@ -928,7 +929,7 @@ _ns_system_x86_64_linux_fork_require:
 # caller preserved, not callee-preserved.)
 #
 # This uses 336 bytes of stack space (equivalent to 42 ‘uint64_t’s).
-ns_system_x86_64_linux_fork_join:
+_ns_system_x86_64_linux_fork_join:
 	# Backup %rdi and %rsi.
 	subq $16, %rsp
 	movq %rdi, 8(%rsp)
@@ -939,8 +940,8 @@ ns_system_x86_64_linux_fork_join:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# According to the man pages, the ‘waitid’ (247 for x86_64-linux; there's
@@ -970,8 +971,8 @@ ns_system_x86_64_linux_fork_join:
 	movq %rcx, 8(%rsp)
 
 	# For an extra check, explained below, backup our
-	# ns_system_x86_64_linux_fork_join instance.
-	leaq ns_system_x86_64_linux_fork_join(%rip), %r11
+	# _ns_system_x86_64_linux_fork_join instance.
+	leaq _ns_system_x86_64_linux_fork_join(%rip), %r11
 	movq %r11, 0(%rsp)
 
 	# siginfo_t looks to be uint32_t signo, uint32_t errno, uint32_t code,
@@ -989,8 +990,8 @@ ns_system_x86_64_linux_fork_join:
 	movq %rsp, %rdx
 
 	# For an extra check, explained below, backup our
-	# ns_system_x86_64_linux_fork_join instance.
-	leaq ns_system_x86_64_linux_fork_join(%rip), %r11
+	# _ns_system_x86_64_linux_fork_join instance.
+	leaq _ns_system_x86_64_linux_fork_join(%rip), %r11
 	subq $16, %rsp
 	movq %r11, 8(%rsp)
 
@@ -1407,8 +1408,8 @@ _ns_system_x86_64_linux_new_writer:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# First backup the input arguments and what we clobber onto the stack.
@@ -1698,8 +1699,8 @@ _ns_system_x86_64_linux_new_writer_close:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# Backup ‘return’.
@@ -1737,8 +1738,8 @@ _ns_system_x86_64_linux_new_writer_query:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# TODO
@@ -1755,8 +1756,8 @@ _ns_system_x86_64_linux_new_writer_write:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# TODO
@@ -1914,8 +1915,8 @@ _ns_system_x86_64_linux_new_reader:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# First backup the input arguments and what we clobber onto the stack.
@@ -2180,8 +2181,8 @@ _ns_system_x86_64_linux_new_reader_close:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# Backup ‘return’.
@@ -2219,8 +2220,8 @@ _ns_system_x86_64_linux_new_reader_query:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# TODO
@@ -2237,8 +2238,8 @@ _ns_system_x86_64_linux_new_reader_read:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# TODO
@@ -2422,8 +2423,8 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# Backup %rax.
@@ -2631,8 +2632,8 @@ _ns_system_x86_64_linux_print_u64:
 9:
 	nop
 	# Restore %rdi and %rsi.
-	movq %rsi, 0(%rsp)
-	movq %rdi, 8(%rsp)
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	movq %rdx, %r11  # Size.
@@ -2892,8 +2893,8 @@ _ns_system_x86_64_linux_is_null_terminated:
 # 	9:
 # 		nop
 # 		# Restore %rdi and %rsi.
-# 		movq %rsi, 0(%rsp)
-# 		movq %rdi, 8(%rsp)
+# 		movq 0(%rsp), %rsi
+# 		movq 8(%rsp), %rdi
 # 		addq $16, %rsp
 #
 # Or internally in this module,
@@ -2907,8 +2908,8 @@ _ns_system_x86_64_linux_is_null_terminated:
 # 	9:
 # 		nop
 # 		# Restore %rdi and %rsi.
-# 		movq %rsi, 0(%rsp)
-# 		movq %rdi, 8(%rsp)
+# 		movq 0(%rsp), %rsi
+# 		movq 8(%rsp), %rdi
 # 		addq $16, %rsp
 #
 # Note: if the check fails, the error will be fatal, so cleanup not needed on a
