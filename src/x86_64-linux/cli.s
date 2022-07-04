@@ -158,6 +158,8 @@ ns_cli_msg_starts_end:
 #
 # Parameters:
 # 	(None.)
+#
+# We use the stack here just to track cleanup requirements.
 .global ns_cli_cli
 .set ns_cli_cli, (_ns_cli_cli - ns_cli_module_begin)
 _ns_cli_cli:
@@ -176,12 +178,30 @@ _ns_cli_cli:
 9:
 	nop
 
-	# Validate the implicit arguments.
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_validate_implicit_arguments, %rax
 	jmp _system
 9:
 	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Reserve extra working storage space if desired.
+	subq $16, %rsp
+	movq $0, 8(%rsp)
+	movq $0, 0(%rsp)
 
 	# Preliminarily check we can malloc and free.
 	movq $0, %rcx
@@ -237,7 +257,7 @@ _ns_cli_cli:
 	movq %rsi, %rdx
 	movq $8388608, %rsi  # Free our 1MiB allocation.
 	leaq 9f(%rip), %rdi
-	movq $ns_system_x86_64_linux_base_malloc_require, %rax
+	movq $ns_system_x86_64_linux_base_mfree, %rax
 	jmp _system
 9:
 	nop
@@ -349,12 +369,62 @@ _ns_cli_cli:
 	movq $23, %rdx
 	syscall
 
+	jmp 5f  # Skip error cleanup.
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# TODO: fix resource leak: cleanup memory allocations and readers and
+	# writers if they have been opened but an exception was thrown before they
+	# were closed!
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	movq $ns_system_x86_64_linux_exit_custom, %rax
+	jmp _system
+	nop
+5:
+	# Cleanup.
+
+	# Restore extra space.
+	addq $16, %rsp
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
+	# Exit success.
 	movq $ns_system_x86_64_linux_exit_success, %rax
 	jmp _system
 	nop
 
+	nop
+	hlt
+
 	jmp ns_cli_cli
 	nop
+	hlt
 
 .global ns_cli_module_end
 ns_cli_module_end:

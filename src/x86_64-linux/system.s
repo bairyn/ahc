@@ -71,14 +71,6 @@
 # 			%rsi: String size.
 # 			%rdx: String.
 # 			%rcx: 0.
-#
-# TODO finish implementing this: you just need to search for %rsp to make sure
-# stack is handled in good practice.  Basically, at least fork_join,
-# new_writer, new_reader, and monotonic_nanosleep will need their own cleaning
-# sections added.  Check other modules too!  Also add the same module implicit
-# parameters to other modules.
-#TODO finish implement this.
-TODO block build until this is done.
 
 # We could have ‘.data’ here, but for modularity and portability, put all of
 # this module in the same section, so it can be e.g. copied and referenced from
@@ -937,21 +929,19 @@ _ns_system_x86_64_linux_fork_require:
 #
 # This uses 336 bytes of stack space (equivalent to 42 ‘uint64_t’s).
 ns_system_x86_64_linux_fork_join:
-	# Begin implicit arg validation check.  Backup original %rdi and %rsi to
-	# the stack.
+	# Backup %rdi and %rsi.
 	subq $16, %rsp
 	movq %rdi, 8(%rsp)
 	movq %rsi, 0(%rsp)
-	# Validate.
+	# Validate implicit parameters.
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_validate_implicit_arguments
 9:
 	nop
-	# Restore original %rdi and %rsi from the stack.
-	movq 0(%rsp), %rsi
-	movq 8(%rsp), %rdi
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
 	addq $16, %rsp
-	# End implicit arg validation check.
 
 	# According to the man pages, the ‘waitid’ (247 for x86_64-linux; there's
 	# an ‘x32’ 529 listin in syscall_64.tbl) is preferred for new applications
@@ -1208,8 +1198,18 @@ ns_system_x86_64_linux_fork_join:
 	#movq 8(%rsp), %rsi
 	addq $16, %rsp
 	addq $16, %rsp
-	# 2) Then return not to %rdi, but to the previous %r14.  (No need to do another %r15 check.)
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
 	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 5:
 	# Cleanup.
@@ -1397,6 +1397,20 @@ ns_system_x86_64_linux_fork_join:
 .global ns_system_x86_64_linux_new_writer
 .set ns_system_x86_64_linux_new_writer, (_ns_system_x86_64_linux_new_writer - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_new_writer:
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# First backup the input arguments and what we clobber onto the stack.
 
 	subq $16, %rsp
@@ -1419,16 +1433,14 @@ _ns_system_x86_64_linux_new_writer:
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
 
-	# Begin implicit arg validation check.  %rdi is already backed up to 40(%rsp).
-	# Validate.
-	leaq 9f(%rip), %rdi
-	jmp _ns_system_x86_64_linux_validate_implicit_arguments
-9:
-	nop
-	# Restore original %rdi from 40(%rsp) and %rsi from 32(%rsp).
-	movq 40(%rsp), %rdi
-	movq 32(%rsp), %rdi
-	# End implicit arg validation check.
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
 
 	# Next just perform a few checks.
 
@@ -1572,9 +1584,15 @@ _ns_system_x86_64_linux_new_writer:
 9:
 	nop
 
-	# TODO: permit error handling!
-
 	# We have a working file handle in %rax.
+	# (Note: at this point, we have an additional resource we would need to
+	# clean up.  However, immediately we get ready to return instead of handing
+	# off control to where there may be exceptions elsewhere, so we don't need
+	# to add to our cleanup requirements.  If we did, there are ways to do
+	# that, and a convenient trick might be to add a prefix to the ‘6f’ error
+	# cleanup address that performs a close on the file handle and then
+	# naturally progresses to the 6f address right afterwards, and we just set
+	# %r14 to that new 7f or whatever label right before 6f, rather than 6f.)
 
 	# Build the arguments before we return back to the return continuation.
 
@@ -1589,6 +1607,51 @@ _ns_system_x86_64_linux_new_writer:
 	leaq _ns_system_x86_64_linux_new_writer_query(%rip), %rdx
 	leaq _ns_system_x86_64_linux_new_writer_write(%rip), %rcx
 	movq $0, %r8
+
+	jmp 5f  # Skip error cleanup.
+
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	movq 0(%rsp), %r10
+	movq 8(%rsp), %r11
+	addq $16, %rsp
+	movq 8(%rsp), %rax
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+5:
+	# Cleanup.
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
 
 	# Restore the working storage units and the stack, except don't preserve
 	# the arguments we'll pass to the return continuation, as we specified:
@@ -1625,6 +1688,20 @@ _ns_system_x86_64_linux_new_writer:
 	nop
 
 _ns_system_x86_64_linux_new_writer_close:
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# Backup ‘return’.
 	movq %rdi, %rdx
 
@@ -1650,10 +1727,38 @@ _ns_system_x86_64_linux_new_writer_close:
 	jmpq *%rax
 	nop
 _ns_system_x86_64_linux_new_writer_query:
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# TODO
 	nop
 	hlt
 _ns_system_x86_64_linux_new_writer_write:
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# TODO
 	nop
 	hlt
@@ -1799,11 +1904,19 @@ _ns_system_x86_64_linux_new_writer_write:
 .global ns_system_x86_64_linux_new_reader
 .set ns_system_x86_64_linux_new_reader, (_ns_system_x86_64_linux_new_reader - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_new_reader:
-	# TODO
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
 	nop
-	jmp _ns_system_x86_64_linux_exit_failure
-	nop
-	hlt
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
 
 	# First backup the input arguments and what we clobber onto the stack.
 
@@ -1827,16 +1940,14 @@ _ns_system_x86_64_linux_new_reader:
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
 
-	# Begin implicit arg validation check.  %rdi is already backed up to 40(%rsp).
-	# Validate.
-	leaq 9f(%rip), %rdi
-	jmp _ns_system_x86_64_linux_validate_implicit_arguments
-9:
-	nop
-	# Restore original %rdi from 40(%rsp) and %rsi from 32(%rsp).
-	movq 40(%rsp), %rdi
-	movq 32(%rsp), %rdi
-	# End implicit arg validation check.
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
 
 	# Next just perform a few checks.
 
@@ -1955,9 +2066,15 @@ _ns_system_x86_64_linux_new_reader:
 9:
 	nop
 
-	# TODO: permit error handling!
-
 	# We have a working file handle in %rax.
+	# (Note: at this point, we have an additional resource we would need to
+	# clean up.  However, immediately we get ready to return instead of handing
+	# off control to where there may be exceptions elsewhere, so we don't need
+	# to add to our cleanup requirements.  If we did, there are ways to do
+	# that, and a convenient trick might be to add a prefix to the ‘6f’ error
+	# cleanup address that performs a close on the file handle and then
+	# naturally progresses to the 6f address right afterwards, and we just set
+	# %r14 to that new 7f or whatever label right before 6f, rather than 6f.)
 
 	# Build the arguments before we return back to the return continuation.
 
@@ -1972,6 +2089,51 @@ _ns_system_x86_64_linux_new_reader:
 	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx
 	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx
 	movq $0, %r8
+
+	jmp 5f  # Skip error cleanup.
+
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	movq 0(%rsp), %r10
+	movq 8(%rsp), %r11
+	addq $16, %rsp
+	movq 8(%rsp), %rax
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+5:
+	# Cleanup.
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
 
 	# Restore the working storage units and the stack, except don't preserve
 	# the arguments we'll pass to the return continuation, as we specified:
@@ -2008,6 +2170,20 @@ _ns_system_x86_64_linux_new_reader:
 	nop
 
 _ns_system_x86_64_linux_new_reader_close:
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# Backup ‘return’.
 	movq %rdi, %rdx
 
@@ -2033,10 +2209,38 @@ _ns_system_x86_64_linux_new_reader_close:
 	jmpq *%rax
 	nop
 _ns_system_x86_64_linux_new_reader_query:
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# TODO
 	nop
 	hlt
 _ns_system_x86_64_linux_new_reader_read:
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# TODO
 	nop
 	hlt
@@ -2208,6 +2412,20 @@ _ns_system_x86_64_linux_cc_call_stack_return:
 _ns_system_x86_64_linux_monotonic_nanosleep:
 	# timespec is a pair of signed longs: seconds and nanoseconds.
 
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
 	# Backup %rax.
 	subq $16, %rsp
 	# 8(%rsp): padding.
@@ -2247,6 +2465,15 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 	subq $16, %rsp
 	movq %rsp, %r10  # Track struct to hold remaining sleep.
 
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
+
 1:
 	# Perform the syscall.
 	movq %r10, %r10  # struct timespec *remain
@@ -2281,6 +2508,52 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 
 	jmp 1b
 0:
+
+	jmp 5f  # Skip error cleanup.
+
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	movq 0(%rsp), %r8
+	addq $16, %rsp
+	movq 0(%rsp), %r10
+	#movq 8(%rsp), %rdx
+	addq $16, %rsp
+	#movq 0(%rsp), %rsi
+	#movq 8(%rsp), %rdi
+	addq $16, %rsp
+	movq 0(%rsp), %r11
+	#movq 8(%rsp), %rcx
+	addq $16, %rsp
+	movq 0(%rsp), %rax
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+
+5:
+	# Cleanup.
 
 	# Restore stack and storage units.
 
@@ -2348,18 +2621,19 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 .global ns_system_x86_64_linux_print_u64
 .set ns_system_x86_64_linux_print_u64, (_ns_system_x86_64_linux_print_u64 - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_print_u64:
-	# Begin implicit arg validation check.  Backup original %rdi to %r11 and %rsi to %r10.
-	movq %rdi, %r11
-	movq %rsi, %r10
-	# Validate.
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_validate_implicit_arguments
 9:
 	nop
-	# Restore original %rdi from %r11 and %rsi from %r10.
-	movq %r10, %rsi
-	movq %r11, %rdi
-	# End implicit arg validation check.
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
 
 	movq %rdx, %r11  # Size.
 
@@ -2440,8 +2714,8 @@ _ns_system_x86_64_linux_print_u64:
 # message.
 # 	%rdi: return
 # 	%rsi: the errno to check (syscall return %rax value, actually)
-# 	%rdx: an error message to print after our prefix of ‘Error (errno %d): ’
-# 	%rcx: size of the error message
+# 	%rdx: size of the error message
+# 	%rcx: an error message to print after our prefix of ‘Error (errno %d): ’
 #
 # If this procedure action returns with no error detected, no storage units are
 # clobbered.
@@ -2456,6 +2730,8 @@ _ns_system_x86_64_linux_verify_errno:
 	jg   0f         # return
 
 	# We have an error.  Prepare the message.
+	xchgq %rdx, %rcx  # Just 'cause I swapped %rdx and %rcx in the docs and
+	                  # adding this instruction is convenient.
 	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rdi
 # 	%rdx: an error message to print after our prefix of ‘Error (errno %d): ’
 	movb $'E, 0(%rdi)
@@ -2605,17 +2881,35 @@ _ns_system_x86_64_linux_is_null_terminated:
 # (Just check the first 3 bytes of %r15.)
 #
 # You can normally check it like this:
+# 		# Backup %rdi and %rsi.
+# 		subq $16, %rsp
+# 		movq %rdi, 8(%rsp)
+# 		movq %rsi, 0(%rsp)
+# 		# Validate implicit parameters.
 # 		leaq 9f(%rip), %rdi
 # 		movq $ns_system_x86_64_linux_validate_implicit_arguments, %rax
 # 		jmp _system
 # 	9:
 # 		nop
+# 		# Restore %rdi and %rsi.
+# 		movq %rsi, 0(%rsp)
+# 		movq %rdi, 8(%rsp)
+# 		addq $16, %rsp
 #
 # Or internally in this module,
+# 		# Backup %rdi and %rsi.
+# 		subq $16, %rsp
+# 		movq %rdi, 8(%rsp)
+# 		movq %rsi, 0(%rsp)
+# 		# Validate implicit parameters.
 # 		leaq 9f(%rip), %rdi
 # 		jmp _ns_system_x86_64_linux_validate_implicit_arguments
 # 	9:
 # 		nop
+# 		# Restore %rdi and %rsi.
+# 		movq %rsi, 0(%rsp)
+# 		movq %rdi, 8(%rsp)
+# 		addq $16, %rsp
 #
 # Note: if the check fails, the error will be fatal, so cleanup not needed on a
 # fatal crash (e.g. you used the stack to backup %rdi and %rsi, so it's okay to

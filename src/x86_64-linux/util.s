@@ -141,6 +141,8 @@ _ns_util_can_cont:
 #
 # For segv handling, only call this once per process instantion (maybe this
 # requirement may be removed with further enhancements in the future).
+#
+# Parameters:
 # 	%rdi: return
 #
 # (I'm trying to keep dependence on the stack at a minimum, but %rsp is used
@@ -155,6 +157,30 @@ _ns_util_system_verify_writeable:
 	subq $16, %rsp
 	movq $0, 8(%rsp)  # Padding.
 	movq %rdi, 0(%rsp)
+
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	movq $ns_system_x86_64_linux_validate_implicit_arguments, %rax
+	jmp _system
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)
+	addq $16, %rsp
+
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
 
 	# First, trap SEGV to print our error message instead just aborting with
 	# SEGV.
@@ -201,10 +227,49 @@ _ns_util_system_verify_writeable:
 9:
 	nop
 
-	# (Uncomment this to trigger a segfault to make sure it's actually being
-	# restored:)
+	# (Uncomment this to trigger a segfault to make sure the SEGV trap is
+	# actually being restored:)
 	#movq $0, %rdi
 	#movq (%rdi), %rdi
+
+	jmp 5f  # Skip error cleanup.
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	#movq 0(%rsp), %rdi
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	movq $ns_system_x86_64_linux_exit_custom, %rax
+	jmp _system
+	nop
+5:
+	# Cleanup.
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
 
 	# Restore return.
 	movq 0(%rsp), %rdi
