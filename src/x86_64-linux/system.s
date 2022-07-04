@@ -1785,7 +1785,22 @@ _ns_system_x86_64_linux_new_writer_write:
 	movq %r15, 8(%rsp)
 	movq %r14, 0(%rsp)
 
-	# Reserve space for TODO.
+	# Backup %rdi and %rsi
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+
+	# Backup %rdx and %rcx
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	# Backup %r8 and %r9
+	subq $16, %rsp
+	movq %r8, 8(%rsp)
+	movq %r9, 0(%rsp)
+
+	# Reserve space for working storage units.
 	subq $16, %rsp
 	movq $0, 8(%rsp)
 	movq $0, 0(%rsp)
@@ -1794,7 +1809,15 @@ _ns_system_x86_64_linux_new_writer_write:
 	# error handling (see the module documentation for more information).
 	leaq 6f(%rip), %r14
 
+	# TODO: prob first just attempt a write, then if would block, check timeout
+	#       and if configured select to wait for it (you may need to use
+	#       syscalls to track time elapsed).
+
 	# TODO: do the write.
+
+	# TODO
+	nop
+	hlt
 
 	jmp 5f  # Skip error cleanup.
 
@@ -1809,6 +1832,9 @@ _ns_system_x86_64_linux_new_writer_write:
 	# 	%rdx: String.
 	# 	%rcx: 0.
 	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
 	addq $16, %rsp
 	movq 0(%rsp), %r14
 	movq 8(%rsp), %r15
@@ -1829,7 +1855,26 @@ _ns_system_x86_64_linux_new_writer_write:
 5:
 	# Cleanup.
 
-	# Restore space for TODO.
+	# Restore space for use.
+	addq $16, %rsp
+
+	# (Leave all argument registers as we set them.  We could potentially
+	# return back the first 5, and we leave the return continuation address in
+	# the 6th argument, ^r9.)
+
+	# Restore %r8 and %r9.
+	#movq 0(%rsp), %r9
+	#movq 8(%rsp), %r8
+	addq $16, %rsp
+
+	# Restore %rdx and %rcx.
+	#movq 0(%rsp), %rcx
+	#movq 8(%rsp), %rdx
+	addq $16, %rsp
+
+	# Restore %rdi and %rsi.
+	#movq 0(%rsp), %rsi
+	#movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# Restore %r15 and %r14.
@@ -1837,12 +1882,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	movq 8(%rsp), %r15
 	addq $16, %rsp
 
-	# TODO
-	nop
-	hlt
-
 	# Return.
-	xchgq %rdi, %r9  # TODO -- %rdi, or %rsi, return.
 	jmpq *%r9
 	nop
 
@@ -2332,7 +2372,35 @@ _ns_system_x86_64_linux_new_reader_read:
 	movq %r15, 8(%rsp)
 	movq %r14, 0(%rsp)
 
-	# TODO: do the write.
+	# Backup %rdi and %rsi
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+
+	# Backup %rdx and %rcx
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	# Backup %r8 and %r9
+	subq $16, %rsp
+	movq %r8, 8(%rsp)
+	movq %r9, 0(%rsp)
+
+	# Reserve space for TODO.
+	subq $16, %rsp
+	movq $0, 8(%rsp)
+	movq $0, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
+
+	# TODO: do the read.
+
+	# TODO
+	nop
+	hlt
 
 	jmp 5f  # Skip error cleanup.
 
@@ -2347,6 +2415,9 @@ _ns_system_x86_64_linux_new_reader_read:
 	# 	%rdx: String.
 	# 	%rcx: 0.
 	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
 	addq $16, %rsp
 	movq 0(%rsp), %r14
 	movq 8(%rsp), %r15
@@ -2367,7 +2438,26 @@ _ns_system_x86_64_linux_new_reader_read:
 5:
 	# Cleanup.
 
-	# Restore space for TODO.
+	# Restore space for use.
+	addq $16, %rsp
+
+	# (Leave all argument registers as we set them.  We could potentially
+	# return back the first 5, and we leave the return continuation address in
+	# the 6th argument, ^r9.)
+
+	# Restore %r8 and %r9.
+	#movq 0(%rsp), %r9
+	#movq 8(%rsp), %r8
+	addq $16, %rsp
+
+	# Restore %rdx and %rcx.
+	#movq 0(%rsp), %rcx
+	#movq 8(%rsp), %rdx
+	addq $16, %rsp
+
+	# Restore %rdi and %rsi.
+	#movq 0(%rsp), %rsi
+	#movq 8(%rsp), %rdi
 	addq $16, %rsp
 
 	# Restore %r15 and %r14.
@@ -2375,16 +2465,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	movq 8(%rsp), %r15
 	addq $16, %rsp
 
-	# TODO
-	nop
-	hlt
-
-	# TODO
-	nop
-	hlt
-
 	# Return.
-	xchgq %rdi, %r9  # TODO -- %rdi, or %rsi, return.
 	jmpq *%r9
 	nop
 
