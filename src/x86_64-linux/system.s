@@ -1914,11 +1914,11 @@ _ns_system_x86_64_linux_new_writer_write:
 	movq $4096, %rsi
 	leaq 128(%rsp), %rdi
 1:
+	subq $8, %rsi
 	testq %rsi, %rsi
 	jz 0f
 	movq $0, (%rdi)
-	subq $8, %rsi
-	addq $8, %rsi
+	addq $8, %rdi
 	jmp 1b
 0:
 
@@ -1950,6 +1950,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	# data pointer.
 
 	# Call outer tuple.
+	movq 80(%rsp), %rcx  # Restore original %rcx.
 	movq %r8, %rsi
 	leaq 9f(%rip), %rdi
 	jmp *%rcx
