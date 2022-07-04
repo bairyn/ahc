@@ -424,6 +424,24 @@ ns_system_x86_64_linux_err_msg_invalid_implicit_args:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_invalid_implicit_args_end:
 
+# (Naming clarification: ‘new_writer’'s ‘.write’ action's ‘write’ syscall
+# failed.)
+ns_system_x86_64_linux_err_msg_new_writer_write_write_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_write_write_failed_end - ns_system_x86_64_linux_err_msg_new_writer_write_write_failed)
+ns_system_x86_64_linux_err_msg_new_writer_write_write_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_writer’ ‘.write’ error: the ‘write’ syscall failed!  Could not request a write.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_write_write_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_end - ns_system_x86_64_linux_err_msg_new_reader_read_read_failed)
+ns_system_x86_64_linux_err_msg_new_reader_read_read_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ ‘.read’ error: the ‘read’ syscall failed!  Could not request a read.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_end:
+
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
 # and shell support.  Also add a few other utilities as needed.
@@ -1313,9 +1331,10 @@ _ns_system_x86_64_linux_fork_join:
 # 				%r9: zero if not ready for writing, 1 if ready.
 # 			%rsi: User data.
 # 		%rcx: Attempt to write optionally with timeout callback, with parameters:
-# 			%rdi: Return on non-fatal error (basically EAGAIN; means it would
-# 			      block and is not available for the write or read), with
-# 			      parameters:
+# 			%rdi: Return on non-fatal error (basically EAGAIN timeout; means it
+# 			      would block and is not available for the write or read), but
+# 			      only if the options bitfield enables this handler rather than
+# 			      returning an error on timeout, with parameters:
 # 				[%rdi, %rsi, …, %r8]: user data and set of new callbacks
 # 				                      corresponding to the original
 # 				                      [%rdi, %rsi, …, %r8] arguments.  Don't
@@ -1341,8 +1360,16 @@ _ns_system_x86_64_linux_fork_join:
 # 			      depend on a stack as much):
 # 				%rdi: Return (please return back to this address when done),
 # 				      with parameters:
-# 					%rdi: Options bitfield: bit 0 is boolean for 0 to disable
-# 					      timeout, 1 to enable timeout.
+# 					%rdi: Options bitfield:
+# 						Bit 0: enable timeout: 1 to enable timeout, 0 to block
+# 						       indefinitely.
+# 						Bit 1: enable user-handled timeout would-block (this
+# 						       doesn't apply to other I/O errors), so that your
+# 						       non-fatal error handler you supplied through
+# 						       %rdi is returned to instead of failing with an
+# 						       error.
+# 					bit 0 is boolean for 0 to disable
+# 					      timeout, 1 to enable timeout.  Bit 2 
 # 					%rsi: Seconds for the timeout (i64).
 # 					%rdx: Nanoseconds for the timeout (i64).
 # 					%rcx: Nested tuple (accessor function) to store still more
@@ -1353,6 +1380,7 @@ _ns_system_x86_64_linux_fork_join:
 # 							      the size.)
 # 							%rsi: The data to request a write for (i.e., the
 # 							      data).
+# 						%rdi: User data.
 # 					%r8: User data supplied to %rcx as a closure.  (Doesn't
 # 					     have to be an FD.)
 # 					%r9: Please set to 0, to make future enhancements more
@@ -1765,6 +1793,7 @@ _ns_system_x86_64_linux_new_writer_query:
 	# TODO
 	nop
 	hlt
+# TODO Update Verify section error messages to be correct.
 _ns_system_x86_64_linux_new_writer_write:
 	# Backup %rdi and %rsi.
 	subq $16, %rsp
@@ -1785,29 +1814,104 @@ _ns_system_x86_64_linux_new_writer_write:
 	movq %r15, 8(%rsp)
 	movq %r14, 0(%rsp)
 
-	# Backup %rdi and %rsi
+	# Reserve space for working storage units.
 	subq $16, %rsp
-	movq %rdi, 8(%rsp)
-	movq %rsi, 0(%rsp)
+	movq $0, 8(%rsp)    # Elapsed seconds waitn  (4232)
+	movq $0, 0(%rsp)    # Elapsed nanosecs watn  (4224)
 
-	# Backup %rdx and %rcx
-	subq $16, %rsp
-	movq %rdx, 8(%rsp)
-	movq %rcx, 0(%rsp)
+	# ‘fd sets’: the kernel seems to use 1024 bytes, divided unto u64s, for a
+	# single FD set.  (We'll reserve twice this for cushion.)  Then it's just
+	# bitfield: fd 0 corresponds to bit 0, fd 1 to bit 1, fd 2 to bit 2, etc.,
+	# e.g. if only fds 3 and 7 are enabled, the set is 0b000…000010001000=136.
 
-	# Backup %r8 and %r9
-	subq $16, %rsp
-	movq %r8, 8(%rsp)
-	movq %r9, 0(%rsp)
+	# So we'll reserve 2 2048-byte FD_SETs.  One is used for NULL input sets,
+	# with all bits cleared (fds disabled).  The other one we'll use to provide
+	# our own FD set for select.
+
+	# All-null FD set:
+	#                   #                        (4224)
+	subq $2048, %rsp    # All-null FD set        (2176)
+
+	# All-null FD set:
+	subq $2048, %rsp    # User FD set            ( 128)
 
 	# Reserve space for working storage units.
 	subq $16, %rsp
-	movq $0, 8(%rsp)
-	movq $0, 0(%rsp)
+	movq $0, 8(%rsp)    # select timeout musecs   (120)
+	movq $0, 0(%rsp)    # select timeout secs     (112)
+
+	# Backup %rdi and %rsi
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)  # Enbld?  Timeout callbk  (104)
+	movq %rsi, 0(%rsp)  # Normal return on succe   (96)
+
+	# Backup %rdx and %rcx
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)  # User data (intrnly FD)   (88)
+	movq %rcx, 0(%rsp)  # Tuple.                   (80)
+
+	# Backup %r8 and %r9
+	subq $16, %rsp
+	movq %r8, 8(%rsp)   # Tuple user data.         (72)
+	movq %r9, 0(%rsp)   #                          (64)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)    # Options.                 (56)
+	movq $0, 0(%rsp)    # Timeout seconds.         (48)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)    # Timeout nanoseconds.     (40)
+	movq $0, 0(%rsp)    # Size of data to write.   (32)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)    # Data to write.           (24)
+	movq $0, 0(%rsp)    #                          (16)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)    # Space for clock_gettime  ( 8)
+	movq $0, 0(%rsp)    # Space for clock_gettime  ( 0)
 
 	# Push / add our own cleanup to our collection of cleanup requirements for
 	# error handling (see the module documentation for more information).
 	leaq 6f(%rip), %r14
+
+	# Zero-init both FD sets.
+	movq $4096, %rsi
+	leaq 128(%rsp), %rdi
+1:
+	testq %rsi, %rsi
+	jz 0f
+	movq $0, (%rdi)
+	subq $8, %rsi
+	addq $8, %rsi
+	jmp 1b
+0:
+
+	# For the user FD set, set the bit corresponding to our FD in the original
+	# %rdx.
+	leaq 128(%rsp), %rdi  # user FD set start.
+	movq  88(%rsp), %rsi  # fd (original %rdx)
+	movq %rsi, %rdx
+	# Can divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	# But just shift and ‘and’ instead, since it's multiples of 2.  (shrq is
+	# unsigned.)
+	shrq $3, %rdx
+	addq %rdx, %rdi  # Get the right byte.
+	# Get the right bit within the byte.
+	movq %rsi, %rcx
+	andq $7, %rcx
+	movq $1, %r8
+	shlq %cl, %r8
+	# Set the right bit within the byte.
+	orb %r8b, (%rdi)
+
+	# Last 5 bits.
+
+	# TODO check original %r8 is 0.
 
 	# TODO: prob first just attempt a write, then if would block, check timeout
 	#       and if configured select to wait for it (you may need to use
@@ -1815,9 +1919,297 @@ _ns_system_x86_64_linux_new_writer_write:
 
 	# TODO: do the write.
 
-	# TODO
+	# Prepare to do the write.
+
+	# Retrieve 2 values from the nested tuple callback, to get the size and
+	# data pointer.
+
+	# Call outer tuple.
+	movq %r8, %rsi
+	leaq 9f(%rip), %rdi
+	jmp *%rcx
+9:
+	nop
+
+	# TODO check %r9 is0.
+
+	# While we're at it, just track options, seconds, and nanoseconds, before
+	# we get into the inner tuple.
+	movq %rdi, 56(%rsp)  # Options.
+	movq %rsi, 48(%rsp)  # Seconds.
+	movq %rdx, 40(%rsp)  # Nanoseconds.
+
+	# Call inner tuple.
+	movq %r8, %rsi
+	leaq 9f(%rip), %rdi
+	jmp *%rcx
+9:
+	nop
+
+	# Get size and data start.
+	movq %rdi, 32(%rsp)  # Size.
+	movq %rsi, 24(%rsp)  # Data.
+
+	# Do the write.
+	movq 32(%rsp), %rdx  # size_t size
+	movq 24(%rsp), %rsi  # const uint8_t *data
+	movq 88(%rsp), %rdi  # int fd (original %rdx)
+	movq $1,       %rax  # write
+	syscall
+
+	# Check for EAGAIN=EWOULDBLOCK (11) with %rax of -11, in which case we skip verification.
+	cmpq $-11, %rax
+	jz 2f
+
+1:
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_write_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_write_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+	jmp 0f  # Go to successful write block.
+2:
+	# The resource is not currently available for a write.
+
+	# Reserve and initialize %r8 and %r9 as monotonic time elapsed waiting for
+	# availability; seconds and nanoseconds.
+	movq $0, %r8
+	movq $0, %r9
+
+	jmp 3f
+	nop
+
+	# 4 begins the timeout block.
+4:
+	# A timeout occurred.  We'll be returning either to a user-provided handler
+	# if enabled or otherwise throwing an error.
+	testq $0x2, 56(%rsp)  # Enable user-handled timeout would-block callback?
+	jnz 7f
+	nop
+	# Not enabled.  Just error.
+	movq $-11, %rax  # EAGAIN=11
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop  # Will not be reached.
+	jmp _ns_system_x86_64_linux_exit_failure
 	nop
 	hlt
+7:
+	# Enabled.  Go back to the user-provided handler, then.
+	movq $0,     %r9   # Status: 0 in general case, 1 if exhausted.  Just set to 0.  (Probably EDQUOT quotas would be most meaningful here in the documented man page returns, but just this to 0.)
+	movq $0, %r8   # %r8 is specified to be 0.
+	leaq _ns_system_x86_64_linux_new_writer_write(%rip), %rcx  # Write request callback.
+	leaq _ns_system_x86_64_linux_new_writer_query(%rip), %rdx  # Query status callback.
+	leaq _ns_system_x86_64_linux_new_writer_close(%rip), %rsi  # Close callback.
+	movq 88(%rsp), %rdi  # Original %rdi, user data (fd).
+	movq 104(%rsp), %r11  # Original %rdi.
+	jmp 5f
+
+	# 3 begins the loop of attempting a write if not yet timed out.
+3:
+	# So first check whether we are in a timeout condition, where we had a
+	# timeout enabled and time elapsed exceeded the timeout.
+	testq $0x1, 56(%rsp)
+	jz 8f  # jump if timeout not enabled, then treat timeout as infinite.
+	nop
+	movq 4232(%rsp), %r8  # Elapsed seconds.
+	movq 4224(%rsp), %r9  # Elapsed nanoseconds.
+	cmpq 48(%rsp), %r8
+	jae 4b  # if elapsed >= timeout, then do a timeout.
+	nop
+	cmpq 40(%rsp), %r9
+	jae 4b  # if elapsed >= timeout, then do a timeout.
+	nop
+8:
+
+	# Just wait until we can write.
+0:
+	# First sample the current time.
+	leaq 0(%rsp), %rsi  # Output storage; secs&nanoseconds i64 pair.
+	movq $1,   %rdi  # clockid_t clockid: CLOCK_MONOTONIC=1
+	movq $228, %rax  # clock_gettime
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop
+
+	# Setup timeout data.
+	#
+	# Null-initialize timeout to %r8, which the syscall treats as an infinite
+	# timeout.
+	movq $0, %r8
+
+	# Timeout enabled?
+	testq $0x1, 56(%rsp)
+	jz 8f  # jump if timeout not enabled, then treat timeout as infinite.
+	nop
+	movq  112(%rsp), %r8   # timeout
+8:
+
+	# Set the timeout values to original timeout minus elapsed.
+	movq 4232(%rsp), %rdx  # Get elapsed seconds.
+	movq 4224(%rsp), %rcx  # Get elapsed nanoseconds.
+	movq   48(%rsp), %rdi  # Get original timeout seconds.
+	movq   40(%rsp), %rsi  # Get original timeout nanoseconds.
+	subq %rdx, %rdi  # Remaining timeout seconds.
+	subq %rcx, %rsi  # Remaining timeout nanoseconds.
+	# Handle remaining nanoseconds < 0 or >= 1000000000.
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000000000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rdx, %rsi
+	addq %rax, %rdi
+	cmpq $0, %rsi
+	jge 8f
+	nop
+	addq $1000000000, %rsi
+	dec %rdi
+8:
+	# Now %rsi is set up.
+	# %rsi /= 1000
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rax, %rsi  # Now microseconds.
+	movq %rdi, 112(%rsp)  # Seconds.
+	movq %rsi, 120(%rsp)  # Microseconds.
+
+	# (Note: ‘select’ works with seconds and microseconds, not seconds and
+	# nanoseconds.)
+	movq %r8,        %r8   # timeout
+	leaq 2176(%rsp), %rcx  # exceptfds
+	leaq  128(%rsp), %rdx  # writefds
+	leaq 2176(%rsp), %rsi  # readfds
+	movq   88(%rsp), %rdi
+	incq %rdi              # int nfds: highest internal fd plus 1.
+	movq $23, %rax         # select
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop
+
+	# Successful ‘select’.
+
+	# Add to time elapsed and loop back to try a write again!
+
+	# Backup begin clock sample.
+	movq 0(%rsp), %r8  # Seconds.
+	movq 8(%rsp), %r9  # Microseconds.
+
+	# Sample the current time.
+	leaq 0(%rsp), %rsi  # Output storage; secs&nanoseconds i64 pair.
+	movq $1,   %rdi  # clockid_t clockid: CLOCK_MONOTONIC=1
+	movq $228, %rax  # clock_gettime
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop
+
+	# end - begin into %r8 and %r9 for this frame's elapsed time.
+	movq 0(%rsp), %rdi
+	movq 8(%rsp), %rsi
+	subq %r8, %rdi
+	subq %r9, %rsi
+	movq %rdi, %r8
+	movq %rsi, %r9  # Now we have elapsed time, but we'll want to double check bounds.
+	movq %r8, %rdi
+	movq %r9, %rsi
+	# Handle remaining nanoseconds < 0 or >= 1000000000.
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000000000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rdx, %rsi
+	addq %rax, %rdi
+	cmpq $0, %rsi
+	jge 8f
+	nop
+	addq $1000000000, %rsi
+	dec %rdi
+8:
+	# Now %rsi is set up.
+	# Just ensure too that %rdi >= 0.
+	cmpq $0, %rdi
+	jge 8f
+	movq $0, %rdi
+8:
+	# So now we have time elapsed for this frame.  Before we loop back, add it
+	# to the total, cumulative time elapsed waiting for availability.
+	addq 4232(%rsp), %rdi
+	addq 4224(%rsp), %rsi
+
+	# Handle remaining nanoseconds < 0 or >= 1000000000.
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000000000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rdx, %rsi
+	addq %rax, %rdi
+	cmpq $0, %rsi
+	jge 8f
+	nop
+	addq $1000000000, %rsi
+	dec %rdi
+8:
+	# Now %rsi is set up.
+	# Just ensure too that %rdi >= 0.
+	cmpq $0, %rdi
+	jge 8f
+	movq $0, %rdi
+8:
+
+	# Now write the results.
+	addq %rdi, 4232(%rsp)
+	addq %rsi, 4224(%rsp)
+
+	# Loop back to try a write again.
+	jmp 3b
+	nop
+
+0:
+	# The write was successful, although it might have been partial.
+	# The number of bytes successfully written is in %rax.
+	#
+	# So prepare for our return to *%r11 by setting up the arguments.
+	movq %rax,     %r9   # Number of bytes written.
+	movq $0, %r8   # %r8 is specified to be 0.
+	leaq _ns_system_x86_64_linux_new_writer_write(%rip), %rcx  # Write request callback.
+	leaq _ns_system_x86_64_linux_new_writer_query(%rip), %rdx  # Query status callback.
+	leaq _ns_system_x86_64_linux_new_writer_close(%rip), %rsi  # Close callback.
+	movq 88(%rsp), %rdi  # Original %rdi, user data (fd).
+	movq 96(%rsp), %r11  # Original %rsi, successfull callback.
 
 	jmp 5f  # Skip error cleanup.
 
@@ -1832,6 +2224,13 @@ _ns_system_x86_64_linux_new_writer_write:
 	# 	%rdx: String.
 	# 	%rcx: 0.
 	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	addq $2048, %rsp
+	addq $2048, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
@@ -1855,12 +2254,31 @@ _ns_system_x86_64_linux_new_writer_write:
 5:
 	# Cleanup.
 
+	# Restore space for elapsed time.
+	addq $16, %rsp
+
+	# Restore both 2048-byte FD sets.
+	addq $2048, %rsp
+	addq $2048, %rsp
+
+	# Restore space for use.
+	addq $16, %rsp
+
+	# Restore space for use.
+	addq $16, %rsp
+
+	# Restore space for use.
+	addq $16, %rsp
+
+	# Restore space for use.
+	addq $16, %rsp
+
 	# Restore space for use.
 	addq $16, %rsp
 
 	# (Leave all argument registers as we set them.  We could potentially
-	# return back the first 5, and we leave the return continuation address in
-	# the 6th argument, ^r9.)
+	# return back all 6, and we leave the return continuation address in the
+	# 6th argument, %r11.)
 
 	# Restore %r8 and %r9.
 	#movq 0(%rsp), %r9
@@ -1883,7 +2301,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	addq $16, %rsp
 
 	# Return.
-	jmpq *%r9
+	jmpq *%r11
 	nop
 
 # Create a new reader, an instance capable of reading from a filepath.
@@ -2044,6 +2462,28 @@ _ns_system_x86_64_linux_new_reader:
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)    # Elapsed seconds waitn  (4232)
+	movq $0, 0(%rsp)    # Elapsed nanosecs watn  (4224)
+
+	# ‘fd sets’: the kernel seems to use 1024 bytes, divided unto u64s, for a
+	# single FD set.  (We'll reserve twice this for cushion.)  Then it's just
+	# bitfield: fd 0 corresponds to bit 0, fd 1 to bit 1, fd 2 to bit 2, etc.,
+	# e.g. if only fds 3 and 7 are enabled, the set is 0b000…000010001000=136.
+
+	# So we'll reserve 2 2048-byte FD_SETs.  One is used for NULL input sets,
+	# with all bits cleared (fds disabled).  The other one we'll use to provide
+	# our own FD set for select.
+
+	nop
+	hlt  # TODO update allocation and cleanup; I'll just deal with this later, since it keeps changing.
+
 	# First backup the input arguments and what we clobber onto the stack.
 
 	subq $16, %rsp
@@ -2065,11 +2505,6 @@ _ns_system_x86_64_linux_new_reader:
 	subq $16, %rsp
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
-
-	# Backup %r15 and %r14.
-	subq $16, %rsp
-	movq %r15, 8(%rsp)
-	movq %r14, 0(%rsp)
 
 	# Push / add our own cleanup to our collection of cleanup requirements for
 	# error handling (see the module documentation for more information).
@@ -2387,7 +2822,22 @@ _ns_system_x86_64_linux_new_reader_read:
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
 
-	# Reserve space for TODO.
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)
+	movq $0, 0(%rsp)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)
+	movq $0, 0(%rsp)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)
+	movq $0, 0(%rsp)
+
+	# Reserve space for working storage units.
 	subq $16, %rsp
 	movq $0, 8(%rsp)
 	movq $0, 0(%rsp)
@@ -2402,6 +2852,26 @@ _ns_system_x86_64_linux_new_reader_read:
 	nop
 	hlt
 
+	#_
+	movq $0, %rax  # read
+	syscall
+
+	# Check for ENOMEM (12) with %rax of -12, in which case we skip verification.
+	cmpq $-12, %rax
+	jz 0f
+
+1:
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_read_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+0:
+
 	jmp 5f  # Skip error cleanup.
 
 6:
@@ -2415,6 +2885,9 @@ _ns_system_x86_64_linux_new_reader_read:
 	# 	%rdx: String.
 	# 	%rcx: 0.
 	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
@@ -2441,9 +2914,18 @@ _ns_system_x86_64_linux_new_reader_read:
 	# Restore space for use.
 	addq $16, %rsp
 
+	# Restore space for use.
+	addq $16, %rsp
+
+	# Restore space for use.
+	addq $16, %rsp
+
+	# Restore space for use.
+	addq $16, %rsp
+
 	# (Leave all argument registers as we set them.  We could potentially
-	# return back the first 5, and we leave the return continuation address in
-	# the 6th argument, ^r9.)
+	# return back all 6, and we leave the return continuation address in the
+	# 6th argument, %r11.)
 
 	# Restore %r8 and %r9.
 	#movq 0(%rsp), %r9
@@ -2466,7 +2948,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	addq $16, %rsp
 
 	# Return.
-	jmpq *%r9
+	jmpq *%r11
 	nop
 
 # TODO
