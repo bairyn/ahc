@@ -3,6 +3,52 @@
 # Configure the platform.
 .code64
 
+# Module implicit parameters:
+#
+# Unless otherwise specified, the following implicit parameters are required by
+# every procedure in this module:
+# 	%r15:
+# 		Call mode and options working storage unit.
+# 		The first 7 (most significant, BE) bytes must be
+# 		(‘printf "0x%02x\n" =<< randomRIO (0x00, 0xFF)’):
+# 			0xF4 0x0D 0xCA 0x88  0x48 0x2D 0x41 (0xXX)
+#
+# 		The final (least significant) byte is an options bitfield.  Unspecified
+# 		bits must be 0.
+#
+# 		Note this is conventionally a caller-saved register, so it should be
+# 		preserved between module action calls and conventional calls.
+# 	%r14:
+# 		Exception return continuation, if overriding default.
+#
+# 		Like a left-branch handler connection for ‘Either’, specify an
+# 		alternative continuation to return to rather than ‘%rdi’ for the typical
+# 		pattern of a procedure action returning to its first address as a
+# 		continuation, optionally with 0 or more arguments.  Most errors, e.g.
+# 		syscalls that return errno's (this can be useful for e.g. specially
+# 		handling certain ) will, rather than calling ‘exit_custom’, call this
+# 		overriding handler.  For errors that aren't special fatal errors that
+# 		cannot be caught, this is analagous to a catch block.
+#
+# 		If the exception return continuation bit is enabled (bit 1,
+# 		second-most-significant bit, in the last byet in $r15), then %r14 is
+# 		used instead of the default exception return handler.  If this bit is
+# 		disabled, then %r14 is ignored for this purpose.
+#
+# 		If working storage is available, then a pattern may be for procedures
+# 		that require cleanup when unwinding, for these procedures to store the
+# 		old %r14 and set their own %r14 as a layer on top, that cleans up and
+# 		then restores the old %r14.
+#
+# 		Note this is conventionally a caller-saved register, so it should be
+# 		preserved between module action calls and conventional calls.
+#
+# 		Unless otherwise specified, this takes the following parameters:
+# 			%rdi: Numeric code.
+# 			%rsi: String size.
+# 			%rdx: String.
+# 			%rcx: 0.
+
 # (See note in ‘system’ for having a module router instead of a separate
 # ‘.data’ section.)
 #.data
@@ -109,6 +155,9 @@ ns_cli_msg_starts_end:
 # A front-end: the CLI.
 #
 # This doesn't return.
+#
+# Parameters:
+# 	(None.)
 .global ns_cli_cli
 .set ns_cli_cli, (_ns_cli_cli - ns_cli_module_begin)
 _ns_cli_cli:
@@ -124,6 +173,13 @@ _ns_cli_cli:
 	leaq 9f(%rip), %rdi
 	movq $ns_util_system_verify_writeable, %rax
 	jmp _util
+9:
+	nop
+
+	# Validate the implicit arguments.
+	leaq 9f(%rip), %rdi
+	movq $ns_system_x86_64_linux_validate_implicit_arguments, %rax
+	jmp _system
 9:
 	nop
 

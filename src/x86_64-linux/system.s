@@ -29,6 +29,16 @@
 # 		The final (least significant) byte is an options bitfield.  Unspecified
 # 		bits must be 0.
 #
+# 		Options:
+# 			Bit 0: Unused.
+# 			Bit 1: Instead of the default error handler (print a message and
+# 			       exit), return to the %r14 continuation (see its description
+# 			       for more information).
+# 			Bit 2: Unused.
+# 			Bit …: Unused.
+# 			Bit 63: Unused.
+# 			(Unused bits should be 0, but this may or may not be checked.)
+#
 # 		Note this is conventionally a caller-saved register, so it should be
 # 		preserved between module action calls and conventional calls.
 # 	%r14:
@@ -67,8 +77,7 @@
 # new_writer, new_reader, and monotonic_nanosleep will need their own cleaning
 # sections added.  Check other modules too!  Also add the same module implicit
 # parameters to other modules.
-#TODO finish implement this.  It's already in fork_join; implement it in the
-#     others, and also don't forget to set up %r15 and %r14 correctly.
+#TODO finish implement this.
 TODO block build until this is done.
 
 # We could have ‘.data’ here, but for modularity and portability, put all of
@@ -1034,14 +1043,14 @@ ns_system_x86_64_linux_fork_join:
 
 	# Double check our 2 values, to make sure they still match.
 	# Check original %rdi.
-	movq 0(%rsp), %rdi
-	movq 320(%rsp), %rsi
+	movq 16(%rsp), %rdi
+	movq 336(%rsp), %rsi
 	cmpq %rsi, %rdi
 	jne 2f
 
 	# Check the %rip-based location, for fork_join.
-	movq 8(%rsp), %rdi
-	movq 272(%rsp), %rsi
+	movq 24(%rsp), %rdi
+	movq 288(%rsp), %rsi
 	cmpq %rsi, %rdi
 	jne 2f
 
@@ -1060,7 +1069,7 @@ ns_system_x86_64_linux_fork_join:
 
 	# Sanity check: just make sure signo is SIGCHLD (17).
 	movq $0, %rdi
-	movl 16(%rsp), %edi  # signo
+	movl 32(%rsp), %edi  # signo
 	cmpq $17, %rdi
 	jz 1f
 	# We don't recognize the signo.
@@ -1096,7 +1105,7 @@ ns_system_x86_64_linux_fork_join:
 	# (we're only interested in CLD_EXITED=1, CLD_KILLED=2, and CLD_DUMPED=3;
 	# not CLD_STOPPED=5, CLD_TRAPPED=4, or CLD_CONTINUED=6), padding, union.
 	movq $0, %rdi
-	movl 24(%rsp), %edi  # code
+	movl 40(%rsp), %edi  # code
 	cmpq $5, %rdi
 	jz 0b
 	cmpq $4, %rdi
@@ -1140,7 +1149,7 @@ ns_system_x86_64_linux_fork_join:
 	# But now see if the process exited succesfully.  If it didn't, abort /
 	# exit with error.
 	movq $0, %rdi
-	movl 20(%rsp), %edi  # status/errno
+	movl 36(%rsp), %edi  # status/errno
 	testq %rdi, %rdi
 	jz 0f
 1:
@@ -2138,7 +2147,7 @@ _ns_system_x86_64_linux_exit_custom:
 
 	# First, check if we've enabled a non-default error / non-zero-exit handler.
 	testq $0x2, %r15
-	jnz 1b
+	jz 1b
 0:
 
 	# We have a non-default error handler.
