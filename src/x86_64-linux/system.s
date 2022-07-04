@@ -1282,6 +1282,13 @@ _ns_system_x86_64_linux_fork_join:
 # display tabs and spaces differently, as I have.  Tabs are used for
 # indentation, and spaces for alignment here.
 #
+# Note that in the returned API implementation, some methods such as the write
+# action accept multiple parameters, and rather than requiring a stack is how
+# memory is managed, we use tuples and nested callbacks to embed this
+# information.  A callback should return the desired component (1st component,
+# 3rd component, or whatever is specified) when called.  So the tuple can hold
+# many arguments, and tuples can be nested.
+#
 # Parameters:
 # 	%rdi: Return with single-use-only (consumes the entire set at that level)
 # 	      (clobbering!) callbacks, with parameters:
@@ -1324,7 +1331,8 @@ _ns_system_x86_64_linux_fork_join:
 # 				                      already consumed (although the new ones
 # 				                      may refer to the same address).
 # 				%r9: Number of bytes written.
-# 			%rdx: tuple callback to get options and timeout, with parameters
+# 			%rdx: User data (under the hood, internally, this is the FD).
+# 			%rcx: tuple callback to get options and timeout, with parameters
 # 			      (we use a tuple instead of direct parameters to compress
 # 			      parameters into fewer parameters (3 into 2) so we don't
 # 			      depend on a stack as much):
@@ -1334,12 +1342,21 @@ _ns_system_x86_64_linux_fork_join:
 # 					      timeout, 1 to enable timeout.
 # 					%rsi: Seconds for the timeout (i64).
 # 					%rdx: Nanoseconds for the timeout (i64).
-# 					%rcx: Please set to 0, to make future enhancements more
-# 					      convenient.
+# 					%rcx: Nested tuple (accessor function) to store still more
+# 					      arguments, with parameters:
+# 						%rdi: Return (please return back to this address when
+# 						      done), with parameters:
+# 							%rdi: Number of bytes to request a write for (i.e.,
+# 							      the size.)
+# 							%rsi: The data to request a write for (i.e., the
+# 							      data).
+# 					%r8: User data supplied to %rcx as a closure.  (Doesn't
+# 					     have to be an FD.)
+# 					%r9: Please set to 0, to make future enhancements more
+# 					     convenient.
 # 				%rsi: User data.
-# 			%rcx: user data supplied to %rdx as a closure
-# 			%r8: Number of bytes to request a write for (i.e., the size).
-# 			%r9: The data to request a write for (i.e., the data).
+# 			%r8: User data supplied to %rdx as a closure.  (You can pass
+# 			     whatever you want; it doesn't have to be an FD.)
 # 		%r8: currently 0, in case future versions want to add functionality.
 # 		     (If the API is extended with APIs, I'd probably make the next
 # 		     addition a tuple to contain, e.g. set %r8 to 1 and then %r9
