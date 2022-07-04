@@ -2526,6 +2526,7 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
+	addq $16, %rsp
 	movq 0(%rsp), %r8
 	addq $16, %rsp
 	movq 0(%rsp), %r10
@@ -2557,6 +2558,11 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 	# Cleanup.
 
 	# Restore stack and storage units.
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
 
 	# Clear time remaining space.
 	addq $16, %rsp
