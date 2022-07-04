@@ -67,6 +67,9 @@
 # new_writer, new_reader, and monotonic_nanosleep will need their own cleaning
 # sections added.  Check other modules too!  Also add the same module implicit
 # parameters to other modules.
+#TODO finish implement this.  It's already in fork_join; implement it in the
+#     others, and also don't forget to set up %r15 and %r14 correctly.
+TODO block build until this is done.
 
 # We could have ‘.data’ here, but for modularity and portability, put all of
 # this module in the same section, so it can be e.g. copied and referenced from
@@ -408,9 +411,15 @@ ns_system_x86_64_linux_err_msg_new_reader_close_close_failed:
 ns_system_x86_64_linux_err_msg_new_reader_close_close_failed_end:
 
 ns_system_x86_64_linux_err_msg_invalid_implicit_args_size:
-	.quad (ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible_end - ns_system_x86_64_linux_err_msg_base_mfree_byte_divisible)
+	.quad (ns_system_x86_64_linux_err_msg_invalid_implicit_args_end - ns_system_x86_64_linux_err_msg_invalid_implicit_args)
 ns_system_x86_64_linux_err_msg_invalid_implicit_args:
-	.ascii "Error: implicit args validation error: invalid implicit arguments: actions in this module required implicit arguments as parameters %r15 and %r14 to be as specified, but they are invalid!  Check the usage of this module, to make sure its procedures are being called correctly; check the documentation.\n"
+	#.ascii "Error: implicit args validation error: invalid implicit arguments: actions in this module required implicit arguments as parameters %r15 and %r14 to be as specified, but they are invalid!  Check the usage of this module, to make sure its procedures are being called correctly; check the documentation.\n"
+	.ascii "Error:\n"
+	.ascii "	implicit args validation error: invalid implicit arguments: actions in\n"
+	.ascii "	this module required implicit arguments as parameters %r15 and %r14 to be\n"
+	.ascii "	as specified, but they are invalid!  Check the usage of this module, to\n"
+	.ascii "	make sure its procedures are being called correctly; check the\n"
+	.ascii "	documentation.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_invalid_implicit_args_end:
 
@@ -919,6 +928,22 @@ _ns_system_x86_64_linux_fork_require:
 #
 # This uses 336 bytes of stack space (equivalent to 42 ‘uint64_t’s).
 ns_system_x86_64_linux_fork_join:
+	# Begin implicit arg validation check.  Backup original %rdi and %rsi to
+	# the stack.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore original %rdi and %rsi from the stack.
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+	# End implicit arg validation check.
+
 	# According to the man pages, the ‘waitid’ (247 for x86_64-linux; there's
 	# an ‘x32’ 529 listin in syscall_64.tbl) is preferred for new applications
 	# over the nonstandard ‘wait4’ (61) syscall, although the former takes 5
@@ -972,6 +997,20 @@ ns_system_x86_64_linux_fork_join:
 
 	# Back up an extra %rdi before, not just after.
 	movq %rdi, 0(%rsp)
+
+	# Back up %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Before we hand over control to any actions capable of causing non-fatal
+	# exceptions, we need to provide a cleanup routine now, via the implicit
+	# parameters %r15 and %r14.  We won't change %r15; we have no need to
+	# change it; we'll only change %r14 and restore it, so that *if* it's used,
+	# cleanup is handled correctly.
+
+	# We'll reserve more space on the stack.
+	leaq 6f(%rip), %r14
 
 0:
 	# ‘waitid’ syscall (linux >= 2.6.9).
@@ -1132,7 +1171,46 @@ ns_system_x86_64_linux_fork_join:
 
 	# The thread didn't fail.
 
+	jmp 5f  # Skip to cleanup.
+6:
+	# Error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	#movq 0(%rsp), %rdi
+	addq $16, %rsp
+	addq $256, %rsp
+	#movq 8(%rsp), %rcx
+	addq $16, %rsp
+	#movq 0(%rsp), %rdx
+	movq 8(%rsp), %r11
+	addq $16, %rsp
+	movq 0(%rsp), %rax
+	#movq 8(%rsp), %rsi
+	addq $16, %rsp
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.  (No need to do another %r15 check.)
+	jmpq *%r14
+	nop
+5:
+	# Cleanup.
+
 	# Restore the stack and registers.
+
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
 	movq 0(%rsp), %rdi
 	# 8(%rsp): Extra fork_join reference.
 	addq $16, %rsp
@@ -1338,8 +1416,9 @@ _ns_system_x86_64_linux_new_writer:
 	jmp _ns_system_x86_64_linux_validate_implicit_arguments
 9:
 	nop
-	# Restore original %rdi from 40(%rsp).
+	# Restore original %rdi from 40(%rsp) and %rsi from 32(%rsp).
 	movq 40(%rsp), %rdi
+	movq 32(%rsp), %rdi
 	# End implicit arg validation check.
 
 	# Next just perform a few checks.
@@ -1745,8 +1824,9 @@ _ns_system_x86_64_linux_new_reader:
 	jmp _ns_system_x86_64_linux_validate_implicit_arguments
 9:
 	nop
-	# Restore original %rdi from 40(%rsp).
+	# Restore original %rdi from 40(%rsp) and %rsi from 32(%rsp).
 	movq 40(%rsp), %rdi
+	movq 32(%rsp), %rdi
 	# End implicit arg validation check.
 
 	# Next just perform a few checks.
@@ -2027,20 +2107,29 @@ _ns_system_x86_64_linux_exit_custom:
 1:
 	# Fatal, *or* non-fatal but the default error handler is used, which is the
 	# error handler for fatal errors.
-	movq %rdi, %r10
+	movq %rdi, %r10  # Back up the original %rdi, the original exit code.
 
-	movq %rdx, %rdx
-	movq %rsi, %rsi
+	#movq %rsi, %rdx  # Would do it like this, but just simplest to xchngq.
+	#movq %rdx, %rsi  # %rdx would be clobbered.
+	xchgq %rsi, %rdx
 	movq $2, %rdi
 	movq $1, %rax  # write
 	syscall
 
-	movq %r10, %rdi
+	# Ignore the exit status of ‘write’; ignore any errors here; we're going to
+	# exit anyway.
+
+	movq %r10, %rdi  # Restore the original %rdi, the exit code.
 
 	movq $60, %rax  # exit
 	movq %rdi, %rdi
 	syscall
 
+	nop
+	hlt
+	jmp 1b
+	nop
+	hlt
 	jmp _ns_system_x86_64_linux_exit_custom
 	nop
 	hlt
@@ -2250,14 +2339,16 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 .global ns_system_x86_64_linux_print_u64
 .set ns_system_x86_64_linux_print_u64, (_ns_system_x86_64_linux_print_u64 - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_print_u64:
-	# Begin implicit arg validation check.  Backup original %rdi to %r11.
+	# Begin implicit arg validation check.  Backup original %rdi to %r11 and %rsi to %r10.
 	movq %rdi, %r11
+	movq %rsi, %r10
 	# Validate.
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_validate_implicit_arguments
 9:
 	nop
-	# Restore original %rdi from %r11.
+	# Restore original %rdi from %r11 and %rsi from %r10.
+	movq %r10, %rsi
 	movq %r11, %rdi
 	# End implicit arg validation check.
 
@@ -2504,9 +2595,6 @@ _ns_system_x86_64_linux_is_null_terminated:
 #
 # (Just check the first 3 bytes of %r15.)
 #
-# (Currently, this is just checked in ‘print_u64’, ‘new_writer’, and
-# ‘new_reader’.
-#
 # You can normally check it like this:
 # 		leaq 9f(%rip), %rdi
 # 		movq $ns_system_x86_64_linux_validate_implicit_arguments, %rax
@@ -2520,8 +2608,19 @@ _ns_system_x86_64_linux_is_null_terminated:
 # 	9:
 # 		nop
 #
+# Note: if the check fails, the error will be fatal, so cleanup not needed on a
+# fatal crash (e.g. you used the stack to backup %rdi and %rsi, so it's okay to
+# leave the stack pointer at an unknown but valid location so it cannot be
+# unwound) can be skipped.
+#
 # Parameters:
 # 	%rdi: Return.
+#
+# Clobbers:
+# 	%rsi:
+# 		to save us extra instruction dependencies, since the architecture
+# 		supports testq and cmpq with 32-bit immediates but not 64-bit
+# 		immediates, we just use %rsi to hold our constants.
 .global ns_system_x86_64_linux_validate_implicit_arguments
 .set ns_system_x86_64_linux_validate_implicit_arguments, (_ns_system_x86_64_linux_validate_implicit_arguments - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_validate_implicit_arguments:
@@ -2529,16 +2628,22 @@ _ns_system_x86_64_linux_validate_implicit_arguments:
 	# 	0xF4 0x0D 0xCA 0x88  0x48 0x2D 0x41 (0xXX)
 	# (Inverted:)
 	# 	0x0B 0xF2 0x35 0x77  0xB7 0xD2 0xBE (0xXX)
-	testq $0x0BF23577B7D2BE00, %r15  # Test no inverted bits are set (‘printf "0x%02X\n" $ complement (0x03 :: Word8)’).
+	#testq $0x0BF23577B7D2BE00, %r15  # Test no inverted bits are set (‘printf "0x%02X\n" $ complement (0x03 :: Word8)’).
+	movq $0x0BF23577B7D2BE00, %rsi
+	testq %rsi, %r15
 	jnz 1f
 
 	# Now do unsigned below and above checks to test it's:
 	# 	- > 0xF40DCA88482D41FF, ||
 	# 	- < 0xF40DCA88482D4100
-	cmpq 0xF40DCA88482D41FF, %r15
+	#cmpq $0xF40DCA88482D41FF, %r15
+	movq $0xF40DCA88482D41FF, %rsi
+	cmpq %rsi, %r15
 	ja 1f
 
-	cmpq 0xF40DCA88482D4100, %r15
+	#cmpq $0xF40DCA88482D4100, %r15
+	movq $0xF40DCA88482D4100, %rsi
+	cmpq %rsi, %r15
 	jb 1f
 
 	jmp 0f
