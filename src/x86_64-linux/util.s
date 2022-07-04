@@ -280,5 +280,61 @@ _ns_util_system_verify_writeable:
 	jmpq *%rdi
 	nop
 
+# Utility function whose return value you can use as a tuple callback for
+# ‘new_writer’'s ‘.write’ action, and then you can just point the user data to
+# be a pointer to data you set up on the stack.
+#
+# This works like defining a struct to specify how to format the data.
+#
+# ‘ns_util_get_tuple_write’ should be called to return the absolute address of
+# the tuple accessor continuation (‘_ns_util_tuple_write_accessor’).
+#
+# The data should be set up as follows (5 * 8 = 40 bytes):
+# 	struct {
+# 		uint64_t options_bitfield;  // enable timeout, etc.
+# 		int64_t  timeout_seconds;
+# 		int64_t  timeout_nanoseconds;
+# 		uint64_t write_size;
+# 		uint64_t data_pointer;
+# 	};
+#
+# Parameters:
+# 	%rdi: Return, with parameters:
+# 		%rdi: An address you can pass as the outer tuple callback.
+#
+# Clobbers %rax.
+.global ns_util_get_tuple_write
+.set ns_util_get_tuple_write, (_ns_util_get_tuple_write - ns_util_module_begin)
+_ns_util_get_tuple_write:
+	leaq _ns_util_tuple_write_accessor_outer(%rip), %rax
+	xchgq %rdi, %rax
+	jmp *%rax
+	nop
+
+_ns_util_tuple_write_accessor_outer:
+	movq %rdi, %rax  # Backup return address.
+	movq %rsi, %r8   # Backup user data.
+
+	movq $0,  %r9       # This should be ‘0’.
+	movq %r8, %r8       # Nested tuple accessor user data (we'll just have it
+	                    # be the same as our own user data.)
+	leaq _ns_util_tuple_write_accessor_inner(%rip), %rcx  # Nested tuple accessor.
+	movq 16(%r8), %rdx  # Read from 16(%base) into %rdx for nanoseconds.
+	movq  8(%r8), %rsi  # Read from  8(%base) into %rsi for seconds.
+	movq  0(%r8), %rdi  # Read from  0(%base) into %rdi for options_bitfield.
+
+	jmp *%rax
+	nop
+
+_ns_util_tuple_write_accessor_inner:
+	movq %rdi, %rax  # Backup return address.
+	movq %rsi, %r8   # Backup user data.
+
+	movq 24(%r8), %rdi  # Read from 24(%base) into %rdi for number of bytes.
+	movq 32(%r8), %rsi  # Read from 32(%base) into %rdi for data start pointer.
+
+	jmp *%rax
+	nop
+
 .global ns_util_module_end
 ns_util_module_end:
