@@ -1289,6 +1289,9 @@ _ns_system_x86_64_linux_fork_join:
 # 3rd component, or whatever is specified) when called.  So the tuple can hold
 # many arguments, and tuples can be nested.
 #
+# Note: the ‘.write’ action implementation currently itself uses a stack to
+# perform its procedure.
+#
 # Parameters:
 # 	%rdi: Return with single-use-only (consumes the entire set at that level)
 # 	      (clobbering!) callbacks, with parameters:
@@ -1777,9 +1780,71 @@ _ns_system_x86_64_linux_new_writer_write:
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Reserve space for TODO.
+	subq $16, %rsp
+	movq $0, 8(%rsp)
+	movq $0, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
+
+	# TODO: do the write.
+
+	jmp 5f  # Skip error cleanup.
+
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+5:
+	# Cleanup.
+
+	# Restore space for TODO.
+	addq $16, %rsp
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
 	# TODO
 	nop
 	hlt
+
+	# Return.
+	xchgq %rdi, %r9  # TODO -- %rdi, or %rsi, return.
+	jmpq *%r9
+	nop
 
 # Create a new reader, an instance capable of reading from a filepath.
 #
@@ -1804,6 +1869,9 @@ _ns_system_x86_64_linux_new_writer_write:
 # available exclusively for that ‘read’ call, and it must have size at least
 # the number of bytes requested to be read (or otherwise specified by the
 # operation's description).
+#
+# Note: the ‘.read’ action implementation currently itself uses a stack to
+# perform its procedure.
 #
 # Parameters:
 # 	%rdi: Return with a single-use-only set (consumes the entire set at that
@@ -2259,9 +2327,66 @@ _ns_system_x86_64_linux_new_reader_read:
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# TODO: do the write.
+
+	jmp 5f  # Skip error cleanup.
+
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+5:
+	# Cleanup.
+
+	# Restore space for TODO.
+	addq $16, %rsp
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
 	# TODO
 	nop
 	hlt
+
+	# TODO
+	nop
+	hlt
+
+	# Return.
+	xchgq %rdi, %r9  # TODO -- %rdi, or %rsi, return.
+	jmpq *%r9
+	nop
 
 # TODO
 
