@@ -1494,8 +1494,8 @@ _ns_system_x86_64_linux_new_writer:
 0:
 
 	# Ensure the filepath is null-terminated.
-	movq 24(%rsp), %rdx  # Data.
-	movq 32(%rsp), %rsi  # Size.
+	movq 40(%rsp), %rdx  # Data.
+	movq 48(%rsp), %rsi  # Size.
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_is_null_terminated
 9:
@@ -1515,7 +1515,7 @@ _ns_system_x86_64_linux_new_writer:
 
 	# Calculate the flags, into %rsi.
 	movq $0, %rsi  # Clear flags.
-	movq 16(%rsp), %rdi  # Original %rcx, options bitfield.
+	movq 32(%rsp), %rdi  # Original %rcx, options bitfield.
 
 	# Base options.
 	orq $0x40,  %rsi  # |= (O_CREAT=64 (0x40))
@@ -1571,7 +1571,7 @@ _ns_system_x86_64_linux_new_writer:
 	#movq $0o664, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired
 	movq $0x1b4, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired - decimal for this mode is 436
 	movq %rsi, %rsi  # flags
-	movq 24(%rsp), %rdi  # We made sure it was null-terminated, so it's compatible with the syscall interface.
+	movq 40(%rsp), %rdi  # We made sure it was null-terminated, so it's compatible with the syscall interface.
 	movq $2, %rax  # open
 	syscall
 
@@ -1600,7 +1600,7 @@ _ns_system_x86_64_linux_new_writer:
 	# Fortunately, our case is simple enough that we can get by with having the
 	# same callback for every object.
 
-	movq 40(%rsp), %rdi  # Get the original return continuation.  Will eventually jump to this.
+	movq 56(%rsp), %rdi  # Get the original return continuation.  Will eventually jump to this.
 	movq %rax,     %r9   # Right before the jump to return, this will be %rdi.  This is the user data: the file handle.
 
 	# Callbacks.
@@ -2000,8 +2000,8 @@ _ns_system_x86_64_linux_new_reader:
 0:
 
 	# Ensure the filepath is null-terminated.
-	movq 24(%rsp), %rdx  # Data.
-	movq 32(%rsp), %rsi  # Size.
+	movq 40(%rsp), %rdx  # Data.
+	movq 48(%rsp), %rsi  # Size.
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_is_null_terminated
 9:
@@ -2021,7 +2021,7 @@ _ns_system_x86_64_linux_new_reader:
 
 	# Calculate the flags, into %rsi.
 	movq $0, %rsi  # Clear flags.
-	movq 16(%rsp), %rdi  # Original %rcx, options bitfield.
+	movq 32(%rsp), %rdi  # Original %rcx, options bitfield.
 
 	# Base options.
 	# (This is a reader; don't worry about O_CREAT.)
@@ -2053,7 +2053,7 @@ _ns_system_x86_64_linux_new_reader:
 	#movq $0o664, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired
 	movq $0x1b4, %rdx  # chmod 0664 if_new_file; if needed can use ‘chmod’ syscall or use a shell callout function, or can add options if desired - decimal for this mode is 436
 	movq %rsi, %rsi  # flags
-	movq 24(%rsp), %rdi  # We made sure it was null-terminated, so it's compatible with the syscall interface.
+	movq 40(%rsp), %rdi  # We made sure it was null-terminated, so it's compatible with the syscall interface.
 	movq $2, %rax  # open
 	syscall
 
@@ -2082,7 +2082,7 @@ _ns_system_x86_64_linux_new_reader:
 	# Fortunately, our case is simple enough that we can get by with having the
 	# same callback for every object.
 
-	movq 40(%rsp), %rdi  # Get the original return continuation.  Will eventually jump to this.
+	movq 56(%rsp), %rdi  # Get the original return continuation.  Will eventually jump to this.
 	movq %rax,     %r9   # Right before the jump to return, this will be %rdi.  This is the user data: the file handle.
 
 	# Callbacks.
