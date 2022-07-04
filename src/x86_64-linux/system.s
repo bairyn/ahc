@@ -442,6 +442,38 @@ ns_system_x86_64_linux_err_msg_new_reader_read_read_failed:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_end:
 
+ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout_end - ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout)
+ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_writer’ ‘.write’ error: the ‘write’ syscall timed out!  Failed to request a write.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout_end:
+
+ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_failed_end - ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_failed)
+ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_writer’ ‘.write’ error: the ‘clock_gettime’ syscall failed (start sample)!  Could not request a write.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_writer_write_select_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_write_select_failed_end - ns_system_x86_64_linux_err_msg_new_writer_write_select_failed)
+ns_system_x86_64_linux_err_msg_new_writer_write_select_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_writer’ ‘.write’ error: the ‘select’ syscall failed!  Could not request a write.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_write_select_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed_end - ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed)
+ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_writer’ ‘.write’ error: the ‘clock_gettime’ syscall failed (end sample)!  Could not request a write.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed_end:
+
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
 # and shell support.  Also add a few other utilities as needed.
@@ -1793,7 +1825,6 @@ _ns_system_x86_64_linux_new_writer_query:
 	# TODO
 	nop
 	hlt
-# TODO Update Verify section error messages to be correct.
 _ns_system_x86_64_linux_new_writer_write:
 	# Backup %rdi and %rsi.
 	subq $16, %rsp
@@ -1913,12 +1944,6 @@ _ns_system_x86_64_linux_new_writer_write:
 
 	# TODO check original %r8 is 0.
 
-	# TODO: prob first just attempt a write, then if would block, check timeout
-	#       and if configured select to wait for it (you may need to use
-	#       syscalls to track time elapsed).
-
-	# TODO: do the write.
-
 	# Prepare to do the write.
 
 	# Retrieve 2 values from the nested tuple callback, to get the size and
@@ -1992,8 +2017,8 @@ _ns_system_x86_64_linux_new_writer_write:
 	nop
 	# Not enabled.  Just error.
 	movq $-11, %rax  # EAGAIN=11
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout_size(%rip), %rdx
 	movq (%rdx), %rdx
 	movq %rax, %rsi
 	leaq 9f(%rip), %rdi
@@ -2040,8 +2065,8 @@ _ns_system_x86_64_linux_new_writer_write:
 	syscall
 
 	# Verify.
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_failed_size(%rip), %rdx
 	movq (%rdx), %rdx
 	movq %rax, %rsi
 	leaq 9f(%rip), %rdi
@@ -2104,8 +2129,8 @@ _ns_system_x86_64_linux_new_writer_write:
 	syscall
 
 	# Verify.
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_select_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_select_failed_size(%rip), %rdx
 	movq (%rdx), %rdx
 	movq %rax, %rsi
 	leaq 9f(%rip), %rdi
@@ -2128,8 +2153,8 @@ _ns_system_x86_64_linux_new_writer_write:
 	syscall
 
 	# Verify.
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error(%rip), %rcx
-	leaq ns_system_x86_64_linux_err_msg_base_mfree_error_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed_size(%rip), %rdx
 	movq (%rdx), %rdx
 	movq %rax, %rsi
 	leaq 9f(%rip), %rdi
