@@ -155,8 +155,12 @@ ns_cli_msg_starts_u_offset:
 	.quad 16
 ns_cli_msg_starts_u_size:
 	.quad 4
+ns_cli_msg_starts_s_offset:
+	.quad 38
+ns_cli_msg_starts_s_size:
+	.quad 12
 ns_cli_msg_starts:
-	.ascii "It starts (code     ).\n"
+	.ascii "It starts (code     ) (cmdline starts             ).\n"
 	.byte 0x00
 ns_cli_msg_starts_end:
 
@@ -367,6 +371,50 @@ _ns_cli_cli:
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
+	# Read.
+	subq $16, %rsp       # Start backing up.
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+	subq $16, %rsp
+	movq %r8,  8(%rsp)
+	movq %r9,  0(%rsp)   # Done backing up.
+	movq %rcx, %r9       # ‘.read’.
+	subq $40, %rsp
+	movq $0x1, 0(%rsp)   # Options bitfield (enable timeout, enable timeout handler, etc.)
+	movq $2,   8(%rsp)   # timeout_seconds
+	movq $500000000, 16(%rsp)  # timeout_nanoseconds
+	leaq ns_cli_msg_starts_s_size(%rip), %r10
+	movq (%r10), %r10
+	movq %r10, 24(%rsp)  # read_size
+	leaq ns_cli_msg_starts(%rip), %r10
+	movq %r10, 32(%rsp)  # data_pointer
+	leaq ns_cli_msg_starts_s_offset(%rip), %r10
+	movq (%r10), %r10
+	addq 32(%rsp), %r10
+	movq %r10, 32(%rsp)
+
+	movq %rsp, %r8       # Tuple user data.
+	movq %rax, %rcx      # Tuple continuation.
+	movq %rdi, %rdx      # User data.
+	leaq 9f(%rip), %rsi  # Success handler.
+	movq $0, %rdi        # Error handler.
+	jmp *%r9
+9:
+	nop
+	addq $40, %rsp
+	movq 0(%rsp), %r9    # Start restoring.
+	movq 8(%rsp), %r8
+	addq $16, %rsp
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rdx
+	addq $16, %rsp
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp       # Done restoring.
+
 	# Close /proc/self/cmdline.
 	movq %rsi, %rdx      # Get close callback.
 	movq %rdi, %rsi      # Get user data.
@@ -399,50 +447,6 @@ _ns_cli_cli:
 	movq 0(%rsp), %rsi
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
-
-	# Read.
-	subq $16, %rsp       # Start backing up.
-	movq %rdi, 8(%rsp)
-	movq %rsi, 0(%rsp)
-	subq $16, %rsp
-	movq %rdx, 8(%rsp)
-	movq %rcx, 0(%rsp)
-	subq $16, %rsp
-	movq %r8,  8(%rsp)
-	movq %r9,  0(%rsp)   # Done backing up.
-	movq %rcx, %r9       # ‘.read’.
-	subq $40, %rsp
-	movq $0x1, 0(%rsp)   # Options bitfield (enable timeout, enable timeout handler, etc.)
-	movq $2,   8(%rsp)   # timeout_seconds
-	movq $500000000, 16(%rsp)  # timeout_nanoseconds
-	leaq ns_cli_msg_starts_u_size(%rip), %r10
-	movq (%r10), %r10
-	movq %r10, 24(%rsp)  # read_size
-	leaq ns_cli_msg_starts(%rip), %r10
-	movq %r10, 32(%rsp)  # data_pointer
-	leaq ns_cli_msg_starts_u_offset(%rip), %r10
-	movq (%r10), %r10
-	addq 32(%rsp), %r10
-	movq %r10, 32(%rsp)
-
-	movq %rsp, %r8       # Tuple user data.
-	movq %rax, %rcx      # Tuple continuation.
-	movq %rdi, %rdx      # User data.
-	leaq 9f(%rip), %rsi  # Success handler.
-	movq $0, %rdi        # Error handler.
-	#jmp *%r9
-9:
-	nop
-	addq $40, %rsp
-	movq 0(%rsp), %r9    # Start restoring.
-	movq 8(%rsp), %r8
-	addq $16, %rsp
-	movq 0(%rsp), %rcx
-	movq 8(%rsp), %rdx
-	addq $16, %rsp
-	movq 0(%rsp), %rsi
-	movq 8(%rsp), %rdi
-	addq $16, %rsp       # Done restoring.
 
 	# Uncomment the jmpq to write a message stdout.
 	subq $16, %rsp       # Start backing up.

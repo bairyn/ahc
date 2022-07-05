@@ -3046,7 +3046,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	# Enabled.  Go back to the user-provided handler, then.
 	movq $0,     %r9   # Status: 0 in general case, 1 if exhausted.  Just set to 0.  (Probably EDQUOT quotas would be most meaningful here in the documented man page returns, but just this to 0.)
 	movq $0, %r8   # %r8 is specified to be 0.
-	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx  # Write request callback.
+	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx  # Read request callback.
 	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx  # Query status callback.
 	leaq _ns_system_x86_64_linux_new_reader_close(%rip), %rsi  # Close callback.
 	movq 88(%rsp), %rdi  # Original %rdi, user data (fd).
@@ -3244,7 +3244,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	# So prepare for our return to *%r11 by setting up the arguments.
 	movq %rax,     %r9   # Number of bytes written.
 	movq $0, %r8   # %r8 is specified to be 0.
-	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx  # Write request callback.
+	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx  # Read request callback.
 	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx  # Query status callback.
 	leaq _ns_system_x86_64_linux_new_reader_close(%rip), %rsi  # Close callback.
 	movq 88(%rsp), %rdi  # Original %rdi, user data (fd).
