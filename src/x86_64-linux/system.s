@@ -1951,6 +1951,7 @@ _ns_system_x86_64_linux_new_writer_write:
 
 	# Call outer tuple.
 	movq 80(%rsp), %rcx  # Restore original %rcx.
+	movq 72(%rsp), %r8   # Restore original %r8.
 	movq %r8, %rsi
 	leaq 9f(%rip), %rdi
 	jmp *%rcx

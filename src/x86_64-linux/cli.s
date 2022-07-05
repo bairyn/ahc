@@ -369,18 +369,18 @@ _ns_cli_cli:
 	movq $0x1, 0(%rsp)   # Options bitfield (enable timeout, enable timeout handler, etc.)
 	movq $2,   8(%rsp)   # timeout_seconds
 	movq $500000000, 16(%rsp)  # timeout_nanoseconds
-	leaq ns_cli_msg_starts_u_size(%rip), %rax
-	movq (%rax), %rax
-	movq %rax, 24(%rsp)  # write_size
-	leaq ns_cli_msg_starts(%rip), %rax
-	movq %rax, 32(%rsp)  # data_pointer
+	leaq ns_cli_msg_starts_u_size(%rip), %r10
+	movq (%rax), %r10
+	movq %r10, 24(%rsp)  # write_size
+	leaq ns_cli_msg_starts(%rip), %r10
+	movq %r10, 32(%rsp)  # data_pointer
 
 	movq %rsp, %r8       # Tuple user data.
 	movq %rax, %rcx      # Tuple continuation.
 	movq %rdi, %rdx      # User data.
 	leaq 9f(%rip), %rsi  # Success handler.
 	movq $0, %rdi        # Error handler.
-	#jmp *%r9
+	jmp *%r9
 9:
 	nop
 	addq $40, %rsp
