@@ -1,6 +1,13 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
+# TODO: make sure cleanups happen on exit code 0 too.
+# TODO: consider having just a ‘cmdline’ argument with size where nulls end an
+#       argument, and then in the utility module just have a simple wrapper
+#       around ‘/bin/sh -c ARG’.  Also ‘shell()’ (probably call it ‘shell’
+#       actually rather than ‘system’) should by default inherit stdin, stdout,
+#       stderr, but have an option to redirect these to readers and writers.
+
 # TODO ‘system’
 # TODO ‘exec’ after ‘system’ - execute arbitrary shell code.
 # TODO ‘networking’ after ‘exec’ - handle networking
