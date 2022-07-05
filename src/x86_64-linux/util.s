@@ -336,5 +336,13 @@ _ns_util_tuple_write_accessor_inner:
 	jmp *%rax
 	nop
 
+# Same as ‘get_tuple_write’ but for ‘new_reader’'s ‘.read’ action.
+.global ns_util_get_tuple_read
+.set ns_util_get_tuple_read, (_ns_util_get_tuple_read - ns_util_module_begin)
+_ns_util_get_tuple_read:
+	# The struct is in the same format, so just treat is like a write tuple.
+	jmp _ns_util_get_tuple_write
+	nop
+
 .global ns_util_module_end
 ns_util_module_end:

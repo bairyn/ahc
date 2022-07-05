@@ -434,14 +434,6 @@ ns_system_x86_64_linux_err_msg_new_writer_write_write_failed:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_new_writer_write_write_failed_end:
 
-ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_size:
-	.quad (ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_end - ns_system_x86_64_linux_err_msg_new_reader_read_read_failed)
-ns_system_x86_64_linux_err_msg_new_reader_read_read_failed:
-	# (Will get an ‘Error: ’-like prefix.)
-	.ascii "‘new_reader’ ‘.read’ error: the ‘read’ syscall failed!  Could not request a read.\n"
-	.byte 0x00
-ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_end:
-
 ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout_size:
 	.quad (ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout_end - ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout)
 ns_system_x86_64_linux_err_msg_new_writer_write_write_timeout:
@@ -473,6 +465,46 @@ ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed:
 	.ascii "‘new_writer’ ‘.write’ error: the ‘clock_gettime’ syscall failed (end sample)!  Could not request a write.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_new_writer_write_clock_gettime_second_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_end - ns_system_x86_64_linux_err_msg_new_reader_read_read_failed)
+ns_system_x86_64_linux_err_msg_new_reader_read_read_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ ‘.read’ error: the ‘read’ syscall failed!  Could not request a read.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_read_read_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_read_read_timeout_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_read_read_timeout_end - ns_system_x86_64_linux_err_msg_new_reader_read_read_timeout)
+ns_system_x86_64_linux_err_msg_new_reader_read_read_timeout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ ‘.read’ error: the ‘read’ syscall timed out!  Failed to request a read.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_read_read_timeout_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_failed_end - ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_failed)
+ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ ‘.read’ error: the ‘clock_gettime’ syscall failed (start sample)!  Could not request a read.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_read_select_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_read_select_failed_end - ns_system_x86_64_linux_err_msg_new_reader_read_select_failed)
+ns_system_x86_64_linux_err_msg_new_reader_read_select_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ ‘.read’ error: the ‘select’ syscall failed!  Could not request a read.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_read_select_failed_end:
+
+ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed_end - ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed)
+ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘new_reader’ ‘.read’ error: the ‘clock_gettime’ syscall failed (end sample)!  Could not request a read.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed_end:
 
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
@@ -1400,8 +1432,6 @@ _ns_system_x86_64_linux_fork_join:
 # 						       non-fatal error handler you supplied through
 # 						       %rdi is returned to instead of failing with an
 # 						       error.
-# 					bit 0 is boolean for 0 to disable
-# 					      timeout, 1 to enable timeout.  Bit 2 
 # 					%rsi: Seconds for the timeout (i64).
 # 					%rdx: Nanoseconds for the timeout (i64).
 # 					%rcx: Nested tuple (accessor function) to store still more
@@ -1418,7 +1448,7 @@ _ns_system_x86_64_linux_fork_join:
 # 					%r9: Please set to 0, to make future enhancements more
 # 					     convenient.
 # 				%rsi: User data.
-# 			%r8: User data supplied to %rdx as a closure.  (You can pass
+# 			%r8: User data supplied to %rcx as a closure.  (You can pass
 # 			     whatever you want; it doesn't have to be an FD.)
 # 		%r8: currently 0, in case future versions want to add functionality.
 # 		     (If the API is extended with APIs, I'd probably make the next
@@ -2401,29 +2431,39 @@ _ns_system_x86_64_linux_new_writer_write:
 # 				                      already consumed (although the new ones
 # 				                      may refer to the same address).
 # 				%r9: Number of bytes read.
-# 			%rdx: tuple callback to get options and timeout, with parameters
+# 			%rdx: User data (under the hood, internally, this is the FD).
+# 			%rcx: tuple callback to get options and timeout, with parameters
 # 			      (we use a tuple instead of direct parameters to compress
 # 			      parameters into fewer parameters (3 into 2) so we don't
 # 			      depend on a stack as much):
 # 				%rdi: Return (please return back to this address when done),
 # 				      with parameters:
-# 					%rdi: Options bitfield: bit 0 is boolean for 0 to disable
-# 					      timeout, 1 to enable timeout.
+# 					%rdi: Options bitfield:
+# 						Bit 0: enable timeout: 1 to enable timeout, 0 to block
+# 						       indefinitely.
+# 						Bit 1: enable user-handled timeout would-block (this
+# 						       doesn't apply to other I/O errors), so that your
+# 						       non-fatal error handler you supplied through
+# 						       %rdi is returned to instead of failing with an
+# 						       error.
 # 					%rsi: Seconds for the timeout (i64).
 # 					%rdx: Nanoseconds for the timeout (i64).
-# 					%rcx: Please set to 0, to make future enhancements more
-# 					      convenient.
+# 					%rcx: Nested tuple (accessor function) to store still more
+# 					      arguments, with parameters:
+# 						%rdi: Return (please return back to this address when
+# 						      done), with parameters:
+# 							%rdi: Number of bytes to request reading (i.e., the
+# 							      size), and this is also the maximum number of
+# 							      bytes to read into your output store.
+# 							%rsi: As noted, memory for a successful read to
+# 							      output to.
+# 					%r8: User data supplied to %rcx as a closure.  (Doesn't
+# 					     have to be an FD.)
+# 					%r9: Please set to 0, to make future enhancements more
+# 					     convenient.
 # 				%rsi: User data.
-# 			%rcx: user data supplied to %rdx as a closure
-# 			%r8: Tuple for remaining read parameters, with parameters:
-# 				%rdi: Return (please return back to this address when done),
-# 				      with parameters:
-# 					%rdi: Number of bytes to request reading, and also the
-# 					      maximum number of bytes to read.
-# 					%rsi: As noted, memory for a successful read to output to.
-# 					%rdx: Please set to 0, so that future versions can add
-# 					      functionality more conveniently.
-# 				%rsi: User data.
+# 			%r8: User data supplied to %rcx as a closure.  (You can pass
+# 			     whatever you want; it doesn't have to be an FD.)
 # 			%r9: User data to provide to the tuple continuation.
 # 		%r8: currently 0, in case future versions want to add functionality.
 # 		     (If the API is extended with APIs, I'd probably make the next
@@ -2488,28 +2528,6 @@ _ns_system_x86_64_linux_new_reader:
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
 
-	# Backup %r15 and %r14.
-	subq $16, %rsp
-	movq %r15, 8(%rsp)
-	movq %r14, 0(%rsp)
-
-	# Reserve space for working storage units.
-	subq $16, %rsp
-	movq $0, 8(%rsp)    # Elapsed seconds waitn  (4232)
-	movq $0, 0(%rsp)    # Elapsed nanosecs watn  (4224)
-
-	# ‘fd sets’: the kernel seems to use 1024 bytes, divided unto u64s, for a
-	# single FD set.  (We'll reserve twice this for cushion.)  Then it's just
-	# bitfield: fd 0 corresponds to bit 0, fd 1 to bit 1, fd 2 to bit 2, etc.,
-	# e.g. if only fds 3 and 7 are enabled, the set is 0b000…000010001000=136.
-
-	# So we'll reserve 2 2048-byte FD_SETs.  One is used for NULL input sets,
-	# with all bits cleared (fds disabled).  The other one we'll use to provide
-	# our own FD set for select.
-
-	nop
-	hlt  # TODO update allocation and cleanup; I'll just deal with this later, since it keeps changing.
-
 	# First backup the input arguments and what we clobber onto the stack.
 
 	subq $16, %rsp
@@ -2531,6 +2549,11 @@ _ns_system_x86_64_linux_new_reader:
 	subq $16, %rsp
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
+
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
 
 	# Push / add our own cleanup to our collection of cleanup requirements for
 	# error handling (see the module documentation for more information).
@@ -2558,8 +2581,9 @@ _ns_system_x86_64_linux_new_reader:
 
 	# Make sure unsupported bits in the options bitfield are 0, to aid in
 	# future enhancements.
-	testq $0xFFFFFFFFFFFFFFC7, %rcx
+	testq $0xFFFFFFFFFFFFFFC0, %rcx
 	jz 0f
+
 	# Error: invalid arguments.
 
 	# First, write to this instance's error message storage to print the
@@ -2596,8 +2620,8 @@ _ns_system_x86_64_linux_new_reader:
 1:
 	# Error: the filepath is not null-terminated.
 	movq $0, %rcx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated(%rip), %rdx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_path_not_null_terminated_size(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_path_not_null_terminated_size(%rip), %rsi
 	movq (%rsi), %rsi
 	movq $2, %rdi
 	jmp _ns_system_x86_64_linux_exit_custom
@@ -2610,7 +2634,7 @@ _ns_system_x86_64_linux_new_reader:
 	movq 32(%rsp), %rdi  # Original %rcx, options bitfield.
 
 	# Base options.
-	# (This is a reader; don't worry about O_CREAT.)
+	orq $0x40,  %rsi  # |= (O_CREAT=64 (0x40))
 	orq $0x800, %rsi  # |= (O_NONBLOCK=2048 (0x800))
 	orq $0x0,   %rsi  # |= (O_RDONLY=0 (0x0))
 
@@ -2674,7 +2698,7 @@ _ns_system_x86_64_linux_new_reader:
 	# Callbacks.
 	leaq _ns_system_x86_64_linux_new_reader_close(%rip), %rsi
 	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx
-	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx
+	leaq _ns_system_x86_64_linux_new_reader_read(%rip), %rcx
 	movq $0, %r8
 
 	jmp 5f  # Skip error cleanup.
@@ -2784,8 +2808,8 @@ _ns_system_x86_64_linux_new_reader_close:
 
 	movq %rdx, %rax  # Restore ‘return’.
 
-	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed(%rip), %rcx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_close_close_failed_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_close_close_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_close_close_failed_size(%rip), %rdx
 	movq (%rdx), %rdx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
@@ -2833,58 +2857,148 @@ _ns_system_x86_64_linux_new_reader_read:
 	movq %r15, 8(%rsp)
 	movq %r14, 0(%rsp)
 
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)    # Elapsed seconds waitn  (4232)
+	movq $0, 0(%rsp)    # Elapsed nanosecs watn  (4224)
+
+	# ‘fd sets’: the kernel seems to use 1024 bytes, divided unto u64s, for a
+	# single FD set.  (We'll reserve twice this for cushion.)  Then it's just
+	# bitfield: fd 0 corresponds to bit 0, fd 1 to bit 1, fd 2 to bit 2, etc.,
+	# e.g. if only fds 3 and 7 are enabled, the set is 0b000…000010001000=136.
+
+	# So we'll reserve 2 2048-byte FD_SETs.  One is used for NULL input sets,
+	# with all bits cleared (fds disabled).  The other one we'll use to provide
+	# our own FD set for select.
+
+	# All-null FD set:
+	#                   #                        (4224)
+	subq $2048, %rsp    # All-null FD set        (2176)
+
+	# All-null FD set:
+	subq $2048, %rsp    # User FD set            ( 128)
+
+	# Reserve space for working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)    # select timeout musecs   (120)
+	movq $0, 0(%rsp)    # select timeout secs     (112)
+
 	# Backup %rdi and %rsi
 	subq $16, %rsp
-	movq %rdi, 8(%rsp)
-	movq %rsi, 0(%rsp)
+	movq %rdi, 8(%rsp)  # Enbld?  Timeout callbk  (104)
+	movq %rsi, 0(%rsp)  # Normal return on succe   (96)
 
 	# Backup %rdx and %rcx
 	subq $16, %rsp
-	movq %rdx, 8(%rsp)
-	movq %rcx, 0(%rsp)
+	movq %rdx, 8(%rsp)  # User data (intrnly FD)   (88)
+	movq %rcx, 0(%rsp)  # Tuple.                   (80)
 
 	# Backup %r8 and %r9
 	subq $16, %rsp
-	movq %r8, 8(%rsp)
-	movq %r9, 0(%rsp)
+	movq %r8, 8(%rsp)   # Tuple user data.         (72)
+	movq %r9, 0(%rsp)   #                          (64)
 
 	# Reserve space for working storage units.
 	subq $16, %rsp
-	movq $0, 8(%rsp)
-	movq $0, 0(%rsp)
+	movq $0, 8(%rsp)    # Options.                 (56)
+	movq $0, 0(%rsp)    # Timeout seconds.         (48)
 
 	# Reserve space for working storage units.
 	subq $16, %rsp
-	movq $0, 8(%rsp)
-	movq $0, 0(%rsp)
+	movq $0, 8(%rsp)    # Timeout nanoseconds.     (40)
+	movq $0, 0(%rsp)    # Size of data to read.    (32)
 
 	# Reserve space for working storage units.
 	subq $16, %rsp
-	movq $0, 8(%rsp)
-	movq $0, 0(%rsp)
+	movq $0, 8(%rsp)    # Data read output pointr  (24)
+	movq $0, 0(%rsp)    #                          (16)
 
 	# Reserve space for working storage units.
 	subq $16, %rsp
-	movq $0, 8(%rsp)
-	movq $0, 0(%rsp)
+	movq $0, 8(%rsp)    # Space for clock_gettime  ( 8)
+	movq $0, 0(%rsp)    # Space for clock_gettime  ( 0)
 
 	# Push / add our own cleanup to our collection of cleanup requirements for
 	# error handling (see the module documentation for more information).
 	leaq 6f(%rip), %r14
 
-	# TODO: do the read.
+	# Zero-init both FD sets.
+	movq $4096, %rsi
+	leaq 128(%rsp), %rdi
+1:
+	subq $8, %rsi
+	testq %rsi, %rsi
+	jz 0f
+	movq $0, (%rdi)
+	addq $8, %rdi
+	jmp 1b
+0:
 
-	# TODO
+	# For the user FD set, set the bit corresponding to our FD in the original
+	# %rdx.
+	leaq 128(%rsp), %rdi  # user FD set start.
+	movq  88(%rsp), %rsi  # fd (original %rdx)
+	movq %rsi, %rdx
+	# Can divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	# But just shift and ‘and’ instead, since it's multiples of 2.  (shrq is
+	# unsigned.)
+	shrq $3, %rdx
+	addq %rdx, %rdi  # Get the right byte.
+	# Get the right bit within the byte.
+	movq %rsi, %rcx
+	andq $7, %rcx
+	movq $1, %r8
+	shlq %cl, %r8
+	# Set the right bit within the byte.
+	orb %r8b, (%rdi)
+
+	# Last 5 bits.
+
+	# TODO check original %r8 is 0.
+
+	# Prepare to do the read.
+
+	# Retrieve 2 values from the nested tuple callback, to get the size and
+	# data pointer.
+
+	# Call outer tuple.
+	movq 80(%rsp), %rcx  # Restore original %rcx.
+	movq 72(%rsp), %r8   # Restore original %r8.
+	movq %r8, %rsi
+	leaq 9f(%rip), %rdi
+	jmp *%rcx
+9:
 	nop
-	hlt
 
-	#_
-	movq $0, %rax  # read
+	# TODO check %r9 is0.
+
+	# While we're at it, just track options, seconds, and nanoseconds, before
+	# we get into the inner tuple.
+	movq %rdi, 56(%rsp)  # Options.
+	movq %rsi, 48(%rsp)  # Seconds.
+	movq %rdx, 40(%rsp)  # Nanoseconds.
+
+	# Call inner tuple.
+	movq %r8, %rsi
+	leaq 9f(%rip), %rdi
+	jmp *%rcx
+9:
+	nop
+
+	# Get size and data start.
+	movq %rdi, 32(%rsp)  # Size.
+	movq %rsi, 24(%rsp)  # Data.
+
+	# Do the read.
+	movq 32(%rsp), %rdx  # size_t size
+	movq 24(%rsp), %rsi  # const uint8_t *data
+	movq 88(%rsp), %rdi  # int fd (original %rdx)
+	movq $0,       %rax  # read
 	syscall
 
-	# Check for ENOMEM (12) with %rax of -12, in which case we skip verification.
-	cmpq $-12, %rax
-	jz 0f
+	# Check for EAGAIN=EWOULDBLOCK (11) with %rax of -11, in which case we skip verification.
+	cmpq $-11, %rax
+	jz 2f
 
 1:
 	# Verify.
@@ -2896,7 +3010,245 @@ _ns_system_x86_64_linux_new_reader_read:
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
 	nop
+	jmp 0f  # Go to successful read block.
+2:
+	# The resource is not currently available for a read.
+
+	# Reserve and initialize %r8 and %r9 as monotonic time elapsed waiting for
+	# availability; seconds and nanoseconds.
+	movq $0, %r8
+	movq $0, %r9
+
+	jmp 3f
+	nop
+
+	# 4 begins the timeout block.
+4:
+	# A timeout occurred.  We'll be returning either to a user-provided handler
+	# if enabled or otherwise throwing an error.
+	testq $0x2, 56(%rsp)  # Enable user-handled timeout would-block callback?
+	jnz 7f
+	nop
+	# Not enabled.  Just error.
+	movq $-11, %rax  # EAGAIN=11
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_read_timeout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_read_timeout_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop  # Will not be reached.
+	jmp _ns_system_x86_64_linux_exit_failure
+	nop
+	hlt
+7:
+	# Enabled.  Go back to the user-provided handler, then.
+	movq $0,     %r9   # Status: 0 in general case, 1 if exhausted.  Just set to 0.  (Probably EDQUOT quotas would be most meaningful here in the documented man page returns, but just this to 0.)
+	movq $0, %r8   # %r8 is specified to be 0.
+	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx  # Write request callback.
+	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx  # Query status callback.
+	leaq _ns_system_x86_64_linux_new_reader_close(%rip), %rsi  # Close callback.
+	movq 88(%rsp), %rdi  # Original %rdi, user data (fd).
+	movq 104(%rsp), %r11  # Original %rdi.
+	jmp 5f
+
+	# 3 begins the loop of attempting a read if not yet timed out.
+3:
+	# So first check whether we are in a timeout condition, where we had a
+	# timeout enabled and time elapsed exceeded the timeout.
+	testq $0x1, 56(%rsp)
+	jz 8f  # jump if timeout not enabled, then treat timeout as infinite.
+	nop
+	movq 4232(%rsp), %r8  # Elapsed seconds.
+	movq 4224(%rsp), %r9  # Elapsed nanoseconds.
+	cmpq 48(%rsp), %r8
+	jae 4b  # if elapsed >= timeout, then do a timeout.
+	nop
+	cmpq 40(%rsp), %r9
+	jae 4b  # if elapsed >= timeout, then do a timeout.
+	nop
+8:
+
+	# Just wait until we can read.
+#0:
+	# First sample the current time.
+	leaq 0(%rsp), %rsi  # Output storage; secs&nanoseconds i64 pair.
+	movq $1,   %rdi  # clockid_t clockid: CLOCK_MONOTONIC=1
+	movq $228, %rax  # clock_gettime
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop
+
+	# Setup timeout data.
+	#
+	# Null-initialize timeout to %r8, which the syscall treats as an infinite
+	# timeout.
+	movq $0, %r8
+
+	# Timeout enabled?
+	testq $0x1, 56(%rsp)
+	jz 8f  # jump if timeout not enabled, then treat timeout as infinite.
+	nop
+	leaq  112(%rsp), %r8   # timeout
+8:
+
+	# Set the timeout values to original timeout minus elapsed.
+	movq 4232(%rsp), %rdx  # Get elapsed seconds.
+	movq 4224(%rsp), %rcx  # Get elapsed nanoseconds.
+	movq   48(%rsp), %rdi  # Get original timeout seconds.
+	movq   40(%rsp), %rsi  # Get original timeout nanoseconds.
+	subq %rdx, %rdi  # Remaining timeout seconds.
+	subq %rcx, %rsi  # Remaining timeout nanoseconds.
+	# Handle remaining nanoseconds < 0 or >= 1000000000.
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000000000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rdx, %rsi
+	addq %rax, %rdi
+	cmpq $0, %rsi
+	jge 8f
+	nop
+	addq $1000000000, %rsi
+	dec %rdi
+8:
+	# Now %rsi is set up.
+	# %rsi /= 1000
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rax, %rsi  # Now microseconds.
+	movq %rdi, 112(%rsp)  # Seconds.
+	movq %rsi, 120(%rsp)  # Microseconds.
+
+	# (Note: ‘select’ works with seconds and microseconds, not seconds and
+	# nanoseconds.)
+	movq %r8,        %r8   # timeout
+	leaq 2176(%rsp), %rcx  # exceptfds
+	leaq 2176(%rsp), %rdx  # writefds
+	leaq  128(%rsp), %rsi  # readfds
+	movq   88(%rsp), %rdi
+	incq %rdi              # int nfds: highest internal fd plus 1.
+	movq $23, %rax         # select
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_select_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_select_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop
+
+	# Successful ‘select’.
+
+	# Add to time elapsed and loop back to try a read again!
+
+	# Backup begin clock sample.
+	movq 0(%rsp), %r8  # Seconds.
+	movq 8(%rsp), %r9  # Microseconds.
+
+	# Sample the current time.
+	leaq 0(%rsp), %rsi  # Output storage; secs&nanoseconds i64 pair.
+	movq $1,   %rdi  # clockid_t clockid: CLOCK_MONOTONIC=1
+	movq $228, %rax  # clock_gettime
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno
+9:
+	nop
+
+	# end - begin into %r8 and %r9 for this frame's elapsed time.
+	movq 0(%rsp), %rdi
+	movq 8(%rsp), %rsi
+	subq %r8, %rdi
+	subq %r9, %rsi
+	movq %rdi, %r8
+	movq %rsi, %r9  # Now we have elapsed time, but we'll want to double check bounds.
+	movq %r8, %rdi
+	movq %r9, %rsi
+	# Handle remaining nanoseconds < 0 or >= 1000000000.
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000000000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rdx, %rsi
+	addq %rax, %rdi
+	cmpq $0, %rsi
+	jge 8f
+	nop
+	addq $1000000000, %rsi
+	dec %rdi
+8:
+	# Now %rsi is set up.
+	# Just ensure too that %rdi >= 0.
+	cmpq $0, %rdi
+	jge 8f
+	movq $0, %rdi
+8:
+	# So now we have time elapsed for this frame.  Before we loop back, add it
+	# to the total, cumulative time elapsed waiting for availability.
+	addq 4232(%rsp), %rdi
+	addq 4224(%rsp), %rsi
+
+	# Handle remaining nanoseconds < 0 or >= 1000000000.
+	movq $0, %rdx
+	movq %rsi, %rax
+	movq $1000000000, %rcx
+	divq %rcx  # Divide %rdx:%rax by OP into quotient %rax, remainder %rdx.
+	movq %rdx, %rsi
+	addq %rax, %rdi
+	cmpq $0, %rsi
+	jge 8f
+	nop
+	addq $1000000000, %rsi
+	dec %rdi
+8:
+	# Now %rsi is set up.
+	# Just ensure too that %rdi >= 0.
+	cmpq $0, %rdi
+	jge 8f
+	movq $0, %rdi
+8:
+
+	# Now write the results.
+	addq %rdi, 4232(%rsp)
+	addq %rsi, 4224(%rsp)
+
+	# Loop back to try a read again.
+	jmp 3b
+	nop
+
 0:
+	# The read was successful, although it might have been partial.
+	# The number of bytes successfully read is in %rax.
+	#
+	# So prepare for our return to *%r11 by setting up the arguments.
+	movq %rax,     %r9   # Number of bytes written.
+	movq $0, %r8   # %r8 is specified to be 0.
+	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rcx  # Write request callback.
+	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx  # Query status callback.
+	leaq _ns_system_x86_64_linux_new_reader_close(%rip), %rsi  # Close callback.
+	movq 88(%rsp), %rdi  # Original %rdi, user data (fd).
+	movq 96(%rsp), %r11  # Original %rsi, successfull callback.
 
 	jmp 5f  # Skip error cleanup.
 
@@ -2911,6 +3263,10 @@ _ns_system_x86_64_linux_new_reader_read:
 	# 	%rdx: String.
 	# 	%rcx: 0.
 	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	addq $2048, %rsp
+	addq $2048, %rsp
+	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
@@ -2936,6 +3292,16 @@ _ns_system_x86_64_linux_new_reader_read:
 	nop
 5:
 	# Cleanup.
+
+	# Restore space for elapsed time.
+	addq $16, %rsp
+
+	# Restore both 2048-byte FD sets.
+	addq $2048, %rsp
+	addq $2048, %rsp
+
+	# Restore space for use.
+	addq $16, %rsp
 
 	# Restore space for use.
 	addq $16, %rsp
