@@ -1,8 +1,7 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
-# TODO: ‘.write’ finally works!  Now implement ‘.read’.  Probably first do a
-# little more testing of ‘.write’.
+# TODO ‘system’
 # TODO ‘exec’ after ‘system’ - execute arbitrary shell code.
 # TODO ‘networking’ after ‘exec’ - handle networking
 # TODO how to handle networking?
