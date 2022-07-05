@@ -331,7 +331,7 @@ _ns_util_tuple_write_accessor_inner:
 	movq %rsi, %r8   # Backup user data.
 
 	movq 24(%r8), %rdi  # Read from 24(%base) into %rdi for number of bytes.
-	movq 32(%r8), %rsi  # Read from 32(%base) into %rdi for data start pointer.
+	movq 32(%r8), %rsi  # Read from 32(%base) into %rsi for data start pointer.
 
 	jmp *%rax
 	nop

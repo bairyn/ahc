@@ -1,10 +1,10 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
-# TODO ‘exec’ after system
-# TODO ‘networking’ after exec
-# TODO probably for join, maybe add an option to override failing exit codes
-# than crashing yourself.
+# TODO: ‘.write’ finally works!  Now implement ‘.read’.  Probably first do a
+# little more testing of ‘.write’.
+# TODO ‘exec’ after ‘system’ - execute arbitrary shell code.
+# TODO ‘networking’ after ‘exec’ - handle networking
 # TODO how to handle networking?
 
 # See ‘arch/x86/entry/syscalls/syscall_64.tbl’ (thanks,
@@ -1600,8 +1600,7 @@ _ns_system_x86_64_linux_new_writer:
 	# Base options.
 	orq $0x40,  %rsi  # |= (O_CREAT=64 (0x40))
 	orq $0x800, %rsi  # |= (O_NONBLOCK=2048 (0x800))
-	orq $0x0,   %rsi  # |= (O_RDONLY=0 (0x0))
-# O_CLOEXEC=524288 (0x80000)
+	orq $0x1,   %rsi  # |= (O_WRONLY=1 (0x1))
 
 	# (not) Shared?
 	testq $0x20, %rdi
@@ -2059,7 +2058,7 @@ _ns_system_x86_64_linux_new_writer_write:
 8:
 
 	# Just wait until we can write.
-0:
+#0:
 	# First sample the current time.
 	leaq 0(%rsp), %rsi  # Output storage; secs&nanoseconds i64 pair.
 	movq $1,   %rdi  # clockid_t clockid: CLOCK_MONOTONIC=1
@@ -2086,7 +2085,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	testq $0x1, 56(%rsp)
 	jz 8f  # jump if timeout not enabled, then treat timeout as infinite.
 	nop
-	movq  112(%rsp), %r8   # timeout
+	leaq  112(%rsp), %r8   # timeout
 8:
 
 	# Set the timeout values to original timeout minus elapsed.
@@ -2613,7 +2612,7 @@ _ns_system_x86_64_linux_new_reader:
 	# Base options.
 	# (This is a reader; don't worry about O_CREAT.)
 	orq $0x800, %rsi  # |= (O_NONBLOCK=2048 (0x800))
-	orq $0x1,   %rsi  # |= (O_WRONLY=1 (0x1))
+	orq $0x0,   %rsi  # |= (O_RDONLY=0 (0x0))
 
 	# (not) Shared?
 	testq $0x20, %rdi

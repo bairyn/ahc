@@ -121,11 +121,6 @@ _module_name:
 	.ascii "cli"
 _module_name_end:
 
-todo:
-#.ascii "It starts.\n"  # 16 offset, size 11.
-.ascii "It starts (code     ).\n"  # 16 offset, size 23.
-.byte 0x00
-
 ns_cli_err_msg_memory_preliminary_checks_size:
 	.quad (ns_cli_err_msg_memory_preliminary_checks_end - ns_cli_err_msg_memory_preliminary_checks)
 ns_cli_err_msg_memory_preliminary_checks:
@@ -369,8 +364,8 @@ _ns_cli_cli:
 	movq $0x1, 0(%rsp)   # Options bitfield (enable timeout, enable timeout handler, etc.)
 	movq $2,   8(%rsp)   # timeout_seconds
 	movq $500000000, 16(%rsp)  # timeout_nanoseconds
-	leaq ns_cli_msg_starts_u_size(%rip), %r10
-	movq (%rax), %r10
+	leaq ns_cli_msg_starts_size(%rip), %r10
+	movq (%r10), %r10
 	movq %r10, 24(%rsp)  # write_size
 	leaq ns_cli_msg_starts(%rip), %r10
 	movq %r10, 32(%rsp)  # data_pointer
@@ -401,25 +396,6 @@ _ns_cli_cli:
 	jmpq *%rdx
 9:
 	nop
-
-	# TODO test ns_system_x86_64_linux_print_u64
-	movq $1324, %rcx
-	movq $4, %rdx
-	leaq todo(%rip), %rsi
-	addq $16, %rsi
-	leaq 9f(%rip), %rdi
-	movq $ns_system_x86_64_linux_print_u64, %rax
-	jmp _system
-9:
-	nop
-
-	# TODO: don't bypass system.s; use the layer to handle syscalls.
-	movq $1, %rax  # write
-	movq $1, %rdi
-	leaq todo(%rip), %rsi
-	#movq $11, %rdx
-	movq $23, %rdx
-	syscall
 
 	jmp 5f  # Skip error cleanup.
 6:
