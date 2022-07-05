@@ -135,6 +135,20 @@ ns_cli_path_dev_stdout:
 	.byte 0x00
 ns_cli_path_dev_stdout_end:
 
+ns_cli_path_dev_stdin_size:
+	.quad (ns_cli_path_dev_stdin_end - ns_cli_path_dev_stdin)
+ns_cli_path_dev_stdin:
+	.ascii "/dev/stdin"
+	.byte 0x00
+ns_cli_path_dev_stdin_end:
+
+ns_cli_path_proc_self_cmdline_size:
+	.quad (ns_cli_path_proc_self_cmdline_end - ns_cli_path_proc_self_cmdline)
+ns_cli_path_proc_self_cmdline:
+	.ascii "/proc/self/cmdline"
+	.byte 0x00
+ns_cli_path_proc_self_cmdline_end:
+
 ns_cli_msg_starts_size:
 	.quad (ns_cli_msg_starts_end - ns_cli_msg_starts)  # 23
 ns_cli_msg_starts_u_offset:
@@ -324,6 +338,43 @@ _ns_cli_cli:
 9:
 	nop
 
+	# Make sure we can open and close ‘/proc/self/cmdline’.
+	# Uncomment the 2 stdin path leaq to read from ‘/dev/stdin’ instead of
+	# ‘/proc/self/cmdline’.
+	movq $0, %rcx
+	leaq ns_cli_path_proc_self_cmdline(%rip), %rdx
+	leaq ns_cli_path_proc_self_cmdline_size(%rip), %rsi
+	#leaq ns_cli_path_dev_stdin(%rip), %rdx
+	#leaq ns_cli_path_dev_stdin_size(%rip), %rsi
+	movq (%rdx), %rsi
+	leaq 9f(%rip), %rdi
+	movq $ns_system_x86_64_linux_new_reader, %rax
+	jmp _system
+9:
+	nop
+
+	# ‘tuple_read()’ -> %rax.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	leaq 9f(%rip), %rdi
+	movq $ns_util_get_tuple_read, %rax
+	jmp _util
+9:
+	nop
+	movq %rdi, %rax
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	# Close /proc/self/cmdline.
+	movq %rsi, %rdx      # Get close callback.
+	movq %rdi, %rsi      # Get user data.
+	leaq 9f(%rip), %rdi  # Get return address.
+	jmpq *%rdx
+9:
+	nop
+
 	# Make sure we can open and close /dev/stdout.
 	movq $0, %rcx
 	leaq ns_cli_path_dev_stdout(%rip), %rdx
@@ -348,6 +399,50 @@ _ns_cli_cli:
 	movq 0(%rsp), %rsi
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
+
+	# Read.
+	subq $16, %rsp       # Start backing up.
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+	subq $16, %rsp
+	movq %r8,  8(%rsp)
+	movq %r9,  0(%rsp)   # Done backing up.
+	movq %rcx, %r9       # ‘.read’.
+	subq $40, %rsp
+	movq $0x1, 0(%rsp)   # Options bitfield (enable timeout, enable timeout handler, etc.)
+	movq $2,   8(%rsp)   # timeout_seconds
+	movq $500000000, 16(%rsp)  # timeout_nanoseconds
+	leaq ns_cli_msg_starts_u_size(%rip), %r10
+	movq (%r10), %r10
+	movq %r10, 24(%rsp)  # read_size
+	leaq ns_cli_msg_starts(%rip), %r10
+	movq %r10, 32(%rsp)  # data_pointer
+	leaq ns_cli_msg_starts_u_offset(%rip), %r10
+	movq (%r10), %r10
+	addq 32(%rsp), %r10
+	movq %r10, 32(%rsp)
+
+	movq %rsp, %r8       # Tuple user data.
+	movq %rax, %rcx      # Tuple continuation.
+	movq %rdi, %rdx      # User data.
+	leaq 9f(%rip), %rsi  # Success handler.
+	movq $0, %rdi        # Error handler.
+	#jmp *%r9
+9:
+	nop
+	addq $40, %rsp
+	movq 0(%rsp), %r9    # Start restoring.
+	movq 8(%rsp), %r8
+	addq $16, %rsp
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rdx
+	addq $16, %rsp
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp       # Done restoring.
 
 	# Uncomment the jmpq to write a message stdout.
 	subq $16, %rsp       # Start backing up.
