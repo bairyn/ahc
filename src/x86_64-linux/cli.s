@@ -216,6 +216,14 @@ _ns_cli_cli:
 	movq $0, 8(%rsp)
 	movq $0, 0(%rsp)
 
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	#leaq ns_cli_exit_custom_force(%rip), %r14
+	leaq 6f(%rip), %r14
+
+	# Enable custom error handlers for both success and exit.
+	orq $0x06, %r15
+
 	# Preliminarily check we can malloc and free.
 	movq $0, %rcx
 	movq $0, %rdx
@@ -550,6 +558,16 @@ _ns_cli_cli:
 	hlt
 
 	jmp ns_cli_cli
+	nop
+	hlt
+
+# A wrapper around ‘exit_custom_force’, which is here since it requires no
+# arguments and does not make this module require more than one linking point
+# for runtime linking to refer to other modules (see the discussion on
+# referring to other modules from one location for more information).
+_ns_cli_exit_custom_force:
+	movq $ns_system_x86_64_linux_exit_custom_force, %rax
+	jmp _system
 	nop
 	hlt
 

@@ -15,7 +15,8 @@ ns_main_main:
 	movq $0, 8(%rsp)
 	movq $0, 0(%rsp)
 
-	movq $0xF40DCA88482D4100, %r15
+	movq $0xF40DCA88482D4100, %r15  # No custom error handlers.
+	#movq $0xF40DCA88482D4106, %r15  # Custom error handlers.
 
 	# Pointer to ‘cli_cli’.
 	movq $ns_cli_cli, %rax
@@ -31,3 +32,6 @@ ns_main_main:
 	movq 0(%rsp), %r14
 	movq 8(%rsp), %r15
 	addq $16, %rsp
+
+	nop
+	hlt

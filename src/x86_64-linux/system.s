@@ -1,14 +1,15 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
-# TODO: make sure cleanups happen on exit code 0 too.
 # TODO: consider having just a ‘cmdline’ argument with size where nulls end an
 #       argument, and then in the utility module just have a simple wrapper
 #       around ‘/bin/sh -c ARG’.  Also ‘shell()’ (probably call it ‘shell’
 #       actually rather than ‘system’) should by default inherit stdin, stdout,
 #       stderr, but have an option to redirect these to readers and writers.
+#       (3 modes: simple null-terminated sh -c, null-terminated arg, and a
+#       vector encoding of a quad length beginning for each argument OSLT)
 
-# TODO ‘system’
+# TODO ‘system’ - rdi size, rsi data pointer, rdx user data 1, rcx user data 2
 # TODO ‘exec’ after ‘system’ - execute arbitrary shell code.
 # TODO ‘networking’ after ‘exec’ - handle networking
 # TODO how to handle networking?
@@ -39,8 +40,13 @@
 # 			Bit 0: Unused.
 # 			Bit 1: Instead of the default error handler (print a message and
 # 			       exit), return to the %r14 continuation (see its description
-# 			       for more information).
-# 			Bit 2: Unused.
+# 			       for more information).  However, the ‘.*_force’ exit methods
+# 			       can override these settings.  This setting applies to
+# 			       non-zero exit codes.
+# 			Bit 2: For a non-forced, standard successful exit, also call the
+# 			       %r14 callback to cleanup resources; success and failure can
+# 			       be dicriminated by checking the exit code.
+# 			Bit 3: Unused.
 # 			Bit …: Unused.
 # 			Bit 63: Unused.
 # 			(Unused bits should be 0, but this may or may not be checked.)
@@ -73,7 +79,7 @@
 # 		preserved between module action calls and conventional calls.
 #
 # 		Unless otherwise specified, this takes the following parameters:
-# 			%rdi: Numeric code.
+# 			%rdi: Numeric code (non-zero is a failure; zero is a success).
 # 			%rsi: String size.
 # 			%rdx: String.
 # 			%rcx: 0.
@@ -3367,7 +3373,28 @@ _ns_system_x86_64_linux_new_reader_read:
 # 	(None.)
 .global ns_system_x86_64_linux_exit_success
 .set ns_system_x86_64_linux_exit_success, (_ns_system_x86_64_linux_exit_success - ns_system_x86_64_linux_module_begin)
+.global ns_system_x86_64_linux_exit_success_force
+.set ns_system_x86_64_linux_exit_success_force, (_ns_system_x86_64_linux_exit_success_force - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_exit_success:
+	# First, check if we've enabled a non-default error / non-zero-exit handler.
+	testq $0x4, %r15
+	jz _ns_system_x86_64_linux_exit_success_force
+
+	# We have a non-default error handler.
+
+	# So instead we'll call %r14 with parameters:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	movq $0,   %rcx
+	jmp *%r14
+	nop
+	hlt
+_ns_system_x86_64_linux_exit_success_force:
 	movq $60, %rax  # exit
 	movq $0, %rdi
 	syscall
@@ -3377,7 +3404,28 @@ _ns_system_x86_64_linux_exit_success:
 
 .global ns_system_x86_64_linux_exit_failure
 .set ns_system_x86_64_linux_exit_failure, (_ns_system_x86_64_linux_exit_failure - ns_system_x86_64_linux_module_begin)
+.global ns_system_x86_64_linux_exit_failure_force
+.set ns_system_x86_64_linux_exit_failure_force, (_ns_system_x86_64_linux_exit_failure_force - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_exit_failure:
+	# First, check if we've enabled a non-default error / non-zero-exit handler.
+	testq $0x2, %r15
+	jz _ns_system_x86_64_linux_exit_failure_force
+
+	# We have a non-default error handler.
+
+	# So instead we'll call %r14 with parameters:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	movq $0,   %rcx
+	jmp *%r14
+	nop
+	hlt
+_ns_system_x86_64_linux_exit_failure_force:
 	movq $60, %rax  # exit
 	movq $1, %rdi
 	syscall
@@ -3405,6 +3453,8 @@ _ns_system_x86_64_linux_exit_failure:
 # TODO: handle success too, which is *not* an exception!
 .global ns_system_x86_64_linux_exit_custom
 .set ns_system_x86_64_linux_exit_custom, (_ns_system_x86_64_linux_exit_custom - ns_system_x86_64_linux_module_begin)
+.global ns_system_x86_64_linux_exit_custom_force
+.set ns_system_x86_64_linux_exit_custom_force, (_ns_system_x86_64_linux_exit_custom_force - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_exit_custom:
 	# Before anything else, check if it's successful (zero code) or a failure
 	# (non-zero code).
@@ -3422,6 +3472,11 @@ _ns_system_x86_64_linux_exit_custom:
 	testq %rcx, %rcx
 	jz 0f
 1:
+_ns_system_x86_64_linux_exit_custom_force:
+	# Check the exit code in case this is forced.
+	testq %rdi, %rdi
+	jz _ns_system_x86_64_linux_exit_success_force
+
 	# Fatal, *or* non-fatal but the default error handler is used, which is the
 	# error handler for fatal errors.
 	movq %rdi, %r10  # Back up the original %rdi, the original exit code.
