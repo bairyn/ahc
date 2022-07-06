@@ -262,6 +262,54 @@ ns_system_x86_64_linux_err_msg_clock_nanosleep:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_clock_nanosleep_end:
 
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdin_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdin_end - ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdin)
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdin:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: the ‘close’ syscall failed!  Failed to close the stdin child end on the parent.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdin_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdout_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdout_end - ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdout)
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: the ‘close’ syscall failed!  Failed to close the stdout child end on the parent.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdout_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stderr_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stderr_end - ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stderr)
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stderr:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: the ‘close’ syscall failed!  Failed to close the stderr child end on the parent.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stderr_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdin_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdin_end - ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdin)
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdin:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: the ‘close’ syscall failed!  Failed to close the stdin parent end on the child.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdin_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdout_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdout_end - ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdout)
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: the ‘close’ syscall failed!  Failed to close the stdout parent end on the child.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdout_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr_end - ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr)
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: the ‘close’ syscall failed!  Failed to close the stderr parent end on the child.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr_end:
+
 # Utility: digits
 ns_system_x86_64_linux_util_digits:
 .ascii "0123456789ABCDEF"
@@ -521,10 +569,17 @@ ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed_end:
 ns_system_x86_64_linux_err_msg_shell_invalid_options_size:
 	.quad (ns_system_x86_64_linux_err_msg_shell_invalid_options_end - ns_system_x86_64_linux_err_msg_shell_invalid_options)
 ns_system_x86_64_linux_err_msg_shell_invalid_options:
-	# (Will get an ‘Error: ’-like prefix.)
-	.ascii "‘shell’ error: invalid options bitfield!  Please make sure the arguments to this action are correct.\n"
+	.ascii "Error: ‘shell’ error: invalid options bitfield!  Please make sure the arguments to this action are correct.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_shell_invalid_options_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin_end - ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin)
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘shell’ error: failed to create a pipe for stdin!  The ‘’ syscall failed.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin_end:
 
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
@@ -3418,44 +3473,32 @@ _ns_system_x86_64_linux_new_reader_read:
 # 					%rsi: User data.  (Internally, the PID of the thread to
 # 					      join to.)
 # 				%rsi: stdin writer callback: pass it the stdin writer user data
-# 				      to get API values:
-# 					%rdi: Tuple of API methods to interface with stdin:
+# 				      to get API values, to return a tuple's contents:
+# 					%rdi: Return (tuple of API methods to interface with
+# 					      stdin), with parameters:
 # 						[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
 # 						                      API callbacks equivalent to the
 # 						                      API implementation created by
 # 						                      ‘new_writer’.
-# 						%r9: *Tuple* user data; you fed it back into the tuple
-# 						     ‘function pointer’ to get the tuple to provide you
-# 						     with the contents of the tuple.
-# 					%rsi: User data fed into the stdin writer callback.
-# 					%rdx: User data to pass to the new %rdi tuple; the tuple
-# 					      user data.
+# 					%rsi: User data (tuple data) fed into the stdin writer callback.
 # 				%rdx: stdout reader callback: pass it the stdout reader user
 # 				      data to get API values:
-# 					%rdi: Tuple of API methods to interface with stdout:
+# 					%rdi: Return (tuple of API methods to interface with
+# 					      stdout), with parameters:
 # 						[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
 # 						                      API callbacks equivalent to the
 # 						                      API implementation created by
 # 						                      ‘new_reader’.
-# 						%r9: *Tuple* user data; you fed it back into the tuple
-# 						     ‘function pointer’ to get the tuple to provide you
-# 						     with the contents of the tuple.
 # 					%rsi: User data fed into the stdout reader callback.
-# 					%rdx: User data to pass to the new %rdi tuple; the tuple
-# 					      user data.
 # 				%rcx: stderr reader callback: pass it the stderr reader user
 # 				      data to get API values:
-# 					%rdi: Tuple of API methods to interface with stderr:
+# 					%rdi: Return (tuple of API methods to interface with
+# 					      stderr), with parameters:
 # 						[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
 # 						                      API callbacks equivalent to the
 # 						                      API implementation created by
 # 						                      ‘new_reader’.
-# 						%r9: *Tuple* user data; you fed it back into the tuple
-# 						     ‘function pointer’ to get the tuple to provide you
-# 						     with the contents of the tuple.
 # 					%rsi: User data fed into the stderr reader callback.
-# 					%rdx: User data to pass to the new %rdi tuple; the tuple
-# 					      user data.
 # 				%r8: This is currently set to 0.
 # 		%rsi: The user data part of the tuple closure; pass it to %rdi as the
 # 		      first argument.
@@ -3473,8 +3516,11 @@ _ns_system_x86_64_linux_new_reader_read:
 # 	%rsi: Options bitfield:
 # 		Bit 0: must be 0.  Unsupported: 1 to enable alternative system
 # 		       argument encodings.
-# 		Bit 1: If enabled, then instead of creating pipes, just inherit from
-# 		       the caller's standard input, output, and error pipes.
+# 		Bit 1: If enabled, and Bit 2 is off, then instead of creating pipes,
+# 		       just inherit from the caller's standard input, output, and error
+# 		       pipes.
+# 		Bit 2: If enabled, then close the shell command's stdin, stdout, and
+# 		       sterr files.  Overrides bit 1.
 # 		(Other bits should be 0; this may or may not be checked.)
 # 	%rdx: Size of command line encoding.
 # 	%rcx: Command line encoding.  (Pointer to start of it.)
@@ -3514,7 +3560,7 @@ _ns_system_x86_64_linux_shell:
 
 	# First just make sure all bits in the options bitfield but Bit 1 are all
 	# 0.
-	testq $0xFFFFFFFFFFFFFFFD, %rsi
+	testq $0xFFFFFFFFFFFFFFF9, %rsi
 	jz 0f
 1:
 	# Error: the filepath is not null-terminated.
@@ -3558,14 +3604,226 @@ _ns_system_x86_64_linux_shell:
 	movq %r8, 8(%rsp)
 	movq %r9, 0(%rsp)
 
+	# Working storage units for the pipe FDs.
+
+	# stdin.
+	subq $16, %rsp
+	movq $0, 8(%rsp)  # Read end.
+	movq $0, 0(%rsp)  # Write end.
+
+	# stdout.
+	subq $16, %rsp
+	movq $0, 8(%rsp)  # Read end.
+	movq $0, 0(%rsp)  # Write end.
+
+	# stderr.
+	subq $16, %rsp
+	movq $0, 8(%rsp)  # Read end.
+	movq $0, 0(%rsp)  # Write end.
+
 	# Push / add our own cleanup to our collection of cleanup requirements for
 	# error handling (see the module documentation for more information).
 	leaq 6f(%rip), %r14
 
-	# TODO: do the stuff
-	TODO break build until this core piece is implemented.
+	# First, if not inheriting, create 3 pairs of pipes before forking (but set
+	# up the rest of the communication after the fork).  Skip this pipe
+	# creation if Bit 1 is off or if Bit 2 is on.
+	testq $0x2, %rsi
+	jz 0f
+	nop
+	testq $0x4, %rsi
+	jnz 0f
+	nop
+1:
+
+	# stdin
+	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800)) (notably this does _not_ have O_CLOEXEC; we're about to fork and exec.)
+	leaq 32(%rsp), %rdi  # Fildes
+	movq $293,     %rax  # pipe2 (22 is pipe)
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+0:
+
+	# stdout
+	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800))
+	leaq 16(%rsp), %rdi  # Fildes
+	movq $293,     %rax  # pipe2 (22 is pipe)
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdout_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+0:
+
+	# stderr
+	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800))
+	leaq  0(%rsp), %rdi  # Fildes
+	movq $293,     %rax  # pipe2 (22 is pipe)
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+0:
+
+	# Now just fork.
+	movq $0,       %rdx  # Price.
+	leaq 1f(%rip), %rsi  # Child return.
+	leaq 9f(%rip), %rdi  # Return.
+	jmp _ns_system_x86_64_linux_fork_require
+9:
+	nop
+
+	jmp 0f
+1:
+	# Child executor.
+
+	# Close parent ends of the 3 pipe pairs now that we've forked.
+
+	# Perform the ‘close’ syscall.
+	movq 32(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdin(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdin_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq 24(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stdout_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq  8(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# TODO
+	TODO break build until this is implemented.  # TODO
+0:
+	# Parent executor.
+
+	# Now %rdi is the joiner and %rsi is the joiner user data.
+
+	# Close the child ends of these 3 pipe pairs on the parent side now that
+	# we've forked.
+	movq %rdi, %r8  # Backup %rdi (joiner).
+	movq %rsi, %r9  # Backup %rsi (joiner data).
+
+	# Perform the ‘close’ syscall.
+	movq 40(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdin(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdin_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq 16(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stdout_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq  0(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stderr(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_pipe_parent_close_stderr_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Restore.
+	movq %r9, %rsi  # Restore %rsi (joiner data).
+	movq %r8, %rdi  # Restore %rdi (joiner).
 
 	# Setup registers to return, and will return to *%rax.
+
+	movq  8(%rsp), %r9   # stderr reader user data
+	movq 24(%rsp), %r8   # stdout reader user data
+	movq 32(%rsp), %rcx  # stdin writer user data
+	movq %rsi,     %rdx  # joiner user data
+	movq $0,       %rsi  # tuple user data
+	leaq _ns_system_x86_64_linux_shell_tuple(%rip), %rdi  # tuple callback continuation
+	# (Note: we'll exploit our internal knowledge of what the joiner is and
+	# skip storing or backing it up here, since we can reproduce it knowing
+	# just the internal implementation, and discard %rdi, the joiner.)
+
+	# Restore original return (%rdi) to %rax.
+	movq 88(%rsp), %rax
 
 	jmp 5f  # Skip error cleanup.
 
@@ -3580,8 +3838,7 @@ _ns_system_x86_64_linux_shell:
 	# 	%rdx: String.
 	# 	%rcx: 0.
 	# 1) Copy the regular cleanup except for these 4 parameters.
-	movq 0(%rsp), %r14
-	movq 8(%rsp), %r15
+	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
@@ -3589,6 +3846,9 @@ _ns_system_x86_64_linux_shell:
 	movq 0(%rsp), %r10
 	addq $16, %rsp
 	movq 0(%rsp), %r11
+	addq $16, %rsp
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
 	addq $16, %rsp
 	# 2) Then return not to %rdi, but to the previous %r14.
 	testq $0x2, %r15  # Double check we still have an overridden exception handler.
@@ -3606,11 +3866,6 @@ _ns_system_x86_64_linux_shell:
 5:
 	# Cleanup.
 
-	# Restore %r15 and %r14.
-	movq 0(%rsp), %r14
-	movq 8(%rsp), %r15
-	addq $16, %rsp
-
 	# Restore the working storage units and the stack, except don't preserve
 	# the arguments we'll pass to the return continuation, as we specified; nor
 	# don't preserve the temporary register we'll use to jump back to the
@@ -3622,6 +3877,15 @@ _ns_system_x86_64_linux_shell:
 	# 	- %r8
 	# 	- %r9
 	# 	- %rax
+
+	# Restore working storage for stderr.
+	addq $16, %rsp
+
+	# Restore working storage for stdout.
+	addq $16, %rsp
+
+	# Restore working storage for stdin.
+	addq $16, %rsp
 
 	# Restore %r8 and %r9.
 	#movq 0(%rsp), %r9
@@ -3648,9 +3912,94 @@ _ns_system_x86_64_linux_shell:
 	#movq 8(%rsp), %rax
 	addq $16, %rsp
 
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
 	# Return.
 	xchgq %rdi, %rax
 	jmpq *%rax
+	nop
+
+# A tuple extractor suitable for use for every, since we don't need the tuple
+# extractor to change on every instance, although we could; using the same
+# tuple extractor in this context for all ‘shell’ tuples returned will work in
+# our current implementation.
+#
+# (This is the tuple callback continuation that ‘shell’ uses and returns for
+# the tuple callback continuation, under the hood.)
+_ns_system_x86_64_linux_shell_tuple:
+	# Ignore and discard the user data.
+	movq $0, %rdi
+
+	# Back up the return address.
+	movq %rsi, %r9  # We'll return to %r9.
+
+	# Now load the contents of the tuple, so the caller has access by having a
+	# copy of the contents.
+
+	movq $0, %r8  # This is specified to be set to 0.
+
+	# Add similar tuple accessors to this one.
+	leaq _ns_system_x86_64_linux_shell_tuple_stderr_tuple(%rip), %rcx
+	leaq _ns_system_x86_64_linux_shell_tuple_stdout_tuple(%rip), %rcx
+	leaq _ns_system_x86_64_linux_shell_tuple_stdin_tuple(%rip), %rcx
+
+	# Joiner callback (we exploited internal details by skipping storing or
+	# preserving this, since we know that the joiner would just be
+	# ‘_ns_system_x86_64_linux_fork_join’):
+	leaq _ns_system_x86_64_linux_fork_join(%rip), %rdi  # Joiner callback.
+
+	# Return.
+	jmp *%r9
+	nop
+
+_ns_system_x86_64_linux_shell_tuple_stdin_tuple:
+	# We have return in %rdi and user data in %rsi.
+	#
+	# Again we exploit knowledge of internal implementation details in our
+	# module here.
+
+	# Back up the return address in %r9.  We'll return to %r9.
+	movq %rdi, %r9
+
+	# Assign user data from %rsi before %rsi gets overwritten.
+	movq %rsi, %rdi
+
+	# Assign the arguments.
+	movq $0,   %r8
+	leaq _ns_system_x86_64_linux_new_writer_close(%rip), %rcx
+	leaq _ns_system_x86_64_linux_new_writer_query(%rip), %rdx
+	leaq _ns_system_x86_64_linux_new_writer_write(%rip), %rsi
+	movq %rdi, %rdi
+
+	# Return.
+	jmp *%r9
+	nop
+
+_ns_system_x86_64_linux_shell_tuple_stdout_tuple:
+_ns_system_x86_64_linux_shell_tuple_stderr_tuple:
+	# We have return in %rdi and user data in %rsi.
+	#
+	# Again we exploit knowledge of internal implementation details in our
+	# module here.
+
+	# Back up the return address in %r9.  We'll return to %r9.
+	movq %rdi, %r9
+
+	# Assign user data from %rsi before %rsi gets overwritten.
+	movq %rsi, %rdi
+
+	# Assign the arguments.
+	movq $0,   %r8
+	leaq _ns_system_x86_64_linux_new_reader_close(%rip), %rcx
+	leaq _ns_system_x86_64_linux_new_reader_query(%rip), %rdx
+	leaq _ns_system_x86_64_linux_new_reader_read(%rip),  %rsi
+	movq %rdi, %rdi
+
+	# Return.
+	jmp *%r9
 	nop
 
 # ################################################################
