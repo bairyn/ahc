@@ -226,7 +226,7 @@ ns_system_x86_64_linux_err_msg_fork_join_stack_mismatch_end:
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure_size:
 	.quad (ns_system_x86_64_linux_err_msg_fork_join_exited_failure_end - ns_system_x86_64_linux_err_msg_fork_join_exited_failure)
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_offset:
-	.quad 29
+	.quad 22
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_size:
 	.quad 3
 ns_system_x86_64_linux_err_msg_fork_join_exited_failure:
@@ -664,9 +664,25 @@ ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin_size:
 	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin_end - ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin)
 ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin:
 	# (Will get an ‘Error: ’-like prefix.)
-	.ascii "‘shell’ error: failed to create a pipe for stdin!  The ‘’ syscall failed.\n"
+	.ascii "‘shell’ error: failed to create a pipe for stdin!  The ‘pipe2’ syscall failed.\n"
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdin_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdout_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdout_end - ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdout)
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘shell’ error: failed to create a pipe for stdout!  The ‘pipe2’ syscall failed.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stdout_end:
+
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr_end - ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr)
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘shell’ error: failed to create a pipe for stderr!  The ‘pipe2’ syscall failed.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr_end:
 
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
@@ -1080,6 +1096,7 @@ _ns_system_x86_64_linux_base_malloc_require:
 ns_system_x86_64_linux_fork:
 	# TODO
 	hlt
+	nop
 
 # Spawn another executor.
 #
@@ -1094,6 +1111,9 @@ ns_system_x86_64_linux_fork:
 # Note: the joiner does use the thread's stack space in order to give the
 # kernel a place to give us information about the child thread.
 #
+# Note: unless it's a vfork, the child process has reset exit handler settings
+# (%r15 bits; see module implicit parameters docs); it has a new stack.
+#
 # Parameters:
 # 	%rdi: Return with arguments:
 # 		%rdi: joiner: continuation callback with the following parameters:
@@ -1101,17 +1121,24 @@ ns_system_x86_64_linux_fork:
 # 			%rsi: User data, to make this callback a closure.
 # 		%rsi: user data that must be provided as the second argument (%rsi) to the joiner.
 # 	%rsi: Where the new executor starts executing.
-# 	%rdx:
+# 	%rdx: Options bitfield:
+# 		Bit 0: vfork: special fork pattern where the fork will exit or execve
+# 		       and the stack is shared; use the vfork syscall instead of the
+# 		       fork syscall, and see the documentation for this.
+# 		(Rest must be 0; this may or may not be checked.)
+# 	%rcx:
 # 		Offered ‘price’, where a higher price may be more likely to result in
 # 		allocation if resources are scarce.
 #
-# Without any error, clobbers %rcx (4th argument), %rax, and %r11 (from the syscall) and all argument registers except r9:
+# Without any error, clobbers %rcx (4th argument), %rax, and %r11 (from the syscall) and all argument registers:
 # 	- %rdi
 # 	- %rsi
 # 	- %rdx
 # 	- %rcx
 # 	- %r8
+# 	- %r9
 # 	- %rax
+# 	- %r11
 #
 # (Technically, the clobbering can be exploited in the current implementation
 # such that %r9 can pass user data to the child thread.)
@@ -1123,7 +1150,7 @@ _ns_system_x86_64_linux_fork_require:
 	# units.
 
 	# So just ignore the price in %rdx for now.  Cool idea, though, I guess.
-	movq %rdx, %rdx
+	movq %rcx, %rcx
 
 	# Clear out the first 32 bits of the PID, which we store as the user data.
 	movq $0, %rax
@@ -1132,8 +1159,19 @@ _ns_system_x86_64_linux_fork_require:
 	movq %rdi, %r8
 	#movq %rsi, %r9  # Just use xchngq in the Verify step instead.  Saves us a register.
 
-	# Fork.
+	# Back up option flags.
+	movq %rdx, %r9
+
+	# Fork.  (If vfork bit, then vfork instead.)
+	testq $0x1, %rdx
+	jz 1f
+	nop
+	movq $58, %rax  # vfork
+	jmp 0f
+	nop
+1:
 	movq $57, %rax  # fork  #  (First 32 bits are 0.)
+0:
 	syscall
 
 	# Verify and backup %rsi.
@@ -1150,7 +1188,18 @@ _ns_system_x86_64_linux_fork_require:
 	# If we're the child, go to the child continuation.
 	testq %rax, %rax
 	jnz 0f
-	jmpq *%rsi
+	# We're the child, but right before we go to the child continuation, first,
+	# if it's not a vfork, then reset the custom error handlers (disable the
+	# flags in %r15), since we have a new stack; from a perspective of linear
+	# types, forking then has an implicit ‘dup’ as far as used resources are
+	# concerned, unless it's ‘vfork’.
+	movq  %r9,  %rdx  # Restore original %rdx (options bitfield).
+	testq $0x1, %rdx  # Test for ‘vfork’.
+	jnz 8f
+	nop
+	andq $0xFFFFFFFFFFFFFFF9, %r15  # Disable bits 1 and 2.
+8:
+	jmpq *%rsi  # Now jump to the child continuation.
 	nop
 0:
 
@@ -1312,9 +1361,11 @@ _ns_system_x86_64_linux_fork_join:
 	# First, write to this instance's error message storage to print the
 	# unknown code, so that the last code gets written.
 	movq %rdi, %rcx
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_u_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_u_offset(%rip), %rdx
 	movq (%rdx), %rdx
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_u_offset(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo(%rip), %rdi
+	addq %rdi, %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unrecognized_signo_u_size(%rip), %rsi
 	movq (%rsi), %rsi
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_print_u64
@@ -1360,9 +1411,11 @@ _ns_system_x86_64_linux_fork_join:
 	# First, write to this instance's error message storage to print the
 	# unknown code, so that the last code gets written.
 	movq %rdi, %rcx
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_u_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_u_offset(%rip), %rdx
 	movq (%rdx), %rdx
-	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_u_offset(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code(%rip), %rdi
+	addq %rdi, %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_unknown_code_u_size(%rip), %rsi
 	movq (%rsi), %rsi
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_print_u64
@@ -1384,7 +1437,7 @@ _ns_system_x86_64_linux_fork_join:
 	# But now see if the process exited succesfully.  If it didn't, abort /
 	# exit with error.
 	movq $0, %rdi
-	movl 36(%rsp), %edi  # status/errno
+	movl 56(%rsp), %edi  # (actually, not status/errno (offset 4), but si_status (offset 24))
 	testq %rdi, %rdi
 	jz 0f
 1:
@@ -1393,10 +1446,12 @@ _ns_system_x86_64_linux_fork_join:
 	# First, write to this instance's error message storage to print the
 	# exit code, so that the last code gets written.
 	movq %rdi, %rcx
-	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_offset(%rip), %rdx
 	movq (%rdx), %rdx
-	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_offset(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure_u_size(%rip), %rsi
 	movq (%rsi), %rsi
+	leaq ns_system_x86_64_linux_err_msg_fork_join_exited_failure(%rip), %rdi
+	addq %rdi, %rdx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_print_u64
 9:
@@ -1745,10 +1800,12 @@ _ns_system_x86_64_linux_new_writer:
 	# First, write to this instance's error message storage to print the
 	# exit code, so that the last code gets written.
 	movq %rdi, %rcx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_offset(%rip), %rdx
 	movq (%rdx), %rdx
-	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_offset(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options_u_size(%rip), %rsi
 	movq (%rsi), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_writer_unsupported_options(%rip), %rdi
+	addq %rdi, %rdx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_print_u64
 9:
@@ -2752,10 +2809,12 @@ _ns_system_x86_64_linux_new_reader:
 	# First, write to this instance's error message storage to print the
 	# exit code, so that the last code gets written.
 	movq %rdi, %rcx
-	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_size(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_offset(%rip), %rdx
 	movq (%rdx), %rdx
-	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_offset(%rip), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options_u_size(%rip), %rsi
 	movq (%rsi), %rsi
+	leaq ns_system_x86_64_linux_err_msg_new_reader_unsupported_options(%rip), %rdi
+	addq %rdi, %rdx
 	leaq 9f(%rip), %rdi
 	jmp _ns_system_x86_64_linux_print_u64
 9:
@@ -3519,7 +3578,9 @@ _ns_system_x86_64_linux_new_reader_read:
 # standard shell call may look like ‘sh -c ‘echo test’’, 3 arguments: ‘sh’,
 # ‘-c’, and then the shell command to run.
 # TODO: double check these docs about encoding ^^^.
-TODO break the build until these docs get fixed.
+#TODO break the build until these docs get fixed.
+# FIXME: the child call failed, but the parent didn't fail too!
+#TODO break the build until these docs get fixed.
 #
 # By default, a pipe is created for stdin, stdout, and stderr, and readers and
 # writers with the same API as that created by ‘new_writer’ and ‘new_reader˚
@@ -3632,10 +3693,6 @@ TODO break the build until these docs get fixed.
 .global ns_system_x86_64_linux_shell
 .set ns_system_x86_64_linux_shell, (_ns_system_x86_64_linux_shell - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_shell:
-	# TODO
-	nop
-	hlt
-
 	# Backup %rdi and %rsi.
 	subq $16, %rsp
 	movq %rdi, 8(%rsp)
@@ -3665,6 +3722,12 @@ _ns_system_x86_64_linux_shell:
 	nop
 	hlt
 0:
+
+	# Backup %r13.
+	subq $16, %rsp
+	movq %r13, 8(%rsp)  #                (152)
+	movq $0,   0(%rsp)  #                (152)
+	# 0(%rsp) is working storage space.  (144)
 
 	# Backup %r15 and %r14.
 	subq $16, %rsp
@@ -3721,10 +3784,10 @@ _ns_system_x86_64_linux_shell:
 	# up the rest of the communication after the fork).  Skip this pipe
 	# creation if Bit 1 is off or if Bit 2 is on.
 	testq $0x2, %rsi
-	jz 0f
+	jnz 0f  # Skip if inheriting.
 	nop
 	testq $0x4, %rsi
-	jnz 0f
+	jnz 0f  # Skip if closing standard files.
 	nop
 1:
 
@@ -3744,8 +3807,6 @@ _ns_system_x86_64_linux_shell:
 9:
 	nop
 
-0:
-
 	# stdout
 	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800))
 	leaq 16(%rsp), %rdi  # Fildes
@@ -3761,8 +3822,6 @@ _ns_system_x86_64_linux_shell:
 	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
 9:
 	nop
-
-0:
 
 	# stderr
 	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800))
@@ -3782,8 +3841,17 @@ _ns_system_x86_64_linux_shell:
 
 0:
 
-	# Now just fork.
-	movq $0,       %rdx  # Price.
+	# Now in the parent cleanup, we will restore %r13.
+	# But here just use it to back up the parent stack location.
+	movq 152(%rsp), %r13
+	movq %rsp, %r13
+
+	# Now just fork, but use vfork and share the stack.
+	movq $0,       %rcx  # Price.
+	#movq $0x1,     %rdx  # Options bitfield; vfork instead of fork.  (If using
+	                      # vfork-style, be sure to update the close syscall
+	                      # error handlers below.)
+	movq $0x0,     %rdx  # Options bitfield.
 	leaq 1f(%rip), %rsi  # Child return.
 	leaq 9f(%rip), %rdi  # Return.
 	jmp _ns_system_x86_64_linux_fork_require
@@ -3794,10 +3862,22 @@ _ns_system_x86_64_linux_shell:
 1:
 	# Child executor.
 
+	movq %r13, %r13  # Parent stack is backed up in %r13, but we need to signal to it when we're done using the stack.
+
+	# Test original %rsi to see if we skipped creating 3 pipes, in which case
+	# we should also skip closing them.
+	movq 80(%r13), %rsi  # Resore original %rsi (options bitfield).
+	testq $0x2, %rsi
+	jnz 4f  # Skip if inheriting.
+	nop
+	testq $0x4, %rsi
+	jnz 4f  # Skip if closing standard files.
+	nop
+
 	# Close parent ends of the 3 pipe pairs now that we've forked.
 
 	# Perform the ‘close’ syscall.
-	movq 32(%rsp), %rdi  # int fd
+	movq 32(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
 
@@ -3812,7 +3892,7 @@ _ns_system_x86_64_linux_shell:
 	nop
 
 	# Perform the ‘close’ syscall.
-	movq 24(%rsp), %rdi  # int fd
+	movq 24(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
 
@@ -3827,7 +3907,7 @@ _ns_system_x86_64_linux_shell:
 	nop
 
 	# Perform the ‘close’ syscall.
-	movq  8(%rsp), %rdi  # int fd
+	movq  8(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
 
@@ -3841,17 +3921,21 @@ _ns_system_x86_64_linux_shell:
 9:
 	nop
 
+4:
+
 	# Now handle standard input, output, and error.
 
-	movq 80(%rsp), %rsi  # Resore original %rsi (options bitfield).
+	movq 80(%r13), %rsi  # Resore original %rsi (options bitfield).
 
-	# First, if we're inheriting, skip this setup since there are no extra pipe
-	# fds to begin with.
-	testq $0x2, %rsi
-	jz 3f  # Don't skip if not inheriting.
-	nop
+	# If we're closing standard streams, start right away, regardless of
+	# inheritance, which is overridden by it.
 	testq $0x4, %rsi
-	jz 2f  # Skip if we're not closing pipes.
+	jnz 3f  # Don't skip if we're closing pipes.
+	nop
+	testq $0x2, %rsi
+	jz 3f  # Don't skip if we're not inheriting.
+	nop
+	jmp 2f  # Skip closing if we're inheriting but not closing.
 	nop
 3:
 	# Whichever is done, we'll first close stdin, stdout, and stderr.
@@ -3910,20 +3994,20 @@ _ns_system_x86_64_linux_shell:
 	# redundancy can introduce a race condition and so is recommended against
 	# (TODO: probably implement this suggestion without breaking things)).
 
-	movq 80(%rsp), %rsi  # Resore original %rsi (options bitfield).
+	movq 80(%r13), %rsi  # Resore original %rsi (options bitfield).
 	testq $0x4, %rsi
-	jz 2f  # Skip if we're not closing pipes.
+	jnz 2f  # Skip if we're closing pipes.
 	nop
 
 	# Finally, just get:
-	# 40(%rsp) -> stdin  0
-	# 16(%rsp) -> stdout 1
-	#  0(%rsp) -> stderr 2
+	# 40(%r13) -> stdin  0
+	# 16(%r13) -> stdout 1
+	#  0(%r13) -> stderr 2
 
 	# Perform the ‘dup2’ syscall.
 	movq $0,       %rsi  # new
-	movq 40(%rsp), %rdi  # old
-	movq $0x3,     %rax  # close
+	movq 40(%r13), %rdi  # old
+	movq $33,      %rax  # dup2
 	syscall
 
 	# Verify.
@@ -3938,8 +4022,8 @@ _ns_system_x86_64_linux_shell:
 
 	# Perform the ‘dup2’ syscall.
 	movq $1,       %rsi  # new
-	movq 16(%rsp), %rdi  # old
-	movq $0x3,     %rax  # close
+	movq 16(%r13), %rdi  # old
+	movq $33,      %rax  # dup2
 	syscall
 
 	# Verify.
@@ -3954,8 +4038,8 @@ _ns_system_x86_64_linux_shell:
 
 	# Perform the ‘dup2’ syscall.
 	movq $2,       %rsi  # new
-	movq  0(%rsp), %rdi  # old
-	movq $0x3,     %rax  # close
+	movq  0(%r13), %rdi  # old
+	movq $33,      %rax  # dup2
 	syscall
 
 	# Verify.
@@ -3971,9 +4055,15 @@ _ns_system_x86_64_linux_shell:
 	# Finally, close the old FDs now that they've been copied over.
 
 	# Perform the ‘close’ syscall.
-	movq 40(%rsp), %rdi  # int fd
+	movq 40(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
+
+	# If using vfork, you'd need to add a section here instead of doing the
+	# verification immediately afterwards, since it breaks things (basically,
+	# just check %rax and then do a direct syscall to exit, as illustrated for
+	# a failed execve() a little further down).  That is, directly check %rax
+	# and directly syscall to exit here if using vfork.
 
 	# Verify.
 	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin(%rip), %rcx
@@ -3986,9 +4076,15 @@ _ns_system_x86_64_linux_shell:
 	nop
 
 	# Perform the ‘close’ syscall.
-	movq 16(%rsp), %rdi  # int fd
+	movq 16(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
+
+	# If using vfork, you'd need to add a section here instead of doing the
+	# verification immediately afterwards, since it breaks things (basically,
+	# just check %rax and then do a direct syscall to exit, as illustrated for
+	# a failed execve() a little further down).  That is, directly check %rax
+	# and directly syscall to exit here if using vfork.
 
 	# Verify.
 	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout(%rip), %rcx
@@ -4001,9 +4097,15 @@ _ns_system_x86_64_linux_shell:
 	nop
 
 	# Perform the ‘close’ syscall.
-	movq  0(%rsp), %rdi  # int fd
+	movq  0(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
+
+	# If using vfork, you'd need to add a section here instead of doing the
+	# verification immediately afterwards, since it breaks things (basically,
+	# just check %rax and then do a direct syscall to exit, as illustrated for
+	# a failed execve() a little further down).  That is, directly check %rax
+	# and directly syscall to exit here if using vfork.
 
 	# Verify.
 	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr(%rip), %rcx
@@ -4017,16 +4119,49 @@ _ns_system_x86_64_linux_shell:
 
 2:
 
-	# TODO
-	TODO break build until this is implemented.  # TODO
-
 	# TODO check null-terminated where appropriate.
+	#TODO break build until this is implemented.  # TODO
 
 	# Execute the new command, to replace the current (child) one.
-	movq 48(%rsp), %rdi  # environment (from original %r9).
-	movq 64(%rsp), %rdi  # pathname (from original %rcx).
-	movq $59,      %rax  # execv (for 64)
+	#movq 48(%r13), %rsi  # environment (from original %r9).
+	#movq 64(%r13), %rdi  # pathname (from original %rcx).
+
+	# Back up what we need from the parent stack.
+	movq 64(%r13), %rdi  # command line data pointer (from original %rcx)
+	movq 48(%r13), %rsi  # environment data (from original %r9)
+
+	# Give up access to the stack, and signal to the parent thread that it can
+	# stop being susponded and free up the stack resources we were using.
+	movq 152(%r13), %rdx
+	movq $1, 144(%r13)  # Concurrency signal that parent can stop spinlocking.
+	movq %rdx, %r13  # Restore original %r13.
+
+	# TODO check null-terminated and handle encoding of strings.
+	#TODO break build until this is implemented.  # TODO
+	movq %rsi, %rdx  # environment (from original %r9).
+	movq %rdi, %rsi  # argv (from original %rcx).
+	movq %rdi, %rdi  # pathname (from original %rcx).
+	movq (%rdi), %rdi  # argv[0]
+	movq $59,      %rax  # execve (for 64)
 	syscall
+
+	# If execve has returned, then an error occurred; just set negated %rax
+	# (negated ERRNO) to the exit code, and directly 
+
+	# Uncomment if using vfork:
+	## Directly exit, or else we may get undefined behaviour because we're in a
+	## ‘vfork()’ and shouldn't change hardly anything.  Otherwise we'd probably
+	## print a more helpful error message.
+	#movq %rax, %rdi
+	#notq %rdi
+	#inc  %rdi
+	#movq $60, %rax  # exit
+	#syscall
+
+	## This shouldn't be reached.
+	#hlt
+	#nop
+	## (End uncomment if using vfork.)
 
 	# Verify.
 	leaq ns_system_x86_64_linux_err_msg_shell_child_start_failed(%rip), %rcx
@@ -4058,10 +4193,18 @@ _ns_system_x86_64_linux_shell:
 
 	# Now %rdi is the joiner and %rsi is the joiner user data.
 
-	# Close the child ends of these 3 pipe pairs on the parent side now that
-	# we've forked.
+	# Close the child ends of these 3 pipe end pairs on the parent side now that
+	# we've forked, unless we didn't create those pipes in the first place.
 	movq %rdi, %r8  # Backup %rdi (joiner).
 	movq %rsi, %r9  # Backup %rsi (joiner data).
+
+	movq 80(%r13), %rsi  # Resore original %rsi (options bitfield).
+	testq $0x2, %rsi
+	jnz 8f  # Skip if inheriting.
+	nop
+	testq $0x4, %rsi
+	jnz 8f  # Skip if closing standard files.
+	nop
 
 	# Perform the ‘close’ syscall.
 	movq 40(%rsp), %rdi  # int fd
@@ -4108,6 +4251,26 @@ _ns_system_x86_64_linux_shell:
 9:
 	nop
 
+	# Before we return, and free the stack, we need to ensure that the child
+	# setup is done using it and has either exited or handed off control to
+	# ‘execve’.  Spinlock until the signal is sent or the thread terminated for
+	# some other reason.
+	#
+	# (Don't clobber %r8 or %r9 here, or else change how you backup the
+	# joiner and joiner user data.)
+8:
+	# Edit: actually, it looks like the thread gets a copy of the stack, so our
+	# changes don't seem to affect it.  Otherwise:
+	# TOD O: check if child thread terminated, and then break out of the loop if
+	# so.  FIXM E: this needs to be done or else if the child thread is killed
+	# at just right the right time (or a close or dup2 fails), then the parent
+	# hangs forever!
+	movq 144(%rsp), %rdi
+	testq %rdi, %rdi
+	#jz 8b  # Spinlock.  Edit: no need to wait; the child has a copy of the stack, apparently.
+	nop
+7:
+
 	# Restore.
 	movq %r9, %rsi  # Restore %rsi (joiner data).
 	movq %r8, %rdi  # Restore %rdi (joiner).
@@ -4151,6 +4314,7 @@ _ns_system_x86_64_linux_shell:
 	addq $16, %rsp
 	movq 0(%rsp), %r14
 	movq 8(%rsp), %r15
+	addq $16, %rsp
 	addq $16, %rsp
 	# 2) Then return not to %rdi, but to the previous %r14.
 	testq $0x2, %r15  # Double check we still have an overridden exception handler.
@@ -4219,8 +4383,13 @@ _ns_system_x86_64_linux_shell:
 	movq 8(%rsp), %r15
 	addq $16, %rsp
 
+	# Restore %r13.
+	# 0(%rsp) is working storage space.
+	movq 8(%rsp), %r13
+	addq $16, %rsp
+
 	# Return.
-	xchgq %rdi, %rax
+	#xchgq %rdi, %rax
 	jmpq *%rax
 	nop
 
@@ -4336,8 +4505,8 @@ _ns_system_x86_64_linux_exit_success:
 	nop
 	hlt
 _ns_system_x86_64_linux_exit_success_force:
+	movq $0,  %rdi
 	movq $60, %rax  # exit
-	movq $0, %rdi
 	syscall
 
 	jmp _ns_system_x86_64_linux_exit_success
@@ -4367,8 +4536,8 @@ _ns_system_x86_64_linux_exit_failure:
 	nop
 	hlt
 _ns_system_x86_64_linux_exit_failure_force:
+	movq $1,  %rdi
 	movq $60, %rax  # exit
-	movq $1, %rdi
 	syscall
 
 	jmp _ns_system_x86_64_linux_exit_failure
@@ -4434,8 +4603,8 @@ _ns_system_x86_64_linux_exit_custom_force:
 
 	movq %r10, %rdi  # Restore the original %rdi, the exit code.
 
-	movq $60, %rax  # exit
 	movq %rdi, %rdi
+	movq $60,  %rax  # exit
 	syscall
 
 	nop
@@ -4707,11 +4876,11 @@ _ns_system_x86_64_linux_monotonic_nanosleep:
 #
 # Parameters:
 # 	%rdi: Return with arguments:
-# 		%rdi: Number of written digits printed to encode the number, excluding writen padding and leftover digits.
+# 		%rdi: Number of written digits printed to encode the number, excluding written padding and leftover digits.
 # 		%rsi: Number of digits or characters (bytes) written or skipped, which here should be equal to the input size.
 # 		%rdx: Number of digits leftover for which there was not enough space to print
-# 	%rsi: Pointer to memory to write ascii digits to; start address.
-# 	%rdx: Size of the memory region for writing the string.
+# 	%rsi: Size of the memory region for writing the string.
+# 	%rdx: Pointer to memory to write ascii digits to; start address.
 # 	%rcx: The u64 to print.
 #
 # This clobbers %r11, %rax, %r10, and all argument registers:
@@ -4740,6 +4909,10 @@ _ns_system_x86_64_linux_print_u64:
 	movq 0(%rsp), %rsi
 	movq 8(%rsp), %rdi
 	addq $16, %rsp
+
+	# Swap %rsi and %rdx out of convenience, to change the parameter order
+	# without otherwise updating the implementation.
+	xchgq %rsi, %rdx
 
 	movq %rdx, %r11  # Size.
 

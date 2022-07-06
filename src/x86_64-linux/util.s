@@ -370,11 +370,6 @@ _ns_util_get_tuple_read:
 .global ns_util_shell_simple
 .set ns_util_shell_simple, (_ns_util_shell_simple - ns_util_module_begin)
 _ns_util_shell_simple:
-	# TODO
-	nop
-	hlt
-	nop
-
 	# Backup %rdi and %rsi.
 	subq $16, %rsp
 	movq %rdi, 8(%rsp)
@@ -429,6 +424,13 @@ _ns_util_shell_simple:
 	# error handling (see the module documentation for more information).
 	leaq 6f(%rip), %r14
 
+	# TODO: inherit the environment!
+movq $ns_cli_date_command, %rcx
+movq $ns_cli_date_command, %rdx
+movq $ns_cli_date_env, %r9
+	#TODO break build until this works.
+	#movq $0,   %r9
+	#movq $0,   %r8
 	# ‘shell()’ and then immediately join afterward (we don't do anything else
 	# before joining, or else we'd need to add to our cleanup requirements.
 	# ‘join’ *is* our cleanup).
@@ -462,6 +464,7 @@ _ns_util_shell_simple:
 	nop
 
 	# Setup registers to return, and will return to *%rax.
+	movq 56(%rsp), %rax
 
 	jmp 5f  # Skip error cleanup.
 
@@ -502,10 +505,6 @@ _ns_util_shell_simple:
 	jmpq *%r14
 	nop
 0:
-	# TODO: inherit the environment!
-	TODO break build until this works.
-	movq $0,   %r9
-	movq $0,   %r8
 	movq %rcx, %rcx
 	movq %rdx, %rdx
 	movq %rsi, %rsi
@@ -515,11 +514,6 @@ _ns_util_shell_simple:
 	nop
 5:
 	# Cleanup.
-
-	# Restore %r15 and %r14.
-	movq 0(%rsp), %r14
-	movq 8(%rsp), %r15
-	addq $16, %rsp
 
 	# Restore the working storage units and the stack.
 
@@ -551,8 +545,13 @@ _ns_util_shell_simple:
 	movq 8(%rsp), %rax
 	addq $16, %rsp
 
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
 	# Return.
-	xchgq %rdi, %rax
+	#xchgq %rdi, %rax
 	jmpq *%rax
 	nop
 
