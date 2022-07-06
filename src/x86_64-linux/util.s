@@ -502,6 +502,10 @@ _ns_util_shell_simple:
 	jmpq *%r14
 	nop
 0:
+	# TODO: inherit the environment!
+	TODO break build until this works.
+	movq $0,   %r9
+	movq $0,   %r8
 	movq %rcx, %rcx
 	movq %rdx, %rdx
 	movq %rsi, %rsi

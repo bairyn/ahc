@@ -173,6 +173,13 @@ ns_cli_date_command:
 	#.byte 0x00
 ns_cli_date_command_end:
 
+ns_cli_date_env_size:
+	.quad (ns_cli_date_env_end - ns_cli_date_env)
+ns_cli_date_env:
+	.ascii "PATH=/bin:/usr/bin\x00"
+	#.byte 0x00
+ns_cli_date_env_end:
+
 .text
 # A front-end: the CLI.
 #
@@ -519,6 +526,9 @@ _ns_cli_cli_with_prelim_checks:
 	# Make sure we can run ‘date’ through ‘system()’.
 	# Uncomment the options override to enable inheritance and make the current
 	# date printed out visible.
+	leaq ns_cli_date_env(%rip), %r9
+	leaq ns_cli_date_env_size(%rip), %r8
+	movq (%r8), %r8
 	leaq ns_cli_date_command(%rip), %rcx
 	leaq ns_cli_date_command_size(%rip), %rdx
 	movq (%rdx), %rdx

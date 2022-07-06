@@ -3518,6 +3518,8 @@ _ns_system_x86_64_linux_new_reader_read:
 # Currently, only the format of null-terminated arguments is supported.  A
 # standard shell call may look like ‘sh -c ‘echo test’’, 3 arguments: ‘sh’,
 # ‘-c’, and then the shell command to run.
+# TODO: double check these docs about encoding ^^^.
+TODO break the build until these docs get fixed.
 #
 # By default, a pipe is created for stdin, stdout, and stderr, and readers and
 # writers with the same API as that created by ‘new_writer’ and ‘new_reader˚
@@ -3601,8 +3603,9 @@ _ns_system_x86_64_linux_new_reader_read:
 # 		     nested in the tuple), or undefined if the inherit option is
 # 		     enabled.
 # 	%rsi: Options bitfield:
-# 		Bit 0: must be 0.  Unsupported: 1 to enable alternative system
-# 		       argument encodings.
+# 		Bit 0: Specifies the encoding of the command line and environment
+# 		       parameters.  Since only one format is currently supported, this
+# 		       must be set to 0.
 # 		Bit 1: If enabled, and Bit 2 is off, then instead of creating pipes,
 # 		       just inherit from the caller's standard input, output, and error
 # 		       pipes.
@@ -3611,6 +3614,8 @@ _ns_system_x86_64_linux_new_reader_read:
 # 		(Other bits should be 0; this may or may not be checked.)
 # 	%rdx: Size of command line encoding.
 # 	%rcx: Command line encoding.  (Pointer to start of it.)
+# 	%r8: Size of environment encoding.
+# 	%r9: Environment encoding.  (Pointer to start of it.)
 #
 # Clobbers:
 # 	- %rax  (syscall-related, and working)
@@ -4015,9 +4020,12 @@ _ns_system_x86_64_linux_shell:
 	# TODO
 	TODO break build until this is implemented.  # TODO
 
+	# TODO check null-terminated where appropriate.
+
 	# Execute the new command, to replace the current (child) one.
-	# TODO args
-	movq $59, %rax  # execv (for 64)
+	movq 48(%rsp), %rdi  # environment (from original %r9).
+	movq 64(%rsp), %rdi  # pathname (from original %rcx).
+	movq $59,      %rax  # execv (for 64)
 	syscall
 
 	# Verify.
