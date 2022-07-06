@@ -518,6 +518,14 @@ ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_new_reader_read_clock_gettime_second_failed_end:
 
+ns_system_x86_64_linux_err_msg_shell_invalid_options_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_invalid_options_end - ns_system_x86_64_linux_err_msg_shell_invalid_options)
+ns_system_x86_64_linux_err_msg_shell_invalid_options:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "‘shell’ error: invalid options bitfield!  Please make sure the arguments to this action are correct.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_invalid_options_end:
+
 # For our compiler, we only require the ability to read and write files and to
 # exit.  We can work out the rest.  But we also add some concurrency support
 # and shell support.  Also add a few other utilities as needed.
@@ -3433,13 +3441,180 @@ _ns_system_x86_64_linux_new_reader_read:
 # 		       the caller's standard input, output, and error pipes.
 # 		(Other bits should be 0; this may or may not be checked.)
 # 	%rdx: Size of command line encoding.
-# 	%rcx: Command line encoding.
+# 	%rcx: Command line encoding.  (Pointer to start of it.)
+#
+# Clobbers:
+# 	- %rax  (syscall-related, and working)
+# 	- %r11  (syscall-related)
+# 	- %rcx  (syscall-related)
+# 	- %r10  (syscall-related)
+# 	- %rdi  (parameter)
+# 	- %rsi  (parameter)
+# 	- %rdx  (parameter)
+# 	- %rcx  (parameter)
+# 	- %r8   (parameter)
+# 	- %r9   (parameter)
+# 	- %rip  (it does things)
 .global ns_system_x86_64_linux_shell
 .set ns_system_x86_64_linux_shell, (_ns_system_x86_64_linux_shell - ns_system_x86_64_linux_module_begin)
 _ns_system_x86_64_linux_shell:
 	# TODO
 	nop
 	hlt
+
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_validate_implicit_arguments
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	# First just make sure all bits in the options bitfield but Bit 1 are all
+	# 0.
+	testq $0xFFFFFFFFFFFFFFFD, %rsi
+	jz 0f
+1:
+	# Error: the filepath is not null-terminated.
+	movq $0, %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_invalid_options(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_shell_invalid_options_size(%rip), %rsi
+	movq (%rsi), %rsi
+	movq $2, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Backup %rax and %r11
+	subq $16, %rsp
+	movq %rax, 8(%rsp)
+	movq %r11, 0(%rsp)
+
+	# Backup %rcx and %r10
+	subq $16, %rsp
+	movq %rcx, 8(%rsp)
+	movq %r10, 0(%rsp)
+
+	# Backup %rdi and %rsi
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+
+	# Backup %rdx and %rcx
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	# Backup %r8 and %r9
+	subq $16, %rsp
+	movq %r8, 8(%rsp)
+	movq %r9, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
+
+	# TODO: do the stuff
+
+	# Setup registers to return, and will return to *%rax.
+
+	jmp 5f  # Skip error cleanup.
+
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	addq $16, %rsp
+	movq 0(%rsp), %r10
+	addq $16, %rsp
+	movq 0(%rsp), %r11
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+5:
+	# Cleanup.
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
+	# Restore the working storage units and the stack, except don't preserve
+	# the arguments we'll pass to the return continuation, as we specified; nor
+	# don't preserve the temporary register we'll use to jump back to the
+	# original %rdi, which we'll put as %rax:
+	# 	- %rdi
+	# 	- %rsi
+	# 	- %rdx
+	# 	- %rcx
+	# 	- %r8
+	# 	- %r9
+	# 	- %rax
+
+	# Restore %r8 and %r9.
+	#movq 0(%rsp), %r9
+	#movq 8(%rsp), %r8
+	addq $16, %rsp
+
+	# Restore %rdx and %rcx.
+	#movq 0(%rsp), %rcx
+	#movq 8(%rsp), %rdx
+	addq $16, %rsp
+
+	# Restore %rdi and %rsi.
+	#movq 0(%rsp), %rsi
+	#movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	# Restore %rcx and %r10.
+	movq 0(%rsp), %r10
+	#movq 8(%rsp), %rcx
+	addq $16, %rsp
+
+	# Restore %rax and %r11.
+	movq 0(%rsp), %r11
+	#movq 8(%rsp), %rax
+	addq $16, %rsp
+
+	# Return.
+	xchgq %rdi, %rax
+	jmpq *%rax
+	nop
 
 # ################################################################
 # Exiting and process maangement.
