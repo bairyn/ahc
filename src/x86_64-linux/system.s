@@ -310,6 +310,93 @@ ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_shell_pipe_child_close_stderr_end:
 
+ns_system_x86_64_linux_err_msg_shell_child_start_failed_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_start_failed_end - ns_system_x86_64_linux_err_msg_shell_child_start_failed)
+ns_system_x86_64_linux_err_msg_shell_child_start_failed:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: the ‘exec’ syscall failed!  Failed to start the command from the child.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_start_failed_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_exec_returned_on_success_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_exec_returned_on_success_end - ns_system_x86_64_linux_err_msg_shell_child_exec_returned_on_success)
+ns_system_x86_64_linux_err_msg_shell_child_exec_returned_on_success:
+	.ascii "Error: shell error: the ‘exec’ syscall returned without error!  This shouldn't happen.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_exec_returned_on_success_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_close_stdin_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_close_stdin_end - ns_system_x86_64_linux_err_msg_shell_child_close_stdin)
+ns_system_x86_64_linux_err_msg_shell_child_close_stdin:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to close stdin on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_close_stdin_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_close_stdout_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_close_stdout_end - ns_system_x86_64_linux_err_msg_shell_child_close_stdout)
+ns_system_x86_64_linux_err_msg_shell_child_close_stdout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to close stdout on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_close_stdout_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_close_stderr_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_close_stderr_end - ns_system_x86_64_linux_err_msg_shell_child_close_stderr)
+ns_system_x86_64_linux_err_msg_shell_child_close_stderr:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to close stderr on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_close_stderr_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stdin_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_dup2_stdin_end - ns_system_x86_64_linux_err_msg_shell_child_dup2_stdin)
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stdin:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to dup2 stdin on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stdin_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stdout_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_dup2_stdout_end - ns_system_x86_64_linux_err_msg_shell_child_dup2_stdout)
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stdout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to dup2 stdout on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stdout_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stderr_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_dup2_stderr_end - ns_system_x86_64_linux_err_msg_shell_child_dup2_stderr)
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stderr:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to dup2 stderr on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_dup2_stderr_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin_end - ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin)
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to close stdin (post) on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout_end - ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout)
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to close stdout (post) on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout_end:
+
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr_end - ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr)
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr:
+	# (Will get an ‘Error: ’-like prefix.)
+	.ascii "shell error: failed to close stderr (post) on the child!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr_end:
+
 # Utility: digits
 ns_system_x86_64_linux_util_digits:
 .ascii "0123456789ABCDEF"
@@ -3749,8 +3836,215 @@ _ns_system_x86_64_linux_shell:
 9:
 	nop
 
+	# Now handle standard input, output, and error.
+
+	movq 80(%rsp), %rsi  # Resore original %rsi (options bitfield).
+
+	# First, if we're inheriting, skip this setup since there are no extra pipe
+	# fds to begin with.
+	testq $0x2, %rsi
+	jz 3f  # Don't skip if not inheriting.
+	nop
+	testq $0x4, %rsi
+	jz 2f  # Skip if we're not closing pipes.
+	nop
+3:
+	# Whichever is done, we'll first close stdin, stdout, and stderr.
+
+	# Close standard file descriptors, somewhat like ‘ssh -n’.
+
+	# Perform the ‘close’ syscall.
+	movq $0,   %rdi  # int fd
+	movq $0x3, %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_stdin(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_stdin_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq $1,   %rdi  # int fd
+	movq $0x3, %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_stdout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_stdout_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq $2,   %rdi  # int fd
+	movq $0x3, %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_stderr(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_stderr_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Now skip the rest of the setup (don't ‘dup2’) if we're closing the file
+	# descriptors rather than setting up a pipe (in which case, technically
+	# doing these closes beforehand was redundant, since ‘dup2’ would do it for
+	# us - actually, the man pages indicate that under certain conditions this
+	# redundancy can introduce a race condition and so is recommended against
+	# (TODO: probably implement this suggestion without breaking things)).
+
+	movq 80(%rsp), %rsi  # Resore original %rsi (options bitfield).
+	testq $0x4, %rsi
+	jz 2f  # Skip if we're not closing pipes.
+	nop
+
+	# Finally, just get:
+	# 40(%rsp) -> stdin  0
+	# 16(%rsp) -> stdout 1
+	#  0(%rsp) -> stderr 2
+
+	# Perform the ‘dup2’ syscall.
+	movq $0,       %rsi  # new
+	movq 40(%rsp), %rdi  # old
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_dup2_stdin(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_dup2_stdin_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘dup2’ syscall.
+	movq $1,       %rsi  # new
+	movq 16(%rsp), %rdi  # old
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_dup2_stdout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_dup2_stdout_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘dup2’ syscall.
+	movq $2,       %rsi  # new
+	movq  0(%rsp), %rdi  # old
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_dup2_stderr(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_dup2_stderr_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Finally, close the old FDs now that they've been copied over.
+
+	# Perform the ‘close’ syscall.
+	movq 40(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stdin_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq 16(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stdout_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# Perform the ‘close’ syscall.
+	movq  0(%rsp), %rdi  # int fd
+	movq $0x3,     %rax  # close
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+2:
+
 	# TODO
 	TODO break build until this is implemented.  # TODO
+
+	# Execute the new command, to replace the current (child) one.
+	# TODO args
+	movq $59, %rax  # execv (for 64)
+	syscall
+
+	# Verify.
+	leaq ns_system_x86_64_linux_err_msg_shell_child_start_failed(%rip), %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_start_failed_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq %rax, %rsi
+	leaq 9f(%rip), %rdi
+	jmp _ns_system_x86_64_linux_verify_errno  # (Clobbers nothing on success.)
+9:
+	nop
+
+	# This shouldn't be reached.
+
+	# Error: Return after a successful ‘exec’.
+	movq $0, %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_exec_returned_on_success(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_shell_child_exec_returned_on_success_size(%rip), %rsi
+	movq (%rsi), %rsi
+	movq $2, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+
+	hlt
+	nop
+
 0:
 	# Parent executor.
 
