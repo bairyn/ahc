@@ -2018,6 +2018,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	movq %rdi, 32(%rsp)  # Size.
 	movq %rsi, 24(%rsp)  # Data.
 
+2:
 	# Do the write.
 	movq 32(%rsp), %rdx  # size_t size
 	movq 24(%rsp), %rsi  # const uint8_t *data
@@ -2027,7 +2028,7 @@ _ns_system_x86_64_linux_new_writer_write:
 
 	# Check for EAGAIN=EWOULDBLOCK (11) with %rax of -11, in which case we skip verification.
 	cmpq $-11, %rax
-	jz 2f
+	jz 8f
 
 1:
 	# Verify.
@@ -2040,7 +2041,7 @@ _ns_system_x86_64_linux_new_writer_write:
 9:
 	nop
 	jmp 0f  # Go to successful write block.
-2:
+8:
 	# The resource is not currently available for a write.
 
 	# Reserve and initialize %r8 and %r9 as monotonic time elapsed waiting for
@@ -2263,7 +2264,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	addq %rsi, 4224(%rsp)
 
 	# Loop back to try a write again.
-	jmp 3b
+	jmp 2b
 	nop
 
 0:
@@ -3001,6 +3002,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	movq %rdi, 32(%rsp)  # Size.
 	movq %rsi, 24(%rsp)  # Data.
 
+2:
 	# Do the read.
 	movq 32(%rsp), %rdx  # size_t size
 	movq 24(%rsp), %rsi  # const uint8_t *data
@@ -3010,7 +3012,7 @@ _ns_system_x86_64_linux_new_reader_read:
 
 	# Check for EAGAIN=EWOULDBLOCK (11) with %rax of -11, in which case we skip verification.
 	cmpq $-11, %rax
-	jz 2f
+	jz 8f
 
 1:
 	# Verify.
@@ -3023,7 +3025,7 @@ _ns_system_x86_64_linux_new_reader_read:
 9:
 	nop
 	jmp 0f  # Go to successful read block.
-2:
+8:
 	# The resource is not currently available for a read.
 
 	# Reserve and initialize %r8 and %r9 as monotonic time elapsed waiting for
@@ -3246,7 +3248,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	addq %rsi, 4224(%rsp)
 
 	# Loop back to try a read again.
-	jmp 3b
+	jmp 2b
 	nop
 
 0:
