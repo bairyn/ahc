@@ -344,5 +344,213 @@ _ns_util_get_tuple_read:
 	jmp _ns_util_get_tuple_write
 	nop
 
+# A wrapper around cli's ‘shell’.
+#
+# It's similar, except an automatic join is performed (like running it in the
+# foreground), and the standard file descriptors are automatically inherited.
+#
+# Parameters:
+# 	%rdi: Return.
+# 	%rsi: Size of command line encoding.
+# 	%rdx: Command line encoding.  (Pointer to start of it.)
+# 	%rcx: Must be 0.  Helps future enhacements.
+#
+# Clobbers:
+# 	- %rax  (syscall-related, and working)
+# 	- %r11  (syscall-related)
+# 	- %rcx  (syscall-related)
+# 	- %r10  (syscall-related)
+# 	- %rdi  (parameter)
+# 	- %rsi  (parameter)
+# 	- %rdx  (parameter)
+# 	- %rcx  (parameter)
+# 	- %r8   (parameter)
+# 	- %r9   (parameter)
+# 	- %rip  (it does things)
+.global ns_util_shell_simple
+.set ns_util_shell_simple, (_ns_util_shell_simple - ns_util_module_begin)
+_ns_util_shell_simple:
+	# TODO
+	nop
+	hlt
+	nop
+
+	# Backup %rdi and %rsi.
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+	# Validate implicit parameters.
+	leaq 9f(%rip), %rdi
+	movq $ns_system_x86_64_linux_validate_implicit_arguments, %rax
+	jmp _system
+9:
+	nop
+	# Restore %rdi and %rsi.
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	# Backup %r15 and %r14.
+	subq $16, %rsp
+	movq %r15, 8(%rsp)
+	movq %r14, 0(%rsp)
+
+	# Backup %rax and %r11
+	subq $16, %rsp
+	movq %rax, 8(%rsp)
+	movq %r11, 0(%rsp)
+
+	# Backup %rcx and %r10
+	subq $16, %rsp
+	movq %rcx, 8(%rsp)
+	movq %r10, 0(%rsp)
+
+	# Backup %rdi and %rsi
+	subq $16, %rsp
+	movq %rdi, 8(%rsp)
+	movq %rsi, 0(%rsp)
+
+	# Backup %rdx and %rcx
+	subq $16, %rsp
+	movq %rdx, 8(%rsp)
+	movq %rcx, 0(%rsp)
+
+	# Backup %r8 and %r9
+	subq $16, %rsp
+	movq %r8, 8(%rsp)
+	movq %r9, 0(%rsp)
+
+	# Extra working storage units.
+	subq $16, %rsp
+	movq $0, 8(%rsp)
+	movq $0, 0(%rsp)
+
+	# Push / add our own cleanup to our collection of cleanup requirements for
+	# error handling (see the module documentation for more information).
+	leaq 6f(%rip), %r14
+
+	# ‘shell()’ and then immediately join afterward (we don't do anything else
+	# before joining, or else we'd need to add to our cleanup requirements.
+	# ‘join’ *is* our cleanup).
+	movq %rdx,     %rcx  # Command line.
+	movq %rsi,     %rdx  # Size.
+	movq $0x2,     %rsi  # Options.
+	leaq 9f(%rip), %rdi  # Return.
+	movq $ns_system_x86_64_linux_shell, %rax
+	jmp _system
+9:
+	nop
+
+	# Backup joiner user data.
+	movq %rdx, 8(%rsp)
+	movq $0,   0(%rsp)
+
+	# Call the tuple to extract its contents.
+	movq %rdi    , %rdx  # We'll call %rdx, the tuple continuation.
+	movq %rsi,     %rdi  # User data for the tuple.
+	leaq 9f(%rip), %rsi  # Return address from the tuple extractor/accessor callback.
+	jmp *%rdx
+9:
+	nop
+
+	# The joiner callback was in the tuple.  Now it's in %rdi.  Call the joiner.
+	movq %rdi,     %rdx  # Move the joiner to an available register.
+	movq 8(%rsp),  %rsi  # Joiner user data.
+	leaq 9f(%rip), %rdi  # Return address from the joiner.
+	jmp *%rdx
+9:
+	nop
+
+	# Setup registers to return, and will return to *%rax.
+
+	jmp 5f  # Skip error cleanup.
+
+6:
+	# Error cleanup.  Special error handler.
+	#
+	# Just cleanup aapropriately and return to the previous error handler.
+	#
+	# Remember, we now have:
+	# 	%rdi: Numeric code.
+	# 	%rsi: String size.
+	# 	%rdx: String.
+	# 	%rcx: 0.
+	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq $16, %rsp
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+	movq 0(%rsp), %r9
+	movq 8(%rsp), %r8
+	addq $16, %rsp
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rdx
+	addq $16, %rsp
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+	movq 0(%rsp), %r10
+	movq 8(%rsp), %rcx
+	addq $16, %rsp
+	movq 0(%rsp), %r11
+	movq 8(%rsp), %rax
+	addq $16, %rsp
+	# 2) Then return not to %rdi, but to the previous %r14.
+	testq $0x2, %r15  # Double check we still have an overridden exception handler.
+	jz 0f
+1:
+	jmpq *%r14
+	nop
+0:
+	movq %rcx, %rcx
+	movq %rdx, %rdx
+	movq %rsi, %rsi
+	movq %rdi, %rdi
+	movq $ns_system_x86_64_linux_exit_custom, %rax
+	jmp _system
+	nop
+5:
+	# Cleanup.
+
+	# Restore %r15 and %r14.
+	movq 0(%rsp), %r14
+	movq 8(%rsp), %r15
+	addq $16, %rsp
+
+	# Restore the working storage units and the stack.
+
+	# Restore space from extra storage units.
+	addq $16, %rsp
+
+	# Restore %r8 and %r9.
+	movq 0(%rsp), %r9
+	movq 8(%rsp), %r8
+	addq $16, %rsp
+
+	# Restore %rdx and %rcx.
+	movq 0(%rsp), %rcx
+	movq 8(%rsp), %rdx
+	addq $16, %rsp
+
+	# Restore %rdi and %rsi.
+	movq 0(%rsp), %rsi
+	movq 8(%rsp), %rdi
+	addq $16, %rsp
+
+	# Restore %rcx and %r10.
+	movq 0(%rsp), %r10
+	movq 8(%rsp), %rcx
+	addq $16, %rsp
+
+	# Restore %rax and %r11.
+	movq 0(%rsp), %r11
+	movq 8(%rsp), %rax
+	addq $16, %rsp
+
+	# Return.
+	xchgq %rdi, %rax
+	jmpq *%rax
+	nop
+
 .global ns_util_module_end
 ns_util_module_end:

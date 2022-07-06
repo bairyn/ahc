@@ -164,6 +164,15 @@ ns_cli_msg_starts:
 	.byte 0x00
 ns_cli_msg_starts_end:
 
+ns_cli_date_command_size:
+	.quad (ns_cli_date_command_end - ns_cli_date_command)
+ns_cli_date_command:
+	.ascii "sh\x00"
+	.ascii "-c\x00"
+	.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
+	#.byte 0x00
+ns_cli_date_command_end:
+
 .text
 # A front-end: the CLI.
 #
@@ -175,7 +184,10 @@ ns_cli_msg_starts_end:
 # We use the stack here just to track cleanup requirements.
 .global ns_cli_cli
 .set ns_cli_cli, (_ns_cli_cli - ns_cli_module_begin)
+.global ns_cli_cli_with_prelim_checks
+.set ns_cli_cli_with_prelim_checks, (_ns_cli_cli_with_prelim_checks - ns_cli_module_begin)
 _ns_cli_cli:
+_ns_cli_cli_with_prelim_checks:
 	# Make sure we can return.
 	# Load the return address (continuation) into ‘rdi’.
 	leaq 9f(%rip), %rdi
@@ -358,7 +370,7 @@ _ns_cli_cli:
 	leaq ns_cli_path_proc_self_cmdline_size(%rip), %rsi
 	#leaq ns_cli_path_dev_stdin(%rip), %rdx
 	#leaq ns_cli_path_dev_stdin_size(%rip), %rsi
-	movq (%rdx), %rsi
+	movq (%rsi), %rsi
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_new_reader, %rax
 	jmp _system
@@ -435,7 +447,7 @@ _ns_cli_cli:
 	movq $0, %rcx
 	leaq ns_cli_path_dev_stdout(%rip), %rdx
 	leaq ns_cli_path_dev_stdout_size(%rip), %rsi
-	movq (%rdx), %rsi
+	movq (%rsi), %rsi
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_new_writer, %rax
 	jmp _system
@@ -501,6 +513,56 @@ _ns_cli_cli:
 	movq %rdi, %rsi      # Get user data.
 	leaq 9f(%rip), %rdi  # Get return address.
 	jmpq *%rdx
+9:
+	nop
+
+	# Make sure we can run ‘date’ through ‘system()’.
+	# Uncomment the options override to enable inheritance and make the current
+	# date printed out visible.
+	leaq ns_cli_date_command(%rip), %rcx
+	leaq ns_cli_date_command_size(%rip), %rdx
+	movq (%rdx), %rdx
+	movq $0x00, %rsi
+	#movq $0x02, %rsi
+	leaq 9f(%rip), %rdi
+	movq $ns_system_x86_64_linux_shell, %rax
+	jmp _system
+9:
+	nop
+
+	# Join ‘date’.
+	movq %rdx, 8(%rsp)   # We've backed up the joiner user data.
+	movq $0,   0(%rsp)
+
+	movq %rdi, %rdx      # We'll call %rdx as our tuple call.
+	movq %rsi, %rdi      # Load tuple call user data.
+	leaq 9f(%rip), %rsi  # Set return address.
+	jmp *%rdx            # Call the tuple (not joining quite yet; almost there)
+9:
+	nop
+
+	# Now joiner is at %rdi and takes (return, joiner user data) args.
+	movq %rdi,     %rdx
+	movq 8(%rsp),  %rsi
+	leaq 9f(%rip), %rdi
+	jmp *%rdx
+9:
+	nop
+
+	# Now do the same, except with ‘util’'s ‘shell_simple’ interface.
+	movq $0, %rcx
+	leaq ns_cli_date_command(%rip), %rdx
+	leaq ns_cli_date_command_size(%rip), %rsi
+	movq (%rsi), %rsi
+	leaq 9f(%rip), %rdi
+	movq $ns_util_shell_simple, %rax
+	jmp _system
+9:
+	nop
+
+	# Finally, call ‘cli_after_prelim_checks’.
+	leaq 9f(%rip), %rdi
+	jmp _ns_cli_after_prelim_checks
 9:
 	nop
 
@@ -570,6 +632,23 @@ _ns_cli_exit_custom_force:
 	jmp _system
 	nop
 	hlt
+
+# The CLI front-end, after some preliminary tests to make sure the system is
+# functioning.  A more complete test suite is (once implemented) separate from
+# these preliminary checks.
+#
+# Parameters:
+# 	%rdi: Return.
+.global ns_cli_after_prelim_checks
+.set ns_cli_after_prelim_checks, (_ns_cli_after_prelim_checks - ns_cli_module_begin)
+_ns_cli_after_prelim_checks:
+	# TODO
+	#nop
+	#hlt
+
+	# Return.
+	jmp *%rdi
+	nop
 
 .global ns_cli_module_end
 ns_cli_module_end:

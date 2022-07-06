@@ -3405,35 +3405,71 @@ _ns_system_x86_64_linux_new_reader_read:
 # 		%rdi: The continuation callback part of the tuple closure, to hold
 # 		      extra arguments, with parameters:
 # 			%rdi: User data for the tuple.
-# 			%rsi: Joiner callback return address, with the same API (doesn't
-# 			      *directly* return the shell call's exit code; to get the exit
-# 			      code, you'd need to either install a custom exception handler
-# 			      or modify the shell statement / command line, as noted in the
-# 			      procedure description docs), with parameters (same as from
-# 			      ‘fork_require’:
-# 				%rdi: Return after joining, blocking and waiting until the thread finishes.  (And fail with an error instead if the joined thread failed with an error.)
-# 				%rsi: User data.  (Internally, the PID of the thread to join to.)
-# 			%rdx: stdin writer callback: pass it the stdin writer user data to get API values:
-# 				%rdi: Tuple of API methods to interface with stdin:
-# 					[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
-# 					                      API callbacks equivalent to the API
-# 					                      implementation created by
-# 					                      ‘new_writer’.
-# 					%r9: *Tuple* user data; you fed it back into the tuple
-# 					     ‘function pointer’ to get the tuple to provide you
-# 					     with the contents of the tuple.
-# 				%rsi: User data fed into the stdin writer callback.
-# 				%rdx: User data to pass to the new %rdi tuple; the tuple user data.
+# 			%rsi: Return, with parameters:
+# 				%rdi: Joiner callback return address, with the same API
+# 				      (doesn't *directly* return the shell call's exit code; to
+# 				      get the exit code, you'd need to either install a custom
+# 				      exception handler or modify the shell statement / command
+# 				      line, as noted in the procedure description docs), with
+# 				      parameters (same as from ‘fork_require’:
+# 					%rdi: Return after joining, blocking and waiting until the
+# 					      thread finishes.  (And fail with an error instead if
+# 					      the joined thread failed with an error.)
+# 					%rsi: User data.  (Internally, the PID of the thread to
+# 					      join to.)
+# 				%rsi: stdin writer callback: pass it the stdin writer user data
+# 				      to get API values:
+# 					%rdi: Tuple of API methods to interface with stdin:
+# 						[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
+# 						                      API callbacks equivalent to the
+# 						                      API implementation created by
+# 						                      ‘new_writer’.
+# 						%r9: *Tuple* user data; you fed it back into the tuple
+# 						     ‘function pointer’ to get the tuple to provide you
+# 						     with the contents of the tuple.
+# 					%rsi: User data fed into the stdin writer callback.
+# 					%rdx: User data to pass to the new %rdi tuple; the tuple
+# 					      user data.
+# 				%rdx: stdout reader callback: pass it the stdout reader user
+# 				      data to get API values:
+# 					%rdi: Tuple of API methods to interface with stdout:
+# 						[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
+# 						                      API callbacks equivalent to the
+# 						                      API implementation created by
+# 						                      ‘new_reader’.
+# 						%r9: *Tuple* user data; you fed it back into the tuple
+# 						     ‘function pointer’ to get the tuple to provide you
+# 						     with the contents of the tuple.
+# 					%rsi: User data fed into the stdout reader callback.
+# 					%rdx: User data to pass to the new %rdi tuple; the tuple
+# 					      user data.
+# 				%rcx: stderr reader callback: pass it the stderr reader user
+# 				      data to get API values:
+# 					%rdi: Tuple of API methods to interface with stderr:
+# 						[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
+# 						                      API callbacks equivalent to the
+# 						                      API implementation created by
+# 						                      ‘new_reader’.
+# 						%r9: *Tuple* user data; you fed it back into the tuple
+# 						     ‘function pointer’ to get the tuple to provide you
+# 						     with the contents of the tuple.
+# 					%rsi: User data fed into the stderr reader callback.
+# 					%rdx: User data to pass to the new %rdi tuple; the tuple
+# 					      user data.
+# 				%r8: This is currently set to 0.
 # 		%rsi: The user data part of the tuple closure; pass it to %rdi as the
 # 		      first argument.
 # 		%rdx: The user data to be passed to the joiner callback (it's nested in
 # 		      the tuple) (although it's the second parameter)
 # 		%rcx: The user data to be passed to the stdin writer callback (it's
-# 		      nested in the tuple)
+# 		      nested in the tuple), or undefined if the inherit option is
+# 		      enabled.
 # 		%r8: The user data to be passed to the stdout reader callback (it's
-# 		     nested in the tuple)
+# 		     nested in the tuple), or undefined if the inherit option is
+# 		     enabled.
 # 		%r9: The user data to be passed to the stderr reader callback (it's
-# 		     nested in the tuple).
+# 		     nested in the tuple), or undefined if the inherit option is
+# 		     enabled.
 # 	%rsi: Options bitfield:
 # 		Bit 0: must be 0.  Unsupported: 1 to enable alternative system
 # 		       argument encodings.
@@ -3527,6 +3563,7 @@ _ns_system_x86_64_linux_shell:
 	leaq 6f(%rip), %r14
 
 	# TODO: do the stuff
+	TODO break build until this core piece is implemented.
 
 	# Setup registers to return, and will return to *%rax.
 
