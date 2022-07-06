@@ -3363,7 +3363,83 @@ _ns_system_x86_64_linux_new_reader_read:
 # Shell calls.
 # ################################################################
 
-# TODO
+# Interpret a string to represent a shell call.
+#
+# Currently, only the format of null-terminated arguments is supported.  A
+# standard shell call may look like ‘sh -c ‘echo test’’, 3 arguments: ‘sh’,
+# ‘-c’, and then the shell command to run.
+#
+# By default, a pipe is created for stdin, stdout, and stderr, and readers and
+# writers with the same API as that created by ‘new_writer’ and ‘new_reader˚
+# are returned; however, an option bit may be enabled to instead let the system
+# / shell process inherit from the parent process in these things.
+#
+# A returned joiner with the same API as ‘fork_require’ creates (internally
+# implemented as ‘_fork_join’) is returned.
+#
+# The new system shell will run in the background, and you normally should run
+# the joiner after calling ‘shell’ to wait for the process to finish.
+#
+# To permit errors, either modify the shell statement to ignore errors, or use
+# %r15 and %r14 to catch the errors you wish to ignore.
+#
+# Note: the ‘util’ module's wrapper may provide a slightry more user-friendly
+# interface, as it defaults to automatically joining and also inheriting
+# standard input and outputs pipes, but this low-level method permits more
+# fine-grained control.
+#
+# Parameters:
+# 	%rdi: Return, with parameters (too many to fit in 6, so some of them have
+# 	      been put in a tuple, rather than using the stack, so you can access
+# 	      more arguments than 6; the tuple is a like a function pointer paired
+# 	      with arbitrary user data for the function pointer to have input or
+# 	      state):
+# 		%rdi: The continuation callback part of the tuple closure, to hold
+# 		      extra arguments, with parameters:
+# 			%rdi: User data for the tuple.
+# 			%rsi: Joiner callback return address, with the same API (doesn't
+# 			      *directly* return the shell call's exit code; to get the exit
+# 			      code, you'd need to either install a custom exception handler
+# 			      or modify the shell statement / command line, as noted in the
+# 			      procedure description docs), with parameters (same as from
+# 			      ‘fork_require’:
+# 				%rdi: Return after joining, blocking and waiting until the thread finishes.  (And fail with an error instead if the joined thread failed with an error.)
+# 				%rsi: User data.  (Internally, the PID of the thread to join to.)
+# 			%rdx: stdin writer callback: pass it the stdin writer user data to get API values:
+# 				%rdi: Tuple of API methods to interface with stdin:
+# 					[%rdi, %rsi, …, %r8]: (NON-tuple) user data and set of
+# 					                      API callbacks equivalent to the API
+# 					                      implementation created by
+# 					                      ‘new_writer’.
+# 					%r9: *Tuple* user data; you fed it back into the tuple
+# 					     ‘function pointer’ to get the tuple to provide you
+# 					     with the contents of the tuple.
+# 				%rsi: User data fed into the stdin writer callback.
+# 				%rdx: User data to pass to the new %rdi tuple; the tuple user data.
+# 		%rsi: The user data part of the tuple closure; pass it to %rdi as the
+# 		      first argument.
+# 		%rdx: The user data to be passed to the joiner callback (it's nested in
+# 		      the tuple) (although it's the second parameter)
+# 		%rcx: The user data to be passed to the stdin writer callback (it's
+# 		      nested in the tuple)
+# 		%r8: The user data to be passed to the stdout reader callback (it's
+# 		     nested in the tuple)
+# 		%r9: The user data to be passed to the stderr reader callback (it's
+# 		     nested in the tuple).
+# 	%rsi: Options bitfield:
+# 		Bit 0: must be 0.  Unsupported: 1 to enable alternative system
+# 		       argument encodings.
+# 		Bit 1: If enabled, then instead of creating pipes, just inherit from
+# 		       the caller's standard input, output, and error pipes.
+# 		(Other bits should be 0; this may or may not be checked.)
+# 	%rdx: Size of command line encoding.
+# 	%rcx: Command line encoding.
+.global ns_system_x86_64_linux_shell
+.set ns_system_x86_64_linux_shell, (_ns_system_x86_64_linux_shell - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_shell:
+	# TODO
+	nop
+	hlt
 
 # ################################################################
 # Exiting and process maangement.
