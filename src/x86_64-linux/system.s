@@ -4551,6 +4551,7 @@ _ns_system_x86_64_linux_shell:
 	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
+	addq $16, %rsp
 	movq 0(%rsp), %r10
 	addq $16, %rsp
 	movq 0(%rsp), %r11
@@ -4558,6 +4559,7 @@ _ns_system_x86_64_linux_shell:
 	movq 0(%rsp), %r14
 	movq 8(%rsp), %r15
 	addq $16, %rsp
+	movq 8(%rsp), %r13
 	addq $16, %rsp
 	# 2) Then return not to %rdi, but to the previous %r14.
 	testq $0x2, %r15  # Double check we still have an overridden exception handler.
