@@ -4953,6 +4953,44 @@ _ns_system_x86_64_linux_cc_call_stack_return:
 	#jmpq *%rdi
 	#nop
 
+# TODO: a version for calling, too:
+## Perform a call to a procedure using the call stack (and, if enabled, shadow
+## stack) to store the return address.
+##
+## Parameters:
+## 	%rdi: Return, after ‘call’ returns back to us.
+## 	%rsi: The address to ‘call’ to with a more conventional calling convention.
+## 	%rdx: Tuple continuation to obtain some arguments:
+## 		%rdi: Return, with parameters:
+## 			%rdi: Size of stack data (anything after 48 is copied onto our own
+## 			      stack after the return address, like the more conventional
+## 			      calling convention).
+## 			%rsi: The stack data.  The first full 6 u64's are loaded into
+## 			      [%rdi, …, %r9], and the rest are added to the stack.
+## 		%rsi: User data.
+## 	%rcx: User data for the tuple continuation.  (This user data isn't
+## 	      essential; it's just a convenience.  But e.g. you could just make
+## 	      copies of the machine code bundled together with slightly different
+## 	      data.)
+##
+## This clobbers:
+## 	- %rax
+## 	- %rdi
+## 	- %rsi
+## 	- %rdx
+## 	- %rcx
+## 	- %r8
+## 	- %r9
+#.global ns_system_x86_64_linux_cc_call_stack_call
+#.set ns_system_x86_64_linux_cc_call_stack_call, (_ns_system_x86_64_linux_cc_call_stack_call - ns_system_x86_64_linux_module_begin)
+#_ns_system_x86_64_linux_cc_call_stack_call:
+#	# (This will need special care with cleanup and error cleanup routines; we
+#	# do use the stack.)
+#
+#	# TODO
+#	hlt
+#	nop
+
 # clock_nanosleep the given number of nanoseconds against the CLOCK_MONOTONIC=1
 # clock.
 #
