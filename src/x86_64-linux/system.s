@@ -1,23 +1,7 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
-# TODO: consider a simple action that obtains a string for the build platform,
-#       e.g. just ‘x86_64-linux’ - the new native build platform, that is, rather
-#       than the new host or target platforms.  (That is, ‘new’ for new
-#       platforms once our own product is built, like a rotation of the 3
-#       platforms.)
-# TODO: consider having just a ‘cmdline’ argument with size where nulls end an
-#       argument, and then in the utility module just have a simple wrapper
-#       around ‘/bin/sh -c ARG’.  Also ‘shell()’ (probably call it ‘shell’
-#       actually rather than ‘system’) should by default inherit stdin, stdout,
-#       stderr, but have an option to redirect these to readers and writers.
-#       (3 modes: simple null-terminated sh -c, null-terminated arg, and a
-#       vector encoding of a quad length beginning for each argument OSLT)
-
-# TODO ‘system’ - rdi size, rsi data pointer, rdx user data 1, rcx user data 2
 # TODO ‘exec’ after ‘system’ - execute arbitrary shell code.
-# TODO ‘networking’ after ‘exec’ - handle networking
-# TODO how to handle networking?
 
 # See ‘arch/x86/entry/syscalls/syscall_64.tbl’ (thanks,
 # https://unix.stackexchange.com/a/499016).
