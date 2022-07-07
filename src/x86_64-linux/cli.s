@@ -169,7 +169,10 @@ ns_cli_date_command_size:
 ns_cli_date_command:
 	.ascii "/bin/sh\x00"
 	.ascii "-c\x00"
-	.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
+	# Switch which ‘.ascii’ line is commented out to toggle whether the
+	# preliminary checks on CLI startup cause a timestamp to be emitted.
+	#.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
+	.ascii "true                     \x00"
 	#.byte 0x00
 ns_cli_date_command_end:
 
