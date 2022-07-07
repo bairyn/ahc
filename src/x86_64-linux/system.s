@@ -155,6 +155,14 @@ _module_name:
 	.ascii "system_x86_64_linux"
 _module_name_end:
 
+# A string constant used by ‘get_platform_name’.
+ns_system_x86_64_linux_platform_name_size:
+	.quad (ns_system_x86_64_linux_platform_name_end - ns_system_x86_64_linux_platform_name)
+ns_system_x86_64_linux_platform_name:
+	.ascii "x86_64-linux"
+	.byte 0x00
+ns_system_x86_64_linux_platform_name_end:
+
 # 152 bytes of data to restore segv trap.
 ns_system_x86_64_linux_sigaction_restore_segv:
 	.quad 0x0  # SIG_DFL = 0
@@ -711,6 +719,35 @@ ns_system_x86_64_linux_err_msg_shell_pipe_pair_stderr_end:
 # ################################################################
 # Base.
 # ################################################################
+
+# Get a platform name string for whatever is running this binary (that is, what
+# is, at the time of your running the application (not our building it), what
+# is the ‘native’, not ‘host’ or ‘target’ part of it).
+#
+# This module already is platfom-specific, so this is easy.  It' sconstant.
+#
+# Parameters:
+# 	%rdi: Return, with parameters:
+# 		%rdi: The size of the platform name string.
+# 		%rsi: A pointer to the beginning of the platform name string.  It also
+# 		      happens to be null-terminated.  This null terminator is part of
+# 		      the string returned.
+#
+# This clobbers the following registers:
+# 	- %rdi
+# 	- %rsi
+# 	- %rdx
+.global ns_system_x86_64_linux_get_platform_name
+.set ns_system_x86_64_linux_get_platform_name, (_ns_system_x86_64_linux_get_platform_name - ns_system_x86_64_linux_module_begin)
+_ns_system_x86_64_linux_get_platform_name:
+	# Back up the return address to %rdx.
+	movq %rdi, %rdx
+
+	# Set up arguments and return.
+	leaq ns_system_x86_64_linux_platform_name(%rip), %rsi
+	movq ns_system_x86_64_linux_platform_name_size(%rip), %rdi
+	jmpq *%rdx
+	nop
 
 # Do nothing but return (or call an alternative continuation).
 #
