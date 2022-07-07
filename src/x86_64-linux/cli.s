@@ -193,7 +193,10 @@ ns_cli_date_command:
 ns_cli_date_command_data:
 	.ascii "/bin/sh\x00"
 	.ascii "-c\x00"
-	.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
+	# Switch which line is commented to get dates to print during the prelimary
+	# checks.
+	#.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
+	.ascii "true                     \x00"
 	#.byte 0x00
 ns_cli_date_command_end:
 
@@ -562,8 +565,7 @@ _ns_cli_cli_with_prelim_checks:
 	leaq ns_cli_date_command_size(%rip), %rdx
 	movq (%rdx), %rdx
 	movq $0x04, %rsi
-	#movq $0x02, %rsi
-movq $0x02, %rsi  # TODO delete this line.
+	movq $0x02, %rsi
 	leaq 9f(%rip), %rdi
 	movq $ns_system_x86_64_linux_shell, %rax
 	jmp _system
