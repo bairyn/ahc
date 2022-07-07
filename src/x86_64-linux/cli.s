@@ -167,7 +167,7 @@ ns_cli_msg_starts_end:
 ns_cli_date_command_size:
 	.quad (ns_cli_date_command_end - ns_cli_date_command)
 ns_cli_date_command:
-	.ascii "/sin/sh\x00"
+	.ascii "/bin/sh\x00"
 	.ascii "-c\x00"
 	.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
 	#.byte 0x00
