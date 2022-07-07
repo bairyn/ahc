@@ -126,6 +126,14 @@ ns_util_err_msg_not_writeable:
 	.byte 0x00
 ns_util_err_msg_not_writeable_end:
 
+# A very simple environment for ‘shell_simple’.
+ns_util_shell_simple_environment_size:
+	.quad (ns_util_shell_simple_environment_end - ns_util_shell_simple_environment)
+ns_util_shell_simple_environment:
+	.ascii "PATH=/usr/bin:/bin\x00"
+	#.byte 0x00
+ns_util_shell_simple_environment_end:
+
 .text
 
 # Can we return?
@@ -349,6 +357,8 @@ _ns_util_get_tuple_read:
 # It's similar, except an automatic join is performed (like running it in the
 # foreground), and the standard file descriptors are automatically inherited.
 #
+# Note: the environment is reset to a very minimal one.
+#
 # Parameters:
 # 	%rdi: Return.
 # 	%rsi: Size of command line encoding.
@@ -424,13 +434,9 @@ _ns_util_shell_simple:
 	# error handling (see the module documentation for more information).
 	leaq 6f(%rip), %r14
 
-	# TODO: inherit the environment!
-movq $ns_cli_date_command, %rcx
-movq $ns_cli_date_command, %rdx
-movq $ns_cli_date_env, %r9
-	#TODO break build until this works.
-	#movq $0,   %r9
-	#movq $0,   %r8
+	leaq ns_util_shell_simple_environment(%rip), %r9
+	leaq ns_util_shell_simple_environment_size(%rip), %r8
+	movq (%r8), %r8
 	# ‘shell()’ and then immediately join afterward (we don't do anything else
 	# before joining, or else we'd need to add to our cleanup requirements.
 	# ‘join’ *is* our cleanup).

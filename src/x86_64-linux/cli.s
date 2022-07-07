@@ -164,49 +164,18 @@ ns_cli_msg_starts:
 	.byte 0x00
 ns_cli_msg_starts_end:
 
-# TODO: we want something like this (PIC):
-#ns_cli_date_command_size:
-#	.quad (ns_cli_date_command_end - ns_cli_date_command)
-#ns_cli_date_command:
-#	.ascii "sh\x00"
-#	.ascii "-c\x00"
-#	.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
-#	#.byte 0x00
-#ns_cli_date_command_end:
-#
-#ns_cli_date_env_size:
-#	.quad (ns_cli_date_env_end - ns_cli_date_env)
-#ns_cli_date_env:
-#	.ascii "PATH=/bin:/usr/bin\x00"
-#	#.byte 0x00
-#ns_cli_date_env_end:
-
-# TODO: temporary copy for testing what we have so far:
 ns_cli_date_command_size:
 	.quad (ns_cli_date_command_end - ns_cli_date_command)
-.global ns_cli_date_command # TODO This should not be global!  Temp just to test ‘shell_simple’.
 ns_cli_date_command:
-	.quad (ns_cli_date_command_data + 0)
-	.quad (ns_cli_date_command_data + 8)
-	.quad (ns_cli_date_command_data + 11)
-	.quad 0
-ns_cli_date_command_data:
-	.ascii "/bin/sh\x00"
+	.ascii "/sin/sh\x00"
 	.ascii "-c\x00"
-	# Switch which line is commented to get dates to print during the prelimary
-	# checks.
-	#.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
-	.ascii "true                     \x00"
+	.ascii "date +'%Y-%M-%d_%H:%M:%S'\x00"
 	#.byte 0x00
 ns_cli_date_command_end:
 
 ns_cli_date_env_size:
 	.quad (ns_cli_date_env_end - ns_cli_date_env)
-.global ns_cli_date_env # TODO This should not be global!  Temp just to test ‘shell_simple’.
 ns_cli_date_env:
-	.quad (ns_cli_date_env_data + 0)
-	.quad 0
-ns_cli_date_env_data:
 	.ascii "PATH=/bin:/usr/bin\x00"
 	#.byte 0x00
 ns_cli_date_env_end:

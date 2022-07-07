@@ -397,6 +397,20 @@ ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr:
 	.byte 0x00
 ns_system_x86_64_linux_err_msg_shell_child_close_post_stderr_end:
 
+ns_system_x86_64_linux_err_msg_shell_invalid_argument_command_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_invalid_argument_command_end - ns_system_x86_64_linux_err_msg_shell_invalid_argument_command)
+ns_system_x86_64_linux_err_msg_shell_invalid_argument_command:
+	.ascii "Error: shell error: invalid arguments: the last command argument should be null-terminated but wasn't!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_invalid_argument_command_end:
+
+ns_system_x86_64_linux_err_msg_shell_invalid_argument_environment_size:
+	.quad (ns_system_x86_64_linux_err_msg_shell_invalid_argument_environment_end - ns_system_x86_64_linux_err_msg_shell_invalid_argument_environment)
+ns_system_x86_64_linux_err_msg_shell_invalid_argument_environment:
+	.ascii "Error: shell error: invalid arguments: the last environment item should be null-terminated but wasn't!  Could not execute a shell or system command.\n"
+	.byte 0x00
+ns_system_x86_64_linux_err_msg_shell_invalid_argument_environment_end:
+
 # Utility: digits
 ns_system_x86_64_linux_util_digits:
 .ascii "0123456789ABCDEF"
@@ -2356,7 +2370,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	jge 8f
 	nop
 	addq $1000000000, %rsi
-	dec %rdi
+	decq %rdi
 8:
 	# Now %rsi is set up.
 	# %rsi /= 1000
@@ -2433,7 +2447,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	jge 8f
 	nop
 	addq $1000000000, %rsi
-	dec %rdi
+	decq %rdi
 8:
 	# Now %rsi is set up.
 	# Just ensure too that %rdi >= 0.
@@ -2457,7 +2471,7 @@ _ns_system_x86_64_linux_new_writer_write:
 	jge 8f
 	nop
 	addq $1000000000, %rsi
-	dec %rdi
+	decq %rdi
 8:
 	# Now %rsi is set up.
 	# Just ensure too that %rdi >= 0.
@@ -3342,7 +3356,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	jge 8f
 	nop
 	addq $1000000000, %rsi
-	dec %rdi
+	decq %rdi
 8:
 	# Now %rsi is set up.
 	# %rsi /= 1000
@@ -3419,7 +3433,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	jge 8f
 	nop
 	addq $1000000000, %rsi
-	dec %rdi
+	decq %rdi
 8:
 	# Now %rsi is set up.
 	# Just ensure too that %rdi >= 0.
@@ -3443,7 +3457,7 @@ _ns_system_x86_64_linux_new_reader_read:
 	jge 8f
 	nop
 	addq $1000000000, %rsi
-	dec %rdi
+	decq %rdi
 8:
 	# Now %rsi is set up.
 	# Just ensure too that %rdi >= 0.
@@ -3574,13 +3588,11 @@ _ns_system_x86_64_linux_new_reader_read:
 
 # Interpret a string to represent a shell call.
 #
-# Currently, only the format of null-terminated arguments is supported.  A
-# standard shell call may look like ‘sh -c ‘echo test’’, 3 arguments: ‘sh’,
-# ‘-c’, and then the shell command to run.
-# TODO: double check these docs about encoding ^^^.
-#TODO break the build until these docs get fixed.
-# FIXME: the child call failed, but the parent didn't fail too!
-#TODO break the build until these docs get fixed.
+# Currently, only the format of null-terminated arguments is supported: within
+# the data range specified by size, each null byte is taken to terminate an
+# argument.  The last argument must be null-terminated.  A standard shell call
+# may look like ‘/bin/sh -c ‘echo test’’, with 3 arguments: ‘/bin/sh’, ‘-c’,
+# and ‘echo test’, and the memory would have 3 null bytes after each argument.
 #
 # By default, a pipe is created for stdin, stdout, and stderr, and readers and
 # writers with the same API as that created by ‘new_writer’ and ‘new_reader˚
@@ -3776,9 +3788,78 @@ _ns_system_x86_64_linux_shell:
 	movq $0, 8(%rsp)  # Read end.
 	movq $0, 0(%rsp)  # Write end.
 
+	# We've backed up %r13.  Use it now to refer to the stack above the
+	# dynamically-sized parts.  We'll restore %r13 when we're done.
+	movq %rsp, %r13
+
+	# Dynamically-sized pointer arrays for the ‘execve’ syscall.
+	# How this works is the quad at %rsp refers to the size, so adding (%rsp)
+	# to %rsp will get you the address to the write end of stderr, that is,
+	# what would be the beginning of the stack with out.  Adding (%rsp) to %rsp
+	# also will pop this dynamically-sized array.
+	subq $16, %rsp
+	movq $0,  8(%rsp)
+	movq $16, 0(%rsp)  # Dynamic array size.
+
 	# Push / add our own cleanup to our collection of cleanup requirements for
 	# error handling (see the module documentation for more information).
 	leaq 6f(%rip), %r14
+
+	# Do a check on the command and environment strings.
+
+	# Command line encoding check.
+	testq %rdx, %rdx
+	jz 0f  # Skip the check if the command data is empty.
+	nop
+1:
+	movq %rdx, %rdi
+	decq %rdi
+	addq %rcx, %rdi
+	movq (%rdi), %rdi
+	testq %rdi, %rdi
+	jz 0f
+
+	# Error: the last item in the command line encoding is not null terminated!
+	# Catch this before we sent a string of unknown length to the kernel,
+	# potentially resulting in unallocated or out-of-bounds memory access.
+	movq $0, %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_invalid_argument_command(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_shell_invalid_argument_command_size(%rip), %rsi
+	movq (%rsi), %rsi
+	movq $2, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+
+	# Environment encoding check.
+	testq %r8, %r8
+	jz 0f  # Skip the check if the command data is empty.
+	nop
+1:
+	movq %r8, %rdi
+	decq %rdi
+	addq %r9, %rdi
+	movq (%rdi), %rdi
+	testq %rdi, %rdi
+	jz 0f
+
+	# Error: the last item in the environment encoding is not null terminated!
+	# Catch this before we sent a string of unknown length to the kernel,
+	# potentially resulting in unallocated or out-of-bounds memory access.
+	movq $0, %rcx
+	leaq ns_system_x86_64_linux_err_msg_shell_invalid_argument_environment(%rip), %rdx
+	leaq ns_system_x86_64_linux_err_msg_shell_invalid_argument_environment_size(%rip), %rsi
+	movq (%rsi), %rsi
+	movq $2, %rdi
+	jmp _ns_system_x86_64_linux_exit_custom
+	nop
+	hlt
+0:
+	# Done with encoding checks.
+	# So restore %rdi and %rsi (redundant).
+	#movq 88(%r13), %rdi  # Resore original %rdi.
+	#movq 80(%r13), %rsi  # Resore original %rsi (options bitfield).
 
 	# First, if not inheriting, create 3 pairs of pipes before forking (but set
 	# up the rest of the communication after the fork).  Skip this pipe
@@ -3793,7 +3874,7 @@ _ns_system_x86_64_linux_shell:
 
 	# stdin
 	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800)) (notably this does _not_ have O_CLOEXEC; we're about to fork and exec.)
-	leaq 32(%rsp), %rdi  # Fildes
+	leaq 32(%r13), %rdi  # Fildes
 	movq $293,     %rax  # pipe2 (22 is pipe)
 	syscall
 
@@ -3809,7 +3890,7 @@ _ns_system_x86_64_linux_shell:
 
 	# stdout
 	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800))
-	leaq 16(%rsp), %rdi  # Fildes
+	leaq 16(%r13), %rdi  # Fildes
 	movq $293,     %rax  # pipe2 (22 is pipe)
 	syscall
 
@@ -3825,7 +3906,7 @@ _ns_system_x86_64_linux_shell:
 
 	# stderr
 	movq $2048,    %rsi  # Flags (O_NONBLOCK=2048 (0x800))
-	leaq  0(%rsp), %rdi  # Fildes
+	leaq  0(%r13), %rdi  # Fildes
 	movq $293,     %rax  # pipe2 (22 is pipe)
 	syscall
 
@@ -3843,8 +3924,10 @@ _ns_system_x86_64_linux_shell:
 
 	# Now in the parent cleanup, we will restore %r13.
 	# But here just use it to back up the parent stack location.
-	movq 152(%rsp), %r13
-	movq %rsp, %r13
+	#movq 152(%r13), %r13  # We've now claimed %r13 in this procedure for a
+	                       # pointer in the stack after the dynamic part, but
+	                       # we will restore %r13 on cleanup.
+	movq %r13, %r13
 
 	# Now just fork, but use vfork and share the stack.
 	movq $0,       %rcx  # Price.
@@ -4119,8 +4202,163 @@ _ns_system_x86_64_linux_shell:
 
 2:
 
-	# TODO check null-terminated where appropriate.
-	#TODO break build until this is implemented.  # TODO
+	# Before we execute the command, we need to parse the encoded commands and
+	# environment strings.
+	#
+	# So what we'll do is count the number of null bytes in each and then
+	# reserve room for that many pointers on the stack.
+
+	# Add the null terminator to our array of null-terminated string pointers.
+	movq (%rsp), %rdi
+	addq $16, %rdi
+	subq $16, %rsp
+	movq %rdi, (%rsp)
+	movq $0, 8(%rsp)  # Null terminator.
+	leaq 8(%rsp), %r8  # The beginning of the command pointer array.
+
+	movq 72(%r13), %rsi  # Command string size (from original %rdx).
+	movq 64(%r13), %rdx  # Command string (from original %rcx).
+	testq %rsi, %rsi
+	jz 3f  # Do nothing if the command string is empty.
+	decq %rsi
+	testq %rsi, %rsi
+	jz 7f
+	decq %rsi  # Skip the last NULL byte.
+	# Start near the end of the string.
+8:
+	# Break if we reached the beginning.
+	testq %rsi, %rsi
+	jz 7f
+	nop
+	decq %rsi
+
+	# Get the next character.
+	movq %rdx, %rdi
+	addq %rsi, %rdi
+	movq (%rdi), %rdi
+
+	# If it's not null, loop back.
+	testq %rdi, %rdi
+	jnz 8b
+	nop
+
+	# Reached a null.  Push addr + 1.
+	subq $8, %r8
+	cmpq %r8, %rsp
+	jnz 9f
+	nop
+	# We've reached the bottom of our stack, so get 2 more u64's.
+	movq (%rsp), %rdi
+	addq $16, %rdi
+	subq $16, %rsp
+	movq %rdi, (%rsp)
+	movq $0, 8(%rsp)  # Just free space.
+9:
+	movq %rdx, %rdi
+	addq %rsi, %rdi
+	incq %rdi
+	movq %rdi, (%r8)  # Here we do the push to add the C-string pointer.
+
+	# Loop back.
+	jmp 8b
+	nop
+7:
+	# First character in a non-empty string.  Push an arg, addr + 0.
+	subq $8, %r8
+	cmpq %r8, %rsp
+	jnz 9f
+	nop
+	# We've reached the bottom of our stack, so get 2 more u64's.
+	movq (%rsp), %rdi
+	addq $16, %rdi
+	subq $16, %rsp
+	movq %rdi, (%rsp)
+	movq $0, 8(%rsp)  # Just free space.
+9:
+	movq %rdx, %rdi
+	addq %rsi, %rdi
+	movq %rdi, (%r8)  # Here we do the push to add the C-string pointer.
+3:
+	# Done building the command pointer for ‘execv’.  Back it up in %r8.
+	#leaq 8(%rsp), %r8
+	movq %r8, %r8
+
+	# Now do the same thing but for the environment and %r9.
+
+	# Add the null terminator to our array of null-terminated string pointers.
+	movq (%rsp), %rdi
+	addq $16, %rdi
+	subq $16, %rsp
+	movq %rdi, (%rsp)
+	movq $0, 8(%rsp)  # Null terminator.
+	leaq 8(%rsp), %r9  # The beginning of the command pointer array.
+
+	movq 56(%r13), %rsi  # Command string size (from original %r8).
+	movq 48(%r13), %rdx  # Command string (from original %r9).
+	testq %rsi, %rsi
+	jz 3f  # Do nothing if the command string is empty.
+	decq %rsi
+	testq %rsi, %rsi
+	jz 7f
+	decq %rsi  # Skip the last NULL byte.
+	# Start near the end of the string.
+8:
+	# Break if we reached the beginning.
+	testq %rsi, %rsi
+	jz 7f
+	nop
+	decq %rsi
+
+	# Get the next character.
+	movq %rdx, %rdi
+	addq %rsi, %rdi
+	movq (%rdi), %rdi
+
+	# If it's not null, loop back.
+	testq %rdi, %rdi
+	jnz 8b
+	nop
+
+	# Reached a null.  Push addr + 1.
+	subq $8, %r9
+	cmpq %r9, %rsp
+	jnz 9f
+	nop
+	# We've reached the bottom of our stack, so get 2 more u64's.
+	movq (%rsp), %rdi
+	addq $16, %rdi
+	subq $16, %rsp
+	movq %rdi, (%rsp)
+	movq $0, 8(%rsp)  # Just free space.
+9:
+	movq %rdx, %rdi
+	addq %rsi, %rdi
+	incq %rdi
+	movq %rdi, (%r9)  # Here we do the push to add the C-string pointer.
+
+	# Loop back.
+	jmp 8b
+	nop
+7:
+	# First character in a non-empty string.  Push an arg, addr + 0.
+	subq $8, %r9
+	cmpq %r9, %rsp
+	jnz 9f
+	nop
+	# We've reached the bottom of our stack, so get 2 more u64's.
+	movq (%rsp), %rdi
+	addq $16, %rdi
+	subq $16, %rsp
+	movq %rdi, (%rsp)
+	movq $0, 8(%rsp)  # Just free space.
+9:
+	movq %rdx, %rdi
+	addq %rsi, %rdi
+	movq %rdi, (%r9)  # Here we do the push to add the C-string pointer.
+3:
+	# Done building the command pointer for ‘execv’.  Back it up in %r9.
+	#leaq 8(%rsp), %r9
+	movq %r9, %r9
 
 	# Execute the new command, to replace the current (child) one.
 	#movq 48(%r13), %rsi  # environment (from original %r9).
@@ -4132,15 +4370,19 @@ _ns_system_x86_64_linux_shell:
 
 	# Give up access to the stack, and signal to the parent thread that it can
 	# stop being susponded and free up the stack resources we were using.
+	# (Edit: doesn't seem to be necessary, since the parent won't see this
+	# write to the parent stack copy.)
 	movq 152(%r13), %rdx
 	movq $1, 144(%r13)  # Concurrency signal that parent can stop spinlocking.
 	movq %rdx, %r13  # Restore original %r13.
 
-	# TODO check null-terminated and handle encoding of strings.
-	#TODO break build until this is implemented.  # TODO
-	movq %rsi, %rdx  # environment (from original %r9).
-	movq %rdi, %rsi  # argv (from original %rcx).
-	movq %rdi, %rdi  # pathname (from original %rcx).
+	# ‘execve’.
+	#movq %rsi, %rdx  # environment (from original %r9).
+	#movq %rdi, %rsi  # argv (from original %rcx).
+	#movq %rdi, %rdi  # pathname (from original %rcx).
+	movq %r9, %rdx  # environment
+	movq %r8, %rsi  # argv
+	movq %r8, %rdi  # pathname
 	movq (%rdi), %rdi  # argv[0]
 	movq $59,      %rax  # execve (for 64)
 	syscall
@@ -4154,7 +4396,7 @@ _ns_system_x86_64_linux_shell:
 	## print a more helpful error message.
 	#movq %rax, %rdi
 	#notq %rdi
-	#inc  %rdi
+	#incq %rdi
 	#movq $60, %rax  # exit
 	#syscall
 
@@ -4207,7 +4449,7 @@ _ns_system_x86_64_linux_shell:
 	nop
 
 	# Perform the ‘close’ syscall.
-	movq 40(%rsp), %rdi  # int fd
+	movq 40(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
 
@@ -4222,7 +4464,7 @@ _ns_system_x86_64_linux_shell:
 	nop
 
 	# Perform the ‘close’ syscall.
-	movq 16(%rsp), %rdi  # int fd
+	movq 16(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
 
@@ -4237,7 +4479,7 @@ _ns_system_x86_64_linux_shell:
 	nop
 
 	# Perform the ‘close’ syscall.
-	movq  0(%rsp), %rdi  # int fd
+	movq  0(%r13), %rdi  # int fd
 	movq $0x3,     %rax  # close
 	syscall
 
@@ -4265,7 +4507,7 @@ _ns_system_x86_64_linux_shell:
 	# so.  FIXM E: this needs to be done or else if the child thread is killed
 	# at just right the right time (or a close or dup2 fails), then the parent
 	# hangs forever!
-	movq 144(%rsp), %rdi
+	movq 144(%r13), %rdi
 	testq %rdi, %rdi
 	#jz 8b  # Spinlock.  Edit: no need to wait; the child has a copy of the stack, apparently.
 	nop
@@ -4277,9 +4519,9 @@ _ns_system_x86_64_linux_shell:
 
 	# Setup registers to return, and will return to *%rax.
 
-	movq  8(%rsp), %r9   # stderr reader user data
-	movq 24(%rsp), %r8   # stdout reader user data
-	movq 32(%rsp), %rcx  # stdin writer user data
+	movq  8(%r13), %r9   # stderr reader user data
+	movq 24(%r13), %r8   # stdout reader user data
+	movq 32(%r13), %rcx  # stdin writer user data
 	movq %rsi,     %rdx  # joiner user data
 	movq $0,       %rsi  # tuple user data
 	leaq _ns_system_x86_64_linux_shell_tuple(%rip), %rdi  # tuple callback continuation
@@ -4288,7 +4530,7 @@ _ns_system_x86_64_linux_shell:
 	# just the internal implementation, and discard %rdi, the joiner.)
 
 	# Restore original return (%rdi) to %rax.
-	movq 88(%rsp), %rax
+	movq 88(%r13), %rax
 
 	jmp 5f  # Skip error cleanup.
 
@@ -4303,6 +4545,7 @@ _ns_system_x86_64_linux_shell:
 	# 	%rdx: String.
 	# 	%rcx: 0.
 	# 1) Copy the regular cleanup except for these 4 parameters.
+	addq (%rsp), %rsp
 	addq $16, %rsp
 	addq $16, %rsp
 	addq $16, %rsp
@@ -4343,6 +4586,11 @@ _ns_system_x86_64_linux_shell:
 	# 	- %r8
 	# 	- %r9
 	# 	- %rax
+
+	# Restore dynamically sized portion.
+	addq (%rsp), %rsp
+
+	# TODO: assert %rsp == %r13 now.
 
 	# Restore working storage for stderr.
 	addq $16, %rsp
@@ -4924,7 +5172,7 @@ _ns_system_x86_64_linux_print_u64:
 	# Break if out of space.
 	testq %r10, %r10
 	jz 4f
-	dec %r10
+	decq %r10
 
 	# Divide by 10 to get the least significant digit.
 	movq $0, %rdx
@@ -4967,7 +5215,7 @@ _ns_system_x86_64_linux_print_u64:
 
 	# Nope, it's non-zero.  Increment number of divisions (digits), divide, and
 	# try again.
-	inc %r10
+	incq %r10
 
 	# Divide by 10 to get the least significant digit.
 	movq $0, %rdx
@@ -5057,16 +5305,16 @@ _ns_system_x86_64_linux_verify_errno:
 
 	movb (%r8), %r9b
 	movb %r9b, (%rdi)
-	dec %rcx
-	inc %rdi
-	inc %r8
+	decq %rcx
+	incq %rdi
+	incq %r8
 
 	jmp 7b
 6:
 
 	# Encode the error code (%rsi) into offsets 13 through 17 of %rdi.
-	not %rsi
-	inc %rsi  # %rsi = -%rsi
+	notq %rsi
+	incq %rsi  # %rsi = -%rsi
 
 	leaq ns_system_x86_64_linux_syscall_verify_builder(%rip), %rdi
 	addq $13, %rdi  # Base.
@@ -5076,7 +5324,7 @@ _ns_system_x86_64_linux_verify_errno:
 	# Break if out of space.
 	testq %rcx, %rcx
 	jz 4f
-	dec %rcx
+	decq %rcx
 
 	# Divide by 10 to get the least significant digit.
 	movq $0, %rdx
@@ -5139,8 +5387,8 @@ _ns_system_x86_64_linux_is_null_terminated:
 	jnz 2f
 3:
 	# Not a null byte here; keep scanning.
-	dec %rsi
-	inc %rdx
+	decq %rsi
+	incq %rdx
 2:
 	# We found a null byte here.
 	subq %rsi, %r8
