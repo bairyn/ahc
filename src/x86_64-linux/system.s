@@ -3815,7 +3815,8 @@ _ns_system_x86_64_linux_shell:
 	movq %rdx, %rdi
 	decq %rdi
 	addq %rcx, %rdi
-	movq (%rdi), %rdi
+	movb (%rdi), %dil
+	andq $0xFF, %rdi
 	testq %rdi, %rdi
 	jz 0f
 
@@ -3840,7 +3841,8 @@ _ns_system_x86_64_linux_shell:
 	movq %r8, %rdi
 	decq %rdi
 	addq %r9, %rdi
-	movq (%rdi), %rdi
+	movb (%rdi), %dil
+	andq $0xFF, %rdi
 	testq %rdi, %rdi
 	jz 0f
 
@@ -4235,7 +4237,8 @@ _ns_system_x86_64_linux_shell:
 	# Get the next character.
 	movq %rdx, %rdi
 	addq %rsi, %rdi
-	movq (%rdi), %rdi
+	movb (%rdi), %dil
+	andq $0xFF, %rdi
 
 	# If it's not null, loop back.
 	testq %rdi, %rdi
@@ -4312,7 +4315,8 @@ _ns_system_x86_64_linux_shell:
 	# Get the next character.
 	movq %rdx, %rdi
 	addq %rsi, %rdi
-	movq (%rdi), %rdi
+	movb (%rdi), %dil
+	andq $0xFF, %rdi
 
 	# If it's not null, loop back.
 	testq %rdi, %rdi
