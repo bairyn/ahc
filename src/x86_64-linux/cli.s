@@ -110,6 +110,10 @@ _util:
 	jmp ns_util_module_begin
 	nop
 	hlt
+_fun_ahc:
+	jmp ns_fun_ahc_module_begin
+	nop
+	hlt
 
 _mod_dep_end:
 .quad 0x12342345
