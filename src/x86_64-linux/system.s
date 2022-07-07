@@ -1,6 +1,11 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
+# TODO: consider a simple action that obtains a string for the build platform,
+#       e.g. just ‘x86_64-linux’ - the new native build platform, that is, rather
+#       than the new host or target platforms.  (That is, ‘new’ for new
+#       platforms once our own product is built, like a rotation of the 3
+#       platforms.)
 # TODO: consider having just a ‘cmdline’ argument with size where nulls end an
 #       argument, and then in the utility module just have a simple wrapper
 #       around ‘/bin/sh -c ARG’.  Also ‘shell()’ (probably call it ‘shell’
