@@ -1,8 +1,6 @@
 # This module provides procedures to interface with the kernel through
 # syscalls.
 
-# TODO ‘exec’ after ‘system’ - execute arbitrary shell code.
-
 # See ‘arch/x86/entry/syscalls/syscall_64.tbl’ (thanks,
 # https://unix.stackexchange.com/a/499016).
 
@@ -4751,6 +4749,21 @@ _ns_system_x86_64_linux_shell_tuple_stderr_tuple:
 
 	# Return.
 	jmp *%r9
+	nop
+
+# Execute arbitrary shell code.
+#
+# (This is _not_ like the ‘exec’-like syscalls and shell builtins, despite the
+# name.)
+#
+# The shell code must handle return back to the continuation where it needs to
+# be, since we don't do that here.
+#
+# Parameters:
+# 	%rdi: The size of the shell code.
+# 	%rsi: A pointer to the beginning of the shell code to execute.
+_ns_system_x86_64_linux_exec:
+	jmp *%rsi
 	nop
 
 # ################################################################
