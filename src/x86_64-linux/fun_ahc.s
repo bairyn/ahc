@@ -191,5 +191,138 @@ _module_name_end:
 #	jmpq *%rdi
 #	nop
 
+# TODO: once you have some more fully developed instances, turn other modules'
+# values into the same format and encoding here, so that you can copy and
+# relocate individual methods without having to copy the whole module (or do it
+# on an ad-hoc basis).
+
+# Here is a low-level, manual implementation similar to have I imagine the
+# compiler will compile top-level declarations, although I have yet to work out
+# the details.
+#
+# The next bit, the very first bit, is set to ‘1’ (currently unsupported!) if
+# we're using a universal, variable-width (unbounded width!) format for numbers
+# e.g. the size encoding.  But it's ‘0’, and in fact the rest of the quad (u64)
+# encodes the size of the value in memory.
+#
+# This is like:
+# example_3 :: Word64
+# example_3 = 3
+#
+# A summary of the format looks like this:
+# 	struct value_s {
+# 		// Header.          // (Byte offset.)
+# 		u64 prefix;         // ( 0) Specially crafted constant.  (Byte offset 0.)
+# 		u64 size_bits;      // ( 8) Size of the whole value, including this header, in bits.
+# 		u64 magic;          // (16) Magic FunAHC tag, a constant value.
+# 		u64 version;        // (24) Encoding format.
+# 		u64 options;        // (32) Options bitfield.
+# 		i64 linker_table;   // (40) Relative to the beginning of this value, pointer to a table in memory that can point to external references outside this value.
+# 		u64 metadata_size;  // (48) Size of metadata.
+# 		i64 metadata;       // (56) Value-relative metadata pointer (embedded in this value).
+# 		i64 type;           // (64) Value-relative type pointer (embedded in this value).
+# 		i64 impl;           // (72) Value-relative value implementation pointer (embedded in this value), normally $0x80, right after the header.
+# 		// Implementation.
+# 		u8 code[];          // (Byte offset 80.)
+# 	};
+# 	typedef struct value_s value_t;
+.global ns_fun_ahc_example_3
+.set ns_fun_ahc_example_3, (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
+.set _ns_fun_ahc_example_3_size, (_ns_fun_ahc-example_3_end - _ns_fun_ahc_example)
+_ns_fun_ahc_example_3:
+# Okay, the beginning of the entire value.
+# First, insert our magical quad that must be at the beginning of each value in
+# our own little function execution model spec, which also serves as an 8-byte
+# prefix for our universal variable-width encoder to specify that the length of
+# the length part of the whole thing is 2^(number of 1s before the 0, that is,
+# 7), so that the length is specified by the u64 that appears after the first
+# (this is explained better later on in this file) (where the next 3 bits are
+# 0).  Also, BE (big-endian).
+# So far, at byte offset 0.
+.byte 0xFE, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # Header u64 prefix.
+# Header BE u64 size (the whole thing, so starting from the header prefix).
+# But since the platform we are on now is little-endian, just swap the byte
+# order.  Add ‘<< 3’ since the size here is in bits, not bytes.
+# So far, at byte offset 8.
+.byte (((_ns_fun_ahc_example_3_size << 3) >> 56) & 0xFF)
+.byte (((_ns_fun_ahc_example_3_size << 3) >> 48) & 0xFF)
+.byte (((_ns_fun_ahc_example_3_size << 3) >> 40) & 0xFF)
+.byte (((_ns_fun_ahc_example_3_size << 3) >> 32) & 0xFF)
+.byte (((_ns_fun_ahc_example_3_size << 3) >> 24) & 0xFF)
+.byte (((_ns_fun_ahc_example_3_size << 3) >> 16) & 0xFF)
+.byte (((_ns_fun_ahc_example_3_size << 3) >>  8) & 0xFF)
+.byte (((_ns_fun_ahc_example_3_size << 3) >>  0) & 0xFF)
+# This came from
+# 	ghci> printf "0x%08X\n" =<< (randomRIO (0x0, 0xFFFFFFFFFFFFFFFF))
+# 	0x83F18A2457AA2B4B
+# So far, at byte offset 16:
+.byte 0x83, 0xF1, 0x8A, 0x24,  0x57, 0xAA, 0x2B, 0x4B  # Magic FunAHC tag to indicate the format.  (Even though it's the third u64, not first.)
+# So far, at byte offset 24:
+.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x01  # Flat encoding format and version.  Must be 1.
+# So far, at byte offset 32:
+.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # Options bitfield.  Currently all 0.
+# So far, at byte offset 40:
+# Again, do a BSWAP (or nop if the assembler would already put it big-endian).
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 56) & 0xFF)
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 48) & 0xFF)
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 40) & 0xFF)
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 32) & 0xFF)
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 24) & 0xFF)
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 16) & 0xFF)
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >>  8) & 0xFF)
+#.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >>  0) & 0xFF)
+# Note that at this point forward, the native endianness can be and is used,
+# and byte-based values are again used.
+# Linker table pointer, relative to the very beginning of the value (that is,
+# the header u64 prefix).  When copying, this must be updated!  The encoding,
+# offset, format, and size requirements are left specified by the type system.
+# (Under the hood, the default and initial value; but if you're copying this
+# value and relocating, you must update or manage this pointer as needed, e.g.
+# by copying other dependencies or creating a new routing table like a pointer
+# to route messages to a copy stored somewhere else.)  For referencing anything
+# external to the value, even within the same module, this linker table must be
+# referenced.  It serves as a common gateway with the external world.  i64.
+.quad (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
+
+# So far, at byte offset 48:
+.quad $0  # Size (in bytes) of value metadata.  Optionally the implementation
+          # may make this non-zero to mean something.  If desired inside the
+          # type system, this can include additional type system information.
+# So far, at byte offset 56:
+.quad $0  # Value-relative pointer (in bytes) of value metadata.  Optionally the implementation may make this non-zero to mean something.  Points to a region within the Value.
+# So far, at byte offset 64:
+.quad $0  # Value-relative pointer to the type, which is a nested Value embedded within this one.
+# So far, at byte offset 72:
+.quad $0x80  # Value-relative pointer to the implementation-specific/defined data, code, or encoding of the Value, conveniently right after the header ends.  Often this is machine code.
+# So far, at byte offset 80:
+# The header is now done.  It had 10 u64s (uint64_t)s.
+
+_ns_fun_ahc_example_3_impl:
+# TODO
+	hlt
+	nop
+_ns_fun_ahc_example_3_end:
+
+# TODO unary meta len (2^ number of ones before the 0), then length.  (Length
+# includes the unary meta len (len of len).
+
+# Notes:
+
+# TODO: clean up these docs when you have time:
+
+# TODO unary meta len, but on this build platform only the following is
+# supported (only length):
+# 0b1110 XXXX = 0xEX, for up to 7 bits of data after the length header (limited in u8).
+# 0b1111 0XXX  XXXX XXXX = 0xF_ 0xXX, for up to 11 bits of data after the length header. (u8 length in u16).
+# 0b1111 10XX  XXXX XXXX   XXXX XXXX  XXXX XXXX = 0xF_ 0xX…, for up to 26 bits of data after the length header. (u16 length in u32).
+# 0b1111 110X  XXXX XXXX   XXXX XXXX  XXXX XXXX  (32x X) = 0xF_ 0xX…, for up to 57 bits of data after the length header. (u32 length in u64).
+# 0b1111 1110  XXXX XXXX   XXXX XXXX  XXXX XXXX  (32x X) (64x X) = 0xFE 0xX…, for up to 121 bits of data after the length header. (u64 length in u128).
+#
+# (Yes, this is bit-level, not byte-level.  But with just the u64 in u128
+# version, it's also just the byte-level one we support.)
+#
+# So only u64 length in a u128 header is supported, 0xFE 00 00 00  00 00 00 00,
+# then u64 length, including header.
+
 .global ns_fun_ahc_module_end
 ns_fun_ahc_module_end:
