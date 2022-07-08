@@ -27,6 +27,15 @@
 # without the boundaries put up by the type system, we must manually by hand
 # ensure requirements and specifications are conformed to, to avoid bug.
 
+# TODO: how to handle:
+# - linking?
+# 	- The modules so far have been designed to be mostly position independent relative to the *module* (just some module pointers near the beginning would need to be updated for relocation), but aren't well structured yet to be easily relocatable individual (e.g. by copying the function; which would need additional special care beyond just copying the module, because many procedures carry module-relative references).
+# - memory allocation?
+# 	- My current thinknig is along the lines of this mainly being a
+# 	  type-system-level concern, though of course low-level defintions can e.g.
+# 	  simply allocate another base allocation of memory, and we can tell the
+# 	  type system that this action allocates a memory resource.
+
 # Configure the platform.
 .code64
 
