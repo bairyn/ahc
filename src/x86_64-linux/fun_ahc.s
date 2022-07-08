@@ -303,6 +303,12 @@ _ns_fun_ahc_example_3_impl:
 	nop
 _ns_fun_ahc_example_3_end:
 
+# TODO: consider adding a field: Encoding of the Value structure.  We use $9
+# for our own platform, ‘x86_64-linux’.  ‘1’ is reserved for a
+# yet-to-be-implemented encoding that is based on unbounded variable-width bit
+# encodings from bits rather than aribtrarily-sized bytes with fixed widths.
+# Or just leave it as ‘version’.
+
 # TODO unary meta len (2^ number of ones before the 0), then length.  (Length
 # includes the unary meta len (len of len).
 
