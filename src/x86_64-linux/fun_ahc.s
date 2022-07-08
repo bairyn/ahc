@@ -1,5 +1,32 @@
 # AHC function execution model.
 
+# Module information:
+#
+# This module itself is untyped.  You can add at ype system such as Haskell's
+# on top to exclude some or all invalid programs.  The type system establishes
+# boundaries of correctness primary, but also helps to define structure
+# (without which you'd need to define an alternative semantics) and also
+# provides documentation.
+#
+# There are many ways to implement a function execution model on top of this
+# platform that satisfies the requirements of the Haskell specification
+# semantics.  Here is how we do it:
+#
+# First, under the hood, every top-level value (function, integer, whatever) is
+# represented as data at a particular region.  Most support copying themselves
+# and destroying themselves, although runtime linking needs to be appropriately
+# handled, so references to dependencies and members of other modules are also
+# taken care of.  A function that, for example, is defined as a lambda would
+# likely, in order to be used, be copied somewhere else and then the copy
+# mutated by being applied.  Alternatively, (and at a top-level, less commonly,
+# and probably normally never without some sort of access management system in
+# place, such as linear types), some lambdas may be mutated by being applied in
+# place.  We entrust handling management of resources, including exclusive
+# access to mutable resources via linear types, to be handled by the type
+# system.  One way to think of it is as a layer on top.  At a low level,
+# without the boundaries put up by the type system, we must manually by hand
+# ensure requirements and specifications are conformed to, to avoid bug.
+
 # Configure the platform.
 .code64
 
