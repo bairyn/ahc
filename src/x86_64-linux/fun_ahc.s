@@ -36,6 +36,11 @@
 # 	  record of routes to third-party dependencies.  So similar to what you
 # 	  have now, except just add a little pointer (like parameter) right before
 # 	  (or near right before) the code for a router for external dependencies.
+# 	  The type system can help to ensure consistency, e.g. that the offsets are
+# 	  the same.
+# 	  TODO: apply these ideas to the other modules, but probably let me test
+# 	  some of these ideas with my own implementation and play around with them
+# 	  first here.
 # - memory allocation?
 # 	- My current thinknig is along the lines of this mainly being a
 # 	  type-system-level concern, though of course low-level defintions can e.g.
