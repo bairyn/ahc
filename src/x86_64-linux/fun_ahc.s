@@ -29,7 +29,13 @@
 
 # TODO: how to handle:
 # - linking?
-# 	- The modules so far have been designed to be mostly position independent relative to the *module* (just some module pointers near the beginning would need to be updated for relocation), but aren't well structured yet to be easily relocatable individual (e.g. by copying the function; which would need additional special care beyond just copying the module, because many procedures carry module-relative references).
+# 	- The modules so far have been designed to be mostly position independent relative to the *module* (just some module pointers near the beginning would need to be updated for relocation), but aren't well structured yet to be easily relocatable individual procedures (e.g. by copying the function; which would need additional special care beyond just copying the module, because many procedures carry module-relative references).
+# 	- Aha!  Just add a little pointer to the internal module right before each
+# 	  individual function.  Whoa!  Just treat it like closure data: pointer to
+# 	  the beginning of - like a router! or like DNS! - a sequence or GADT or
+# 	  record of routes to third-party dependencies.  So similar to what you
+# 	  have now, except just add a little pointer (like parameter) right before
+# 	  (or near right before) the code for a router for external dependencies.
 # - memory allocation?
 # 	- My current thinknig is along the lines of this mainly being a
 # 	  type-system-level concern, though of course low-level defintions can e.g.
