@@ -216,14 +216,16 @@ _module_name_end:
 # 		u64 size_bits;      // ( 8) Size of the whole value, including this header, in bits.
 # 		u64 magic;          // (16) Magic FunAHC tag, a constant value.
 # 		u64 version;        // (24) Encoding format.
-# 		u64 options;        // (32) Options bitfield.
-# 		i64 linker_table;   // (40) Relative to the beginning of this value, pointer to a table in memory that can point to external references outside this value.
-# 		u64 metadata_size;  // (48) Size of metadata.
-# 		i64 metadata;       // (56) Value-relative metadata pointer (embedded in this value).
-# 		i64 type;           // (64) Value-relative type pointer (embedded in this value).
-# 		i64 impl;           // (72) Value-relative value implementation pointer (embedded in this value), normally $0x80, right after the header.
+# 		u64 machine;        // (32) Platform encoding; set to ‘9' for ‘x86_64-system’.
+# 		u64 options;        // (40) Options bitfield.
+# 		i64 linker_table;   // (48) Relative to the beginning of this value, pointer to a table in memory that can point to external references outside this value.
+# 		u64 metadata_size;  // (56) Size of metadata.
+# 		i64 metadata;       // (64) Value-relative metadata pointer (embedded in this value).
+# 		i64 type;           // (72) Value-relative type pointer (embedded in this value).
+# 		i64 impl;           // (80) Value-relative value implementation pointer (embedded in this value), normally $0x80, right after the header.
+# 		u64 reserved0;      // (88) Reserved for future use.
 # 		// Implementation.
-# 		u8 code[];          // (Byte offset 80.)
+# 		u8 code[];          // (Byte offset 96.)
 # 	};
 # 	typedef struct value_s value_t;
 .global ns_fun_ahc_example_3
@@ -260,8 +262,14 @@ _ns_fun_ahc_example_3:
 # So far, at byte offset 24:
 .byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x01  # Flat encoding format and version.  Must be 1.
 # So far, at byte offset 32:
-.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # Options bitfield.  Currently all 0.
+# Encoding of the Value structure.  We use $9 for our own platform,
+# ‘x86_64-linux’.  ‘1’ is reserved for a yet-to-be-implemented encoding that is
+# based on unbounded variable-width bit encodings from bits rather than
+# aribtrarily-sized bytes with fixed widths.  Or just leave it as ‘version’.
+.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x09  # This one, however, is big-endian.
 # So far, at byte offset 40:
+.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # Options bitfield.  Currently all 0.
+# So far, at byte offset 48:
 # Again, do a BSWAP (or nop if the assembler would already put it big-endian).
 #.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 56) & 0xFF)
 #.byte (((_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin) >> 48) & 0xFF)
@@ -284,18 +292,22 @@ _ns_fun_ahc_example_3:
 # referenced.  It serves as a common gateway with the external world.  i64.
 .quad (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
 
-# So far, at byte offset 48:
+# So far, at byte offset 56:
 .quad $0  # Size (in bytes) of value metadata.  Optionally the implementation
           # may make this non-zero to mean something.  If desired inside the
           # type system, this can include additional type system information.
-# So far, at byte offset 56:
-.quad $0  # Value-relative pointer (in bytes) of value metadata.  Optionally the implementation may make this non-zero to mean something.  Points to a region within the Value.
 # So far, at byte offset 64:
-.quad $0  # Value-relative pointer to the type, which is a nested Value embedded within this one.
+.quad $0  # Value-relative pointer (in bytes) of value metadata.  Optionally the implementation may make this non-zero to mean something.  Points to a region within the Value.
 # So far, at byte offset 72:
-.quad $0x80  # Value-relative pointer to the implementation-specific/defined data, code, or encoding of the Value, conveniently right after the header ends.  Often this is machine code.
+.quad $0  # Value-relative pointer to the type, which is a nested Value embedded within this one.
 # So far, at byte offset 80:
-# The header is now done.  It had 10 u64s (uint64_t)s.
+.quad $0x80  # Value-relative pointer to the implementation-specific/defined data, code, or encoding of the Value, conveniently right after the header ends.  Often this is machine code.
+# So far, at byte offset 88:
+.quad $0  # Reserved for future use; set to 0.  Do note the space cost this
+          # adds to values.  But I would guess this isn't too difficult to
+          # adapt to.
+# So far, at byte offset 96:
+# The header is now done.  It had 12 u64s (uint64_t)s.
 
 _ns_fun_ahc_example_3_impl:
 # TODO
@@ -303,11 +315,26 @@ _ns_fun_ahc_example_3_impl:
 	nop
 _ns_fun_ahc_example_3_end:
 
-# TODO: consider adding a field: Encoding of the Value structure.  We use $9
-# for our own platform, ‘x86_64-linux’.  ‘1’ is reserved for a
-# yet-to-be-implemented encoding that is based on unbounded variable-width bit
-# encodings from bits rather than aribtrarily-sized bytes with fixed widths.
-# Or just leave it as ‘version’.
+# (TODO Note: oh, brilliant; then function application can be modeled as a mutation.
+# Normally what you do is copy a top-level declaration locally and then mutate
+# your local, exclusive copy.  (Detail: is it the top-level value that
+# primarily handles the copying, or the caller of that value?).  Probably how I
+# imagine it'd work is in the normal case (but you can probably still just copy
+# the bytes manually) the caller writes or invokes a copy request from the
+# top-level value, and then the top-level value does a copy of itself to the
+# requested location.  Brilliant!  (BTW, the compiler can note where a lambda
+# actually implies a ‘dup’: that is, something like \x -> f x x, where the ‘x’
+# appears more than once on the right-hand side (or zero, I guess for
+# destruction)).  Brilliant!  I think this can work brilliantly!  Woo!
+# 2022-07-08.)
+
+# (TODO then I guess you have have a psuh-based computational step model, where
+# an executor can be pointed at a Value, and one step of execution or mutation
+# occurs.  Writes are a primitive in this model.  Reads outside the local Value
+# don't need to be primitive (e.g. continuously write to a queue until the
+# target Value signals back to us with its own write that it received our
+# request, and then we can stop our write request), but a non-primitive read
+# can be (and is) provided as a convenience.)
 
 # TODO unary meta len (2^ number of ones before the 0), then length.  (Length
 # includes the unary meta len (len of len).
