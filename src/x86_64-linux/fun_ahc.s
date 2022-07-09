@@ -339,7 +339,94 @@ _ns_fun_ahc_example_3_end:
 # TODO unary meta len (2^ number of ones before the 0), then length.  (Length
 # includes the unary meta len (len of len).
 
-# Notes:
+# Notes: so function application is a mutation.  While technically you could
+# apply a top-level function in-place, if it's top-level normally you'd just
+# get a copy of the top-level function to yourself and then mutate / apply
+# in-place.  However, by a linear type model, ownership is preserved, and
+# primitives are supported to support duplication and destruction.  Perhaps it
+# may be thought of as the internal state, or observability, or value in time
+# is preserved, where it is used exactly once (dup and del can branch and end);
+# access to excluded to non-owners.  Ownership may be integrated with an FRP
+# framework with an interpretation that a time value for a time-varying value
+# can only be supplied once, and also resources must be cleaned.
+#
+# Wow, so then, if you have ‘\x -> f (g x) h (i 8 x j)’, then actually there
+# must be implied ‘dup’s in there, that consume and then produce 2 outputs,
+# sort of like ‘x -> (x, x)’.  (The implicit and unused inputs can be
+# interpreted as being consumed but producing exactly the same output,
+# unchanged.)
+#
+# So then I guess with linear types, probably a common operation is probably
+# just to move around or reorient inputs and resources, either directly or with
+# references or pointers to them, and dup and cleanup operations can handle
+# those specific operations.
+#
+# So to start out encoding a particular function or example or whatever, say a
+# simple application of \x f -> f x, basically the value should be such that
+# when you copy it, and you apply one computational step, the value becomes ‘f
+# x’, once you apply it.  (And the machine code of a value means that when you
+# execute it, exactly one computational step is performed.  (This may also be
+# helpful for real-time computational analysis.  (!).))
+#
+# So a Value is something you can apply a computational step for.  When it
+# returns, one computational step has been performed.  A constant value can be
+# executed but it just doesn't change itself when it is executed.  Probably a
+# Value unapplied just leaves itself (the state) unchanged when executed, and
+# when a value is specified to apply, it performs the application.  The details (e.g. how to encode function application, how to
+# encode _) can be left to the implementation, but this is the general idea.
+# And technically a Value can take a more strict-evaluation approach by jumping
+# to another Value, telling it where to return when done, blocking until its
+# execution step is performed (and thus I think ‘frame’ is a better term than
+# ‘step’, becausea frame is composable and can be highly large and complex and
+# take a long time to execute or evaluate, whereas a step or cycle is meant to
+# be predictably trivial and not composable or nestable.).
+#
+# Now this function application model here itself doesn't specify (that can be
+# left up to other components in the ABI, or the executor to specify) how
+# access is managed, although probably rarely does a Value directly write to
+# other Values, except for a special region within the external Value
+# designated specifically for other Values to write to as signals, for when
+# that Value is executed.  Instead normally a Value just copies into itself.
+
+# Okay, so to sort of ‘test’ out this design, maybe try to challenge it with
+# potential critiques.  So then is this just factories?  I mean, copying other
+# Values is a big part of it, but I think it's a little different because
+# you're doing more direct copying than having specially crafted ways of
+# constructing things.  Are Values just Java objects?  I mean, if I were to
+# take what I have so far, what's the closest Java equivalent?  (Or C++?)
+# Probably as classes with static methods whose only constructor (at least by
+# default) is to do a direct copy of the whole class.  Reproduce itself, and
+# then further mutation is possible.
+#
+# BTW, the system can provide concurrency primitives like our own fork and join
+# procedures, and an executor can do something analagous to a ‘dup’ except for
+# executors (threads) instead of certificates of exclusive access control
+# (like titles of ownership).
+#
+# And BTW, if you have a pointer in linear types, maybe you could just have its
+# own dup and del operations, where dup lets the pointer be duplicated
+# (separately from what is pointed to), which increments some counter to track
+# how many references there are, and del decrements it to perform a del when
+# the counter reaches 0.  Like a C++ shared pointer.
+#
+# So while you can probably implement this model I'm proposing here - its
+# general idea - in a language like Java, the typical pattern design patterns
+# I'm imagining is probably not quite the same as how OOP is typicall done,
+# although of coruse you may think of bridges or isomorphisms that let you
+# reduce one to the other, or so it seems to me right now, anyway.
+
+# Now to get started, maybe I'll just come up with a simpe function application
+# encoding, and while I'm getting started, maybe evolve it as we go.
+#
+# So for a _frame_ (I'm calling it a ‘frame’ now, not a ‘step’, since it can be
+# composed to become quite large: in a frame, a Value evolves itself until it
+# ‘finalizes’ its new state possibly from output, although the executor,
+# depending on how the executor is specified, may or may not be able to observe
+# non-finalized states, intermediate states between certain FRP time inputs),
+# let's go with this: check the Value's input zone for an input.  If there's no
+# input, the lambda remains unchanged like a constant and the executor just
+# returns in order to finalize the frame.  But if there's input, the Value
+# changes and mutates itself before being ‘finalized’.
 
 # TODO: clean up these docs when you have time:
 
