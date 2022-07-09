@@ -211,21 +211,48 @@ _module_name_end:
 #
 # A summary of the format looks like this:
 # 	struct value_s {
-# 		// Header.          // (Byte offset.)
-# 		u64 prefix;         // ( 0) Specially crafted constant.  (Byte offset 0.)
-# 		u64 size_bits;      // ( 8) Size of the whole value, including this header, in bits.
-# 		u64 magic;          // (16) Magic FunAHC tag, a constant value.
-# 		u64 version;        // (24) Encoding format.
-# 		u64 machine;        // (32) Platform encoding; set to ‘9' for ‘x86_64-system’.
-# 		u64 options;        // (40) Options bitfield.
-# 		i64 linker_table;   // (48) Relative to the beginning of this value, pointer to a table in memory that can point to external references outside this value.
-# 		u64 metadata_size;  // (56) Size of metadata.
-# 		i64 metadata;       // (64) Value-relative metadata pointer (embedded in this value).
-# 		i64 type;           // (72) Value-relative type pointer (embedded in this value).
-# 		i64 impl;           // (80) Value-relative value implementation pointer (embedded in this value), normally $0x80, right after the header.
-# 		u64 reserved0;      // (88) Reserved for future use.
-# 		// Implementation.
-# 		u8 code[];          // (Byte offset 96.)
+# 		// Header region.   // (Byte offset.)
+# 		u64 prefix;         // (  0) Specially crafted constant.  (Byte offset 0.)
+# 		u64 size_bits;      // (  8) Size of the whole value, including this header, in bits.
+# 		u64 magic;          // ( 16) Magic FunAHC tag, a constant value.
+# 		u64 version;        // ( 24) Encoding format.
+# 		u64 machine;        // ( 32) Platform encoding; set to ‘9' for ‘x86_64-system’.
+# 		u64 options;        // ( 40) Options bitfield.
+# 		i64 linker_table;   // ( 48) Relative to the beginning of this value, pointer to a table in memory that can point to external references outside this value.  (Often this table can be inside or outside this Value, but check the executor specifications.)
+# 		u64 metadata_size;  // ( 56) Size of metadata.
+# 		i64 metadata;       // ( 64) Value-relative metadata pointer (embedded in this value).
+# 		i64 type;           // ( 72) Value-relative type pointer (embedded in this value).
+# 		i64 impl;           // ( 80) Value-relative value implementation pointer (embedded in this value), normally $0x80, right after the header.
+# 		u64 receiver_size;  // ( 88) Receiver region size (e.g. input parameters for the next execution frame; unspecified here; maybe the type system can specify encoding etc.; generally others can write to this, but details are for the executor or other components)
+# 		i64 receiver;       // ( 96) Receiver region Value-relative base pointer
+# 		u64 reserved0;      // (104) Reserved for future use.
+#
+# 		// Receiver region.
+# 		// We'll suggest normally 2 u64s bytes here (e.g. status u64 bitfield
+# 		// and then Value-relative pointer u64), but it can be any size.
+# 		//
+# 		// This can go anywhere in the Value, but we suggest putting it right
+# 		// after the header.
+# 		u64 receiver0;      // (112) Optionally typed receiver data.
+# 		u64 receiver1;      // (120) Optionally typed receiver data.
+#
+# 		// Implementation.  Everything else.  Machine code.  Context like type
+# 		// system information can help inform how to interpret it.  Parts of
+# 		// the implementation region can represent output, parts can represent
+# 		// code for an executor (thread) to execute to perform a frame advance
+# 		// from one frame at a particular point in time to the next frame at
+# 		// another time, parts can represent state, and parts can represent
+# 		// working storage units as memory.  (Again, can go anywhere; we
+# 		// suggest putting it right after the receiver region.)
+# 		//
+# 		// If you are using a type system, probably the type system and
+# 		// (perhaps more relevantly) the executor may add constraints to what
+# 		// can go in here.  But we suggest starting off the implementation
+# 		// region with an IP-relative jump to the currently (that is, the last)
+# 		// finalized buffer, which can hold machine code (for the executor, for
+# 		// evaluating a frame or for copying or for just returning the
+# 		// finalized buffer offset), output, etc.
+# 		u8 code[];          // (Byte offset 128.)
 # 	};
 # 	typedef struct value_s value_t;
 .global ns_fun_ahc_example_3
@@ -303,17 +330,73 @@ _ns_fun_ahc_example_3:
 # So far, at byte offset 80:
 .quad $0x80  # Value-relative pointer to the implementation-specific/defined data, code, or encoding of the Value, conveniently right after the header ends.  Often this is machine code.
 # So far, at byte offset 88:
+.quad $0  # Size of the receiver region, where other Values can write for
+          # whatever signalling purposes may be supported or specified.
+# So far, at byte offset 96:
+.quad $0  # Value-relative pointer to the receiver region, which can contain
+          # input values for function application.
+# So far, at byte offset 104:
 .quad $0  # Reserved for future use; set to 0.  Do note the space cost this
           # adds to values.  But I would guess this isn't too difficult to
           # adapt to.
-# So far, at byte offset 96:
-# The header is now done.  It had 12 u64s (uint64_t)s.
+# So far, at byte offset 112:
+# The header is now done.  It had 14 u64s (uint64_t)s.
+
+# Receiver region.  If the type system and executor permits, external Values
+# can write here, except normally this is not used for other Values to write to
+# (but if this Value is meant to support writes from elsewhere and from
+# external sources, this is where they would go), but instead to use as space
+# for, after the top-level value is copied, this region in the copy is changed
+# to supply an input value along with signalling the right bits in the bitfield
+# to indicate function application, along with the input to be supplied.
+
+_ns_fun_ahc_example_3_receiver_status:
+# Options bitfield:
+# 	Bit 0: Version / interpretation bits; set to 0.
+# 	Bit 1: Currently unused.  Set to 0.
+# 	Bit 2: Whether the next frame will 
+# 	Bit 3: Currently unused.  Set to 0.
+.quad $0
+_ns_fun_ahc_example_3_receiver_input:
+# If there is an input supplied for function application, this is a
+# Value-relative pointer to that input.
+.quad $0
+
+# The receiver region is now done.  We've had 16 u64s so far.
+
+# The implementation region.  It's probably a good idea for the implementation
+# to put a block in itself, perhaps near its beginning, to signal that it's not
+# a finalized state, so that anybody else who copies us, our Value in whole,
+# can resume a frame from our last finalized state.  An alternative approach is
+# to actually have the implementation region start with a simple pointer or
+# wrapper to a region later on in the Value, and to build up a non-frozen
+# state, and then perform an atomic write to that u64 pointer to finalize it,
+# like double buffering in OpenGL: the buffer is switched (the pointer near the
+# beginning of the implementation region) is switched to the other buffer
+# that's being built up or constructed.
 
 _ns_fun_ahc_example_3_impl:
-# TODO
+	# Just do a jump to current finalized buffer.
+	jmp _ns_fun_ahc_example_3_impl_buffer0(%rip)
+	nop
+
+# (The locations of non-finalized buffers might move around a bit.)
+_ns_fun_ahc_example_3_impl_buffer0:
+	# TODO
 	hlt
 	nop
+
+# (The locations of non-finalized buffers might move around a bit.)
+_ns_fun_ahc_example_3_impl_buffer1:
+	# TODO
+	hlt
+	nop
+
 _ns_fun_ahc_example_3_end:
+
+# Okay, cool, so I think you have the foundation in place!  Now it's just a
+# matter of putting everything together.  Fun puzzle or challenge to design and
+# engineer this thing.  Cool!  I think the rest will just fall into place.
 
 # (TODO Note: oh, brilliant; then function application can be modeled as a mutation.
 # Normally what you do is copy a top-level declaration locally and then mutate
