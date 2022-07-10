@@ -459,6 +459,17 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 _ns_fun_ahc_example_swap_impl_buffer1:
 _ns_fun_ahc_example_swap_end:
 
+# (So when you signal a bit, you are telling the executor to treat the frame
+# advancement as performing function application.  So if you copy an unapplied
+# lambda, just apply it by supplying the input value (type&executor-defined,
+# but often just a Value-relative pointer) and then setting the application bit
+# the options bitfield.)
+#
+# (Then you could even have multiple function arrow types (type system
+# feature), perhaps that the executor treats differently.  Or perhaps by
+# supplying our machine code executor, we are already being part of the
+# executor's machine code execution.)
+
 # TODO:
 #_ns_fun_ahc_example_list:
 
