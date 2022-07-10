@@ -257,7 +257,7 @@ _module_name_end:
 # 	typedef struct value_s value_t;
 .global ns_fun_ahc_example_3
 .set ns_fun_ahc_example_3, (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
-.set _ns_fun_ahc_example_3_size, (_ns_fun_ahc-example_3_end - _ns_fun_ahc_example)
+.set _ns_fun_ahc_example_3_size, (_ns_fun_ahc_example_3_end - _ns_fun_ahc_example)
 _ns_fun_ahc_example_3:
 # Okay, the beginning of the entire value.
 # First, insert our magical quad that must be at the beginning of each value in
@@ -328,7 +328,7 @@ _ns_fun_ahc_example_3:
 # So far, at byte offset 72:
 .quad $0  # Value-relative pointer to the type, which is a nested Value embedded within this one.
 # So far, at byte offset 80:
-.quad $0x80  # Value-relative pointer to the implementation-specific/defined data, code, or encoding of the Value, conveniently right after the header ends.  Often this is machine code.
+.quad (_ns_fun_ahc_example_3_impl - _ns_fun_ahc_example_3)  # Value-relative pointer to the implementation-specific/defined data, code, or encoding of the Value, conveniently right after the header ends.  Often this is machine code.  This is equal to $128.
 # So far, at byte offset 88:
 .quad $0  # Size of the receiver region, where other Values can write for
           # whatever signalling purposes may be supported or specified.
@@ -401,6 +401,74 @@ _ns_fun_ahc_example_3_end:
 # Okay, cool, so I think you have the foundation in place!  Now it's just a
 # matter of putting everything together.  Fun puzzle or challenge to design and
 # engineer this thing.  Cool!  I think the rest will just fall into place.
+
+# Oh, another thing to contemplate: GADTs?  Maybe look at HoTT for inspiration.
+# Because the ‘movq $3, %rdi’ thing is just an ad-hoc, hardware-specific
+# optimization.  The executor maybe could say that the machine code can do
+# hardware-specific optimizations with essentially equivalent observability.
+
+# Simple example, though:
+# Now try lists.
+#
+# (Or first do a simple function application example, like swaps.)
+
+# A Value.  16 u64s (128 bytes) followed by the implementation, often machine
+# code for an executor to advance a frame in time by one frame.
+_ns_fun_ahc_example_swap:
+.global ns_fun_ahc_example_swap
+.set ns_fun_ahc_example_swap, (_ns_fun_ahc_example_swap - ns_fun_ahc_module_begin)
+.set _ns_fun_ahc_example_swap_size, (_ns_fun_ahc_example_swap_end - _ns_fun_ahc_example)
+_ns_fun_ahc_example_swap:
+	.byte 0xFE, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # (  0) u64 prefix, bytes (BE)
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >> 56) & 0xFF)  # (  8) u64 bit size, BE
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >> 48) & 0xFF)
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >> 40) & 0xFF)
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >> 32) & 0xFF)
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >> 24) & 0xFF)
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >> 16) & 0xFF)
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >>  8) & 0xFF)
+	.byte (((_ns_fun_ahc_example_swap_size << 3) >>  0) & 0xFF)
+	.byte 0x83, 0xF1, 0x8A, 0x24,  0x57, 0xAA, 0x2B, 0x4B  # ( 16) u64 magic, bytes (BE)
+	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x01  # ( 24) u64 version, BE
+	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x09  # ( 32) u64 machine, BE
+	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # ( 40) u64 options, BE
+	.quad (_ns_fun_ahc_example_swap - ns_fun_ahc_module_begin)  # ( 48) i64 linker_table, host endianness (jumps to ‘module_route’)
+	.quad $0                                               # ( 56) u64 metadata_size, host
+	.quad $0                                               # ( 64) i64 metadata, host
+	.quad $0                                               # ( 72) i64 type, host (Value-relative pointer to embedded Value, or possibly external Value to save space)
+	.quad (_ns_fun_ahc_example_swap_impl - _ns_fun_ahc_example_swap)  # ( 80) i64 impl pointer, host
+	.quad (_ns_fun_ahc_example_swap_impl - _ns_fun_ahc_example_swap_receiver)  # ( 88) u64 receiver_size, host
+	.quad (_ns_fun_ahc_example_swap_receiver - _ns_fun_ahc_example_swap)  # ( 96) i64 receiver
+	.quad $0                                               # (104) u64 reserved0
+_ns_fun_ahc_example_swap_receiver:
+	.quad $0  // (112) Status bitfield.
+	.quad $0  // (120) Data / pointer (Value-relative).
+_ns_fun_ahc_example_swap_impl:
+	// (128)
+	jmp _ns_fun_ahc_example_swap_impl_buffer0
+	nop
+_ns_fun_ahc_example_swap_impl_buffer0:
+	# swap f x y = f y x
+	# swap = \f x y -> f y x
+	# swap = \f -> \x -> \y -> (f y) x
+	# (Note: no dups or dels are used here.  Just reordering arguments.)
+
+	# TODO
+	hlt
+	nop
+_ns_fun_ahc_example_swap_impl_buffer1:
+_ns_fun_ahc_example_swap_end:
+
+# TODO:
+#_ns_fun_ahc_example_list:
+
+# TODO:
+# A value that functions like a minimal pointer, although here I guess a
+# pointer is not 1 u64 but 16 u64s plus machine code.
+
+# TODO: after a few examples, probably the plan is to make as needed what may
+# be handy for a compiler, e.g. starting with option parsing for the CLI
+# interface.  (Could even have additional front-ends!)
 
 # (TODO Note: oh, brilliant; then function application can be modeled as a mutation.
 # Normally what you do is copy a top-level declaration locally and then mutate
