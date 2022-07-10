@@ -354,7 +354,8 @@ _ns_fun_ahc_example_3_receiver_status:
 # Options bitfield:
 # 	Bit 0: Version / interpretation bits; set to 0.
 # 	Bit 1: Currently unused.  Set to 0.
-# 	Bit 2: Whether the next frame will 
+# 	Bit 2: Whether the next frame will have input supplied to do function
+# 	       application.
 # 	Bit 3: Currently unused.  Set to 0.
 .quad $0
 _ns_fun_ahc_example_3_receiver_input:
@@ -441,7 +442,7 @@ _ns_fun_ahc_example_swap:
 	.quad (_ns_fun_ahc_example_swap_receiver - _ns_fun_ahc_example_swap)  # ( 96) i64 receiver
 	.quad $0                                               # (104) u64 reserved0
 _ns_fun_ahc_example_swap_receiver:
-	.quad $0  // (112) Status bitfield.
+	.quad $0  // (112) Status bitfield.  Bit 2 for funapp.
 	.quad $0  // (120) Data / pointer (Value-relative).
 _ns_fun_ahc_example_swap_impl:
 	// (128)
@@ -453,10 +454,31 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 	# swap = \f -> \x -> \y -> (f y) x
 	# (Note: no dups or dels are used here.  Just reordering arguments.)
 
+	# The executor hands over control to us to advance a frame, with
+	# parameters:
+	# 	%rdi: Return after the frame is advanced and finalized.
+
+	# Test the application bit.  We're done (we don't change anything in us) if
+	# there's no application; just leave the lambda unchanged.
+	leaq _ns_fun_ahc_example_swap_receiver(%rip), %rsi
+	movq (%rsi), %rsi
+	testq $0x4, %rsi
+	jz *%rdi
+	nop
+
+	# We're performing function application, and we have an argument available.
+	# Build up ‘buffer1’ so we can swap the buffer pointer to activate it.
+
 	# TODO
 	hlt
 	nop
 _ns_fun_ahc_example_swap_impl_buffer1:
+	# Just get a bunch of halt-nops to make this the same size (a little larger
+	# if needed to make things fit) as buffer0.
+	.repr ((_ns_fun_ahc_example_swap_impl_buffer1 - _ns_fun_ahc_example_swap_impl_buffer0 + 1)/2)
+	hlt
+	nop
+	.endr
 _ns_fun_ahc_example_swap_end:
 
 # (So when you signal a bit, you are telling the executor to treat the frame
