@@ -382,14 +382,18 @@ _ns_fun_ahc_example_3_impl:
 
 # (The locations of non-finalized buffers might move around a bit.)
 _ns_fun_ahc_example_3_impl_buffer0:
-	# TODO
-	hlt
+	# Word64 implementation:
+	# Parameters:
+	# 	%rdi: Return to executor when frame is finalized, with parameters:
+	# 		%rdi: The Word64 in the finalized state given the implicit time value consumed.
+	movq %rdi, %rsi
+	movq $3, %rdi
+	jmp *%rsi
 	nop
 
 # (The locations of non-finalized buffers might move around a bit.)
 _ns_fun_ahc_example_3_impl_buffer1:
-	# TODO
-	hlt
+	jmp *%rdi
 	nop
 
 _ns_fun_ahc_example_3_end:
