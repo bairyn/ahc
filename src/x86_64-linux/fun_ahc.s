@@ -218,7 +218,7 @@ _module_name_end:
 # 		u64 version;        // ( 24) Encoding format.
 # 		u64 machine;        // ( 32) Platform encoding; set to ‘9' for ‘x86_64-system’.
 # 		u64 options;        // ( 40) Options bitfield.
-# 		i64 linker_table;   // ( 48) Relative to the beginning of this value, pointer to a table in memory that can point to external references outside this value.  (Often this table can be inside or outside this Value, but check the executor specifications.)
+# 		i64 linker_table;   // ( 48) Relative to the beginning of this value, pointer to a table in memory that can point to external references outside this value.  (Often this table can be inside or outside this Value, but check the executor specifications.)  Access external to Values should be only through this pointer, which may be updated in case the Value is copied and relocated.
 # 		u64 metadata_size;  // ( 56) Size of metadata.
 # 		i64 metadata;       // ( 64) Value-relative metadata pointer (embedded in this value).
 # 		i64 type;           // ( 72) Value-relative type pointer (embedded in this value).
@@ -317,6 +317,11 @@ _ns_fun_ahc_example_3:
 # to route messages to a copy stored somewhere else.)  For referencing anything
 # external to the value, even within the same module, this linker table must be
 # referenced.  It serves as a common gateway with the external world.  i64.
+#
+# Also this attribute must be referenced to access the linker table.  Then
+# there is a common gateway or access point, greatly aiding in relocation:
+# Values then can merely be copied and relocated where the linker table is
+# copied and then this pointer is just updated.
 .quad (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
 
 # So far, at byte offset 56:
@@ -467,7 +472,44 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 
 	# (TODO: I think I have a good gist of how this can be done up until the
 	# normalization, but I'll probably need to think through the linking and
-	# external communication parts?)
+	# external communication parts?  I guess if an external Value wants to
+	# supply us with a complex Value, it can supply us a pointer as input,
+	# which must pointer either to a region inside our own Value, or the linker
+	# table, but the linker table doesn't give it much flexibility beyond
+	# referring ot other modules perhaps, so maybe it could just stash its
+	# value somewhere in our region and then supply its input pointer.  It can
+	# read our linker table data if needed.  Same for us.)
+	#
+	# (TODO: If we could only write to an external Value's 2 quads in its
+	# receiver region, then we can only refer to other bits of data in that
+	# Value or (in typical cases) only the beginning of other modules, but not
+	# long references to Values within other modules, since we'd need to encode
+	# more data, e.g. our base offset relative to the beginning of the module
+	# in which we reside.
+	#
+	# And I guess we can work with that.  If we write externally, we need to
+	# tell the external thing how to reach us, and to do that we may need to
+	# access its linker table and get access to additional storage in its
+	# Value.)
+	#
+	# (TODO: also, this means that under typical circumstances, it is probably
+	# commonly needed to access extra storage for external writes, but only if,
+	# which is probably not typical, since probably - I imagine - copying
+	# externally locally and then evaluating is probably more common.
+	#
+	# TODO: Now if we copy from externally, then we should only need that Value
+	# and its linker table, which is its bridge or interface with the external
+	# world, as accesses with external locations should only be done through
+	# the linker table, e.g. to lookup Values external (that is, not embedded
+	# inside the same) to a Value.  NOTE: in particular, the linker table
+	# should be accessed only through the linker table pointer inside the
+	# Value.
+	#
+	# TODO: so in order to copy external Values, we can just copy its linker
+	# table and then update the linker table value.
+	#
+	# TODO: Okay, I *think* that's enough to get started.  Perhaps if needed for
+	# improvements or outright fixes, we can evolve it as we go if we want.)
 
 	# TODO: maybe note that Values should only communicate with the external
 	# world through its designated linker table / region.
