@@ -469,6 +469,9 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 	# normalization, but I'll probably need to think through the linking and
 	# external communication parts?)
 
+	# TODO: maybe note that Values should only communicate with the external
+	# world through its designated linker table / region.
+
 	# The executor hands over control to us to advance a frame, with
 	# parameters:
 	# 	%rdi: Return after the frame is advanced and finalized.
