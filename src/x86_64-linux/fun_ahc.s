@@ -377,8 +377,8 @@ _ns_fun_ahc_example_3_receiver_input:
 # that's being built up or constructed.
 
 _ns_fun_ahc_example_3_impl:
-	# Just do a jump to current finalized buffer.
-	jmp _ns_fun_ahc_example_3_impl_buffer0(%rip)
+	# Just do a jump to current finalized buffer (local-relative!)
+	jmp _ns_fun_ahc_example_3_impl_buffer0
 	nop
 
 # (The locations of non-finalized buffers might move around a bit.)
@@ -445,7 +445,7 @@ _ns_fun_ahc_example_swap_receiver:
 	.quad $0  // (112) Status bitfield.  Bit 2 for funapp.
 	.quad $0  // (120) Data / pointer (Value-relative).
 _ns_fun_ahc_example_swap_impl:
-	// (128)
+	# (128) Implementation, swappable (a la OpenGL's double buffering) pointer.
 	jmp _ns_fun_ahc_example_swap_impl_buffer0
 	nop
 _ns_fun_ahc_example_swap_impl_buffer0:
@@ -453,6 +453,21 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 	# swap = \f x y -> f y x
 	# swap = \f -> \x -> \y -> (f y) x
 	# (Note: no dups or dels are used here.  Just reordering arguments.)
+
+	# Until all values are input, essentially we're mutating ourselves to fill
+	# in ‘holes’ until we have the normalized expression, ‘(f y) x’.  Here,
+	# depending on how much run-time QA we want to do during execution (the QA
+	# has costs, mainly performance-related), we can verify or validate
+	# attributes and sizes to various degrees, or we can simply assume sizes,
+	# pointers, and attributes are correct and directly write to the ‘f’
+	# Value-relative Value pointer's application status bit signals and input
+	# value; and when the next frame is needed for lazy evaluation, jump to the
+	# ‘f’ value to execute it - that is, in the normal case, where ‘f’ has been
+	# copied to the local Value memory region.
+
+	# (TODO: I think I have a good gist of how this can be done up until the
+	# normalization, but I'll probably need to think through the linking and
+	# external communication parts?)
 
 	# The executor hands over control to us to advance a frame, with
 	# parameters:
