@@ -514,6 +514,12 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 	# TODO: maybe note that Values should only communicate with the external
 	# world through its designated linker table / region.
 
+	# TODO: Hmm, so maybe what we could do here is assume the supplied ‘f’ is a
+	# nested value and the external source already handled linking for us
+	# (caller's responsibility or whatever).  And then if the ‘f’ reference is
+	# evaluated, it just means we replace the ‘f’ reference with the value of
+	# ‘f’, the data.  We just copy it over into ourselves 20:42.
+
 	# The executor hands over control to us to advance a frame, with
 	# parameters:
 	# 	%rdi: Return after the frame is advanced and finalized.
