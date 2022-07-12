@@ -548,12 +548,11 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 	hlt
 	nop
 _ns_fun_ahc_example_swap_impl_buffer1:
-	# Just get a bunch of halt-nops to make this the same size (a little larger
-	# if needed to make things fit) as buffer0.
-	.rept ((_ns_fun_ahc_example_swap_impl_buffer1 - _ns_fun_ahc_example_swap_impl_buffer0 + 1)/2)
+	# Just get a bunch of nops to make this the same size (a little larger if
+	# needed to make things fit) as buffer0.
 	hlt
 	nop
-	.endr
+	.skip ((_ns_fun_ahc_example_id_impl_buffer1 - _ns_fun_ahc_example_id_impl_buffer0 + 1)/2), 0x90
 _ns_fun_ahc_example_swap_end:
 
 # (So when you signal a bit, you are telling the executor to treat the frame
@@ -767,12 +766,11 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	hlt
 	nop
 _ns_fun_ahc_example_id_impl_buffer1:
-	# Just get a bunch of halt-nops to make this the same size (a little larger
-	# if needed to make things fit) as buffer0.
-	.rept ((_ns_fun_ahc_example_id_impl_buffer1 - _ns_fun_ahc_example_id_impl_buffer0 + 1)/2)
+	# Just get a bunch of nops to make this the same size (a little larger if
+	# needed to make things fit) as buffer0.
 	hlt
 	nop
-	.endr
+	.skip ((_ns_fun_ahc_example_id_impl_buffer1 - _ns_fun_ahc_example_id_impl_buffer0 + 1)/2), 0x90
 _ns_fun_ahc_example_id_end:
 
 .global ns_fun_ahc_module_end
