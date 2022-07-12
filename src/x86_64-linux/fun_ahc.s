@@ -327,23 +327,23 @@ _ns_fun_ahc_example_3:
 .quad (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
 
 # So far, at byte offset 56:
-.quad $0  # Size (in bytes) of value metadata.  Optionally the implementation
+.quad 0   # Size (in bytes) of value metadata.  Optionally the implementation
           # may make this non-zero to mean something.  If desired inside the
           # type system, this can include additional type system information.
 # So far, at byte offset 64:
-.quad $0  # Value-relative pointer (in bytes) of value metadata.  Optionally the implementation may make this non-zero to mean something.  Points to a region within the Value.
+.quad 0   # Value-relative pointer (in bytes) of value metadata.  Optionally the implementation may make this non-zero to mean something.  Points to a region within the Value.
 # So far, at byte offset 72:
-.quad $0  # Value-relative pointer to the type, which is a nested Value embedded within this one.
+.quad 0   # Value-relative pointer to the type, which is a nested Value embedded within this one.
 # So far, at byte offset 80:
 .quad (_ns_fun_ahc_example_3_impl - _ns_fun_ahc_example_3)  # Value-relative pointer to the implementation-specific/defined data, code, or encoding of the Value, conveniently right after the header ends.  Often this is machine code.  This is equal to $128.
 # So far, at byte offset 88:
-.quad $0  # Size of the receiver region, where other Values can write for
+.quad 0   # Size of the receiver region, where other Values can write for
           # whatever signalling purposes may be supported or specified.
 # So far, at byte offset 96:
-.quad $0  # Value-relative pointer to the receiver region, which can contain
+.quad 0   # Value-relative pointer to the receiver region, which can contain
           # input values for function application.
 # So far, at byte offset 104:
-.quad $0  # Reserved for future use; set to 0.  Do note the space cost this
+.quad 0   # Reserved for future use; set to 0.  Do note the space cost this
           # adds to values.  But I would guess this isn't too difficult to
           # adapt to.
 # So far, at byte offset 112:
@@ -364,11 +364,11 @@ _ns_fun_ahc_example_3_receiver_status:
 # 	Bit 2: Whether the next frame will have input supplied to do function
 # 	       application.
 # 	Bit 3: Currently unused.  Set to 0.
-.quad $0
+.quad 0
 _ns_fun_ahc_example_3_receiver_input:
 # If there is an input supplied for function application, this is a
 # Value-relative pointer to that input.
-.quad $0
+.quad 0
 
 # The receiver region is now done.  We've had 16 u64s so far.
 
@@ -729,13 +729,13 @@ _ns_fun_ahc_example_id:
 	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x09  # ( 32) u64 machine, BE
 	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # ( 40) u64 options, BE
 	.quad (_ns_fun_ahc_example_id - ns_fun_ahc_module_begin)  # ( 48) i64 linker_table, host endianness (jumps to ‘module_route’)
-	.quad $0                                               # ( 56) u64 metadata_size, host
-	.quad $0                                               # ( 64) i64 metadata, host
-	.quad $0                                               # ( 72) i64 type, host (Value-relative pointer to embedded Value, or possibly external Value to save space)
+	.quad 0                                                # ( 56) u64 metadata_size, host
+	.quad 0                                                # ( 64) i64 metadata, host
+	.quad 0                                                # ( 72) i64 type, host (Value-relative pointer to embedded Value, or possibly external Value to save space)
 	.quad (_ns_fun_ahc_example_id_impl - _ns_fun_ahc_example_id)  # ( 80) i64 impl pointer, host
 	.quad (_ns_fun_ahc_example_id_impl - _ns_fun_ahc_example_id_receiver)  # ( 88) u64 receiver_size, host
 	.quad (_ns_fun_ahc_example_id_receiver - _ns_fun_ahc_example_id)  # ( 96) i64 receiver
-	.quad $0                                               # (104) u64 reserved0
+	.quad 0                                                # (104) u64 reserved0
 _ns_fun_ahc_example_id_receiver:
 	.quad 0                                                # (112) Status bitfield.  Bit 2 for funapp.
 	.quad 0                                                # (120) Data / pointer (Value-relative).
