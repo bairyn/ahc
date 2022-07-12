@@ -833,6 +833,10 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	# memory allocation, e.g. how can a Value's implementation know what memory
 	# is available.
 
+	# Probably what would be helpful is to just have a parent (the module
+	# Value) interface with Values, and probably the first feature for this is
+	# managing memory, e.g. if more memory needs to be allocated.
+
 	# TODO
 	hlt
 	nop
