@@ -257,7 +257,7 @@ _module_name_end:
 # 	typedef struct value_s value_t;
 .global ns_fun_ahc_example_3
 .set ns_fun_ahc_example_3, (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
-.set _ns_fun_ahc_example_3_size, (_ns_fun_ahc_example_3_end - _ns_fun_ahc_example)
+.set _ns_fun_ahc_example_3_size, (_ns_fun_ahc_example_3_end - _ns_fun_ahc_example_3)
 _ns_fun_ahc_example_3:
 # Okay, the beginning of the entire value.
 # First, insert our magical quad that must be at the beginning of each value in
@@ -321,7 +321,9 @@ _ns_fun_ahc_example_3:
 # Also this attribute must be referenced to access the linker table.  Then
 # there is a common gateway or access point, greatly aiding in relocation:
 # Values then can merely be copied and relocated where the linker table is
-# copied and then this pointer is just updated.
+# copied and then this pointer is just updated.  (Moreover, the type system and
+# executor may give us information that enables us to save resources for better
+# performance in our internal implementation.)
 .quad (_ns_fun_ahc_example_3 - ns_fun_ahc_module_begin)
 
 # So far, at byte offset 56:
@@ -423,7 +425,7 @@ _ns_fun_ahc_example_3_end:
 _ns_fun_ahc_example_swap:
 .global ns_fun_ahc_example_swap
 .set ns_fun_ahc_example_swap, (_ns_fun_ahc_example_swap - ns_fun_ahc_module_begin)
-.set _ns_fun_ahc_example_swap_size, (_ns_fun_ahc_example_swap_end - _ns_fun_ahc_example)
+.set _ns_fun_ahc_example_swap_size, (_ns_fun_ahc_example_swap_end - _ns_fun_ahc_example_swap)
 _ns_fun_ahc_example_swap:
 	.byte 0xFE, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # (  0) u64 prefix, bytes (BE)
 	.byte (((_ns_fun_ahc_example_swap_size << 3) >> 56) & 0xFF)  # (  8) u64 bit size, BE
@@ -454,6 +456,10 @@ _ns_fun_ahc_example_swap_impl:
 	jmp _ns_fun_ahc_example_swap_impl_buffer0
 	nop
 _ns_fun_ahc_example_swap_impl_buffer0:
+	# TODO
+	hlt
+	nop
+
 	# swap f x y = f y x
 	# swap = \f x y -> f y x
 	# swap = \f -> \x -> \y -> (f y) x
@@ -697,6 +703,71 @@ _ns_fun_ahc_example_swap_end:
 #
 # So only u64 length in a u128 header is supported, 0xFE 00 00 00  00 00 00 00,
 # then u64 length, including header.
+
+# A basic identity function Value: \x -> x
+#
+# A Value.  16 u64s (128 bytes) followed by the implementation, often machine
+# code for an executor to advance a frame in time by one frame.
+_ns_fun_ahc_example_id:
+.global ns_fun_ahc_example_id
+.set ns_fun_ahc_example_id, (_ns_fun_ahc_example_id - ns_fun_ahc_module_begin)
+.set _ns_fun_ahc_example_id_size, (_ns_fun_ahc_example_id_end - _ns_fun_ahc_example_id)
+_ns_fun_ahc_example_id:
+	.byte 0xFE, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # (  0) u64 prefix, bytes (BE)
+	.byte (((_ns_fun_ahc_example_id_size << 3) >> 56) & 0xFF)  # (  8) u64 bit size, BE
+	.byte (((_ns_fun_ahc_example_id_size << 3) >> 48) & 0xFF)
+	.byte (((_ns_fun_ahc_example_id_size << 3) >> 40) & 0xFF)
+	.byte (((_ns_fun_ahc_example_id_size << 3) >> 32) & 0xFF)
+	.byte (((_ns_fun_ahc_example_id_size << 3) >> 24) & 0xFF)
+	.byte (((_ns_fun_ahc_example_id_size << 3) >> 16) & 0xFF)
+	.byte (((_ns_fun_ahc_example_id_size << 3) >>  8) & 0xFF)
+	.byte (((_ns_fun_ahc_example_id_size << 3) >>  0) & 0xFF)
+	.byte 0x83, 0xF1, 0x8A, 0x24,  0x57, 0xAA, 0x2B, 0x4B  # ( 16) u64 magic, bytes (BE)
+	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x01  # ( 24) u64 version, BE
+	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x09  # ( 32) u64 machine, BE
+	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # ( 40) u64 options, BE
+	.quad (_ns_fun_ahc_example_id - ns_fun_ahc_module_begin)  # ( 48) i64 linker_table, host endianness (jumps to ‘module_route’)
+	.quad $0                                               # ( 56) u64 metadata_size, host
+	.quad $0                                               # ( 64) i64 metadata, host
+	.quad $0                                               # ( 72) i64 type, host (Value-relative pointer to embedded Value, or possibly external Value to save space)
+	.quad (_ns_fun_ahc_example_id_impl - _ns_fun_ahc_example_id)  # ( 80) i64 impl pointer, host
+	.quad (_ns_fun_ahc_example_id_impl - _ns_fun_ahc_example_id_receiver)  # ( 88) u64 receiver_size, host
+	.quad (_ns_fun_ahc_example_id_receiver - _ns_fun_ahc_example_id)  # ( 96) i64 receiver
+	.quad $0                                               # (104) u64 reserved0
+_ns_fun_ahc_example_id_receiver:
+	.quad $0  // (112) Status bitfield.  Bit 2 for funapp.
+	.quad $0  // (120) Data / pointer (Value-relative).
+_ns_fun_ahc_example_id_impl:
+	# (128) Implementation, swappable (a la OpenGL's double buffering) pointer.
+	jmp _ns_fun_ahc_example_id_impl_buffer0
+	nop
+_ns_fun_ahc_example_id_impl_buffer0:
+	# TODO
+	hlt
+	nop
+
+	# Test the application bit.  We're done (we don't change anything in us) if
+	# there's no application; just leave the lambda unchanged.
+	leaq _ns_fun_ahc_example_swap_receiver(%rip), %rsi
+	movq (%rsi), %rsi
+	testq $0x4, %rsi
+	jz *%rdi
+	nop
+
+	# We're performing function application, and we have an argument available.
+	# Build up ‘buffer1’ so we can swap the buffer pointer to activate it.
+
+	# TODO
+	hlt
+	nop
+_ns_fun_ahc_example_id_impl_buffer1:
+	# Just get a bunch of halt-nops to make this the same size (a little larger
+	# if needed to make things fit) as buffer0.
+	.repr ((_ns_fun_ahc_example_id_impl_buffer1 - _ns_fun_ahc_example_id_impl_buffer0 + 1)/2)
+	hlt
+	nop
+	.endr
+_ns_fun_ahc_example_id_end:
 
 .global ns_fun_ahc_module_end
 ns_fun_ahc_module_end:
