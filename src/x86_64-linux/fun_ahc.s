@@ -441,16 +441,16 @@ _ns_fun_ahc_example_swap:
 	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x09  # ( 32) u64 machine, BE
 	.byte 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00  # ( 40) u64 options, BE
 	.quad (_ns_fun_ahc_example_swap - ns_fun_ahc_module_begin)  # ( 48) i64 linker_table, host endianness (jumps to ‘module_route’)
-	.quad $0                                               # ( 56) u64 metadata_size, host
-	.quad $0                                               # ( 64) i64 metadata, host
-	.quad $0                                               # ( 72) i64 type, host (Value-relative pointer to embedded Value, or possibly external Value to save space)
+	.quad 0                                                # ( 56) u64 metadata_size, host
+	.quad 0                                                # ( 64) i64 metadata, host
+	.quad 0                                                # ( 72) i64 type, host (Value-relative pointer to embedded Value, or possibly external Value to save space)
 	.quad (_ns_fun_ahc_example_swap_impl - _ns_fun_ahc_example_swap)  # ( 80) i64 impl pointer, host
 	.quad (_ns_fun_ahc_example_swap_impl - _ns_fun_ahc_example_swap_receiver)  # ( 88) u64 receiver_size, host
 	.quad (_ns_fun_ahc_example_swap_receiver - _ns_fun_ahc_example_swap)  # ( 96) i64 receiver
-	.quad $0                                               # (104) u64 reserved0
+	.quad 0                                                # (104) u64 reserved0
 _ns_fun_ahc_example_swap_receiver:
-	.quad $0  // (112) Status bitfield.  Bit 2 for funapp.
-	.quad $0  // (120) Data / pointer (Value-relative).
+	.quad 0                                                # (112) Status bitfield.  Bit 2 for funapp.
+	.quad 0                                                # (120) Data / pointer (Value-relative).
 _ns_fun_ahc_example_swap_impl:
 	# (128) Implementation, swappable (a la OpenGL's double buffering) pointer.
 	jmp _ns_fun_ahc_example_swap_impl_buffer0
@@ -535,7 +535,10 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 	leaq _ns_fun_ahc_example_swap_receiver(%rip), %rsi
 	movq (%rsi), %rsi
 	testq $0x4, %rsi
-	jz *%rdi
+	jnz 9f
+	nop
+	jmp *%rdi
+9:
 	nop
 
 	# We're performing function application, and we have an argument available.
@@ -547,7 +550,7 @@ _ns_fun_ahc_example_swap_impl_buffer0:
 _ns_fun_ahc_example_swap_impl_buffer1:
 	# Just get a bunch of halt-nops to make this the same size (a little larger
 	# if needed to make things fit) as buffer0.
-	.repr ((_ns_fun_ahc_example_swap_impl_buffer1 - _ns_fun_ahc_example_swap_impl_buffer0 + 1)/2)
+	.rept ((_ns_fun_ahc_example_swap_impl_buffer1 - _ns_fun_ahc_example_swap_impl_buffer0 + 1)/2)
 	hlt
 	nop
 	.endr
@@ -735,8 +738,8 @@ _ns_fun_ahc_example_id:
 	.quad (_ns_fun_ahc_example_id_receiver - _ns_fun_ahc_example_id)  # ( 96) i64 receiver
 	.quad $0                                               # (104) u64 reserved0
 _ns_fun_ahc_example_id_receiver:
-	.quad $0  // (112) Status bitfield.  Bit 2 for funapp.
-	.quad $0  // (120) Data / pointer (Value-relative).
+	.quad 0                                                # (112) Status bitfield.  Bit 2 for funapp.
+	.quad 0                                                # (120) Data / pointer (Value-relative).
 _ns_fun_ahc_example_id_impl:
 	# (128) Implementation, swappable (a la OpenGL's double buffering) pointer.
 	jmp _ns_fun_ahc_example_id_impl_buffer0
@@ -751,7 +754,10 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	leaq _ns_fun_ahc_example_swap_receiver(%rip), %rsi
 	movq (%rsi), %rsi
 	testq $0x4, %rsi
-	jz *%rdi
+	jnz 9f
+	nop
+	jmp *%rdi
+9:
 	nop
 
 	# We're performing function application, and we have an argument available.
@@ -763,7 +769,7 @@ _ns_fun_ahc_example_id_impl_buffer0:
 _ns_fun_ahc_example_id_impl_buffer1:
 	# Just get a bunch of halt-nops to make this the same size (a little larger
 	# if needed to make things fit) as buffer0.
-	.repr ((_ns_fun_ahc_example_id_impl_buffer1 - _ns_fun_ahc_example_id_impl_buffer0 + 1)/2)
+	.rept ((_ns_fun_ahc_example_id_impl_buffer1 - _ns_fun_ahc_example_id_impl_buffer0 + 1)/2)
 	hlt
 	nop
 	.endr
