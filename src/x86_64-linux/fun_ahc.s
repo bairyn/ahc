@@ -765,6 +765,74 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	# TODO: perhaps just copy the ‘x’ pointed-to data ... what now?  Either
 	# jump to an embedded Value's implementation on buffer1, or probably better would be this, can we just replace ourselves with ‘x’?  The former seems poorly efficient.
 
+	# TODO So we'd like to have a technique in place to replace it, and
+	# probably at least the structure should be modified (if not going further
+	# than this) such that it's just size and magic identifier followed by a
+	# Value-relative pointer to the beginning of the rest of the header, so
+	# that a Value can be updated to a new Value by writing the rest of the
+	# header in another location, (we may need to expand (we can shrink
+	# afterwards sometimes)), and then simply updating this u64 pointer.  Then
+	# we _.  (If we need to expand such that the parent Value memory region
+	# needs to itself relocate, we shouldn't need to do anything special,
+	# since probably we are agnostic to locations of anything outside our Value
+	# except for the linker/router table.)
+	#
+	# TODO In this manner, a Value doesn't need to be relocated, rather than
+	# consuming a Value and producing a new one, destroying the old one,
+	# freeing up the new Value from the constraint of having to be located in
+	# the same location as the old one.
+	#
+	# TODO In fact either style of Value would probably work: a Value when mutating
+	# itself to provide the next iteration may end up with the new finalized
+	# Value with the same base Value pointer, or it may end up in a new
+	# location - probably the executor calls the machine code in the
+	# implementation section of a Value, and the implementation returns with
+	# the location of the new Value right after destroying the old (which
+	# sometimes may be only conceptual, as actually the location is the same
+	# and it just updated itself in-place).  The type system (e.g.  with linear
+	# types) can provide further mechanisms to coordinate relocation.
+	#
+	# TODO lots of good ideas here.  Let's hope the progress continues.
+
+	# TODO: another type: Values that work like pointers or references to other
+	# Values, to look them up, returning a Value-relative, but external,
+	# reference?  But there are a few issue here that would need to be worked
+	# out: with linear types, a consumed Value could easily be destroyed,
+	# invalidating pointers to it.  I guess conventionally it's the caller's
+	# responsibility to ensure that the mutated Value's new location is
+	# appropriately managed.
+
+	# TODO I guess another scenario to consider is there being multiple
+	# top-level references, and other modules to refer to module A's top-level
+	# Values, which is equivalent to pointers through it, albeit pointers
+	# relative to module A.  (Ignore module A's access management for now.)  If
+	# indeed you mutate A's top-level attribute / definition by jumping the
+	# executor to it, then (while it can also do an in-place update, e.g.
+	# especially if no change is made to save on resources), there's a risk and
+	# possibility that the new top-level attribute could be at a new location,
+	# invalidating other effective pointers to A's top-level definition.
+	# (Probably the design is better if the callee doesn't manage external
+	# references to it, but referencers manage it?, e.g. a caller handles an
+	# updated reference, but let's think through this.)
+	#
+	# I guess a few approaches could work:
+	# - The type system could add a constraint that certain Values may not be
+	# executed or mutated, however these Values may be copied.
+	# - A's top-level Values normally should not be reached directly, but only
+	# through A's top-level interface (sort of like our current module
+	# routers), and then A tracks its definitions' relocations when they
+	# happen, and presumably you just have basically an enumeration or string
+	# table like an associative map of strings to Value locations relative to
+	# the module.
+	# - If neither approach is taken, then ultimately the caller of A's
+	# definitions will need to add or integrate its own mechanisms to ensure
+	# that its pointer is valid, so that conventionally this is the
+	# responsibility of the pointer Values, not A's definitions.
+
+	# Probably also one major mechanism to contemplate designs for then is
+	# memory allocation, e.g. how can a Value's implementation know what memory
+	# is available.
+
 	# TODO
 	hlt
 	nop
