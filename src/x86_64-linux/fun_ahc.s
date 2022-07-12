@@ -762,6 +762,9 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	# We're performing function application, and we have an argument available.
 	# Build up ‘buffer1’ so we can swap the buffer pointer to activate it.
 
+	# TODO: perhaps just copy the ‘x’ pointed-to data ... what now?  Either
+	# jump to an embedded Value's implementation on buffer1, or probably better would be this, can we just replace ourselves with ‘x’?  The former seems poorly efficient.
+
 	# TODO
 	hlt
 	nop
