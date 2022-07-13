@@ -837,6 +837,62 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	# Value) interface with Values, and probably the first feature for this is
 	# managing memory, e.g. if more memory needs to be allocated.
 
+	# 22:30 Okay, so I think the way I want to do this is (the type system
+	# determines the rest of the format of the linker table) to standardize the
+	# beginning of the linker table.  Its encodnig is just conveniently adapted
+	# to the platform.  So it starts with a u64 size (in bytes) of the linker
+	# table, including a null terminator; and after the size it's just an array
+	# of i64 addresses relative to the very beginning of the linker table
+	# (actually, no, only the parent Value is relative to the linker table, but
+	# the rest is relative to the parent Value position).  The system informs
+	# what points where, except we'll probably just conventionalize that it
+	# starts with:
+	# 1) A parent Value, e.g. a module Value with a larger, overlapping memory
+	# region - it is also used as a reference for some of the standard
+	# conventional methods provided, as well as a reference for the remaining
+	# entries in this table:
+	# 2) Reserved; magic value of 1, host byte order.
+	# 3) malloc (Value, price : Integer -> size : UInteger -> IO (Either String Integer)), to make a new reservation of memory of provided size
+	# (platform-specific, in bytes); returned address of allocation base on
+	# success is relative to the parent value.
+	# 4) mfree, to free a malloc allocation.
+	# 5) mrealloc, conceptually not required but for convenience this can be
+	# used in place of a ‘malloc’, copy, then ‘free’ pattern for sometimes
+	# better efficiency - because it can first see if it can simply expand the
+	# allocation without copying or moving over the old allocation.
+	#
+	# TODO I think I'll probably just go with this for now (I might end up rewriting
+	# some of the structure or whatever once I experiment and play around with
+	# the architecture a bit and can from experience approach it with more
+	# experience also as to what the benefits and costs of certain decisions
+	# may be or useful ways to think about it), although if I wanted to
+	# consider alternatives, probably one might be to standardize a Value
+	# interface for attributes with standardized malloc, mfree etc. references
+	# there, to be moved from the linker table, so that then the linker table
+	# is reduced to have e.g. just the size, parent, reserved, and null
+	# terminator, and then the parent can be looked up.  23:06.
+
+	# TODO Okay, now, that's probably enough to continue, except one thought:
+	# how about pointers?  I guess if the caller appropriately handles resource
+	# management (mutation, constant, and relocation, etc.), then it could just
+	# be either some encoding of how to navigate a chain of parent Values and
+	# attributes should the need arise, or to instead simply just lookup the
+	# Value itself to get a current offset (may be invalidated in case of
+	# mutation or relocation) of the target Value in its module or parent
+	# Value, relative to the pointer Value.  Also, check out Nix!  How does it
+	# handle attributes again?  Is taking a similar approach to there's better
+	# than ours?
+	#
+	# (BTW, with parent values: I guess you could even have (or not have) a
+	# root Value that just spans the entire available memory space.)
+
+	# TODO: so you *could* get started as is, but probably first (could save
+	# you some work and having to redo things) double check the Nix design in
+	# case it gives you any useful thoughts or ideas here, and if you still
+	# think what you've laid out here is the way to go, have at, or else modify
+	# it to incorporate some of the linking and reference features.  (I like
+	# the hash+name idea, by the way 23:12.)
+
 	# TODO
 	hlt
 	nop
