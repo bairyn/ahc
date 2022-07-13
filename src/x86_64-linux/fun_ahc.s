@@ -893,6 +893,13 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	# it to incorporate some of the linking and reference features.  (I like
 	# the hash+name idea, by the way 23:12.)
 
+	# TODO: {-# LANGUAGE #-} extension idea: a syntactical addition to request
+	# that the compiler pre-compile something at compile time, until it's in
+	# some level of normal form perhaps (perhaps have a way to specify which of
+	# supported forms are supported); maybe also support a compiler CLI option
+	# to specify a timeout of steps or frames.  It's sort of like a generalized
+	# ‘inline’.
+
 	# TODO
 	hlt
 	nop
