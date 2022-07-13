@@ -900,6 +900,54 @@ _ns_fun_ahc_example_id_impl_buffer0:
 	# to specify a timeout of steps or frames.  It's sort of like a generalized
 	# ‘inline’.
 
+	# TODO: Okay, so I think 2 approaches would work for overall linking
+	# architecture.  The former is simpler and more direct and can use the
+	# current linker, and the latter offers more functionality and explicit
+	# control, e.g. to access symbols and modules from the same package at
+	# different versions, with different hashes.
+	#
+	# So the first mechanism is simply to have flat symbols (e.g. like our
+	# ‘ns_fun_ahc_example_id’ pattern, for namespacing, except it'd probably be
+	# e.g. ‘ns_control_monad’, with a compiler option to encode qualified
+	# identifiers to, say, base64 with an magic prefix, like
+	# ‘ns_hs_base64_<base64encoding>’, and optionally even a hash+name for a
+	# package can be included to disambiguate between multiple package
+	# versions).  Now a Value should only directly access regions within itself
+	# and within its linker table, and the linker table then can simply have
+	# .quads or whatever of the sort ‘other_external_value - module_begin’.  In
+	# fact, probably since it's an absolute path, it should have a base64 or
+	# whatever encoded full path starting from a hash+name combo - then
+	# probably the compiler; but actually the compiler probably can and should
+	# support multiple modes for this.
+	#
+	# The second mechanism (which can work alongside the first; the first
+	# linker item is, after all, a linker-table-relative Value offset (to which
+	# the rest of the items are relative)) is to just have modules (often the
+	# parent of Values the module exports) themselves have a standard
+	# interface, where essentially Values can navigate relative to their
+	# current position, where the module can find its own parent, etc., and a
+	# Value's parent can lookup a name to find a sibling Value, and so on.
+
+	# TODO Also, while it'd be nice to have a nice sorted AST (avl, etc.) for module
+	# attribute tables, it's also helpful to try to not pull in too much
+	# complexity in the foundational layer.  So I would suggest a strict
+	# bytestring-like encoding of a size, length, null-terminated offset array
+	# (module Value to attribute/definition Value that the module exports
+	# offset), then null-terminated cstring array (e.g.
+	# ‘aoeu\x00example2\x00example3\x00\x00’.  Remember, we're bootstrapping a
+	# foundation.  Perhaps later on caches and views on top of these
+	# bytestrings to construct an AST may be helpful.  Or, heck, *do* include
+	# an assoc data structure.  You know what, fine, let's probably go ahead
+	# and do that.  Maybe.)
+
+	# TODO Okay, probably for now I'll just have it be a List of tuples of
+	# strings, but probably honestly I can implement this particular part
+	# later.  Let's just build up I guess our own little Prelude of sorts that
+	# provides us some primitives to work with to represent Modules and build
+	# up a basic CLI and such.  List, Maybe, etc.  (So a module is a Value of I
+	# guess a list of tuples of strings (symbols) and module-relative offsets,
+	# but internally it's also a memory region in which its exports reside.)
+
 	# TODO
 	hlt
 	nop
