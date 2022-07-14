@@ -1,5 +1,136 @@
 # AHC function execution model.
 
+# This module supplies a bootstrapping Prelude for use for our compiler.  In a
+# sense, it's a pre-compiled module according to how I imagine the actual
+# compiler might do it later on when I write it.
+#
+# It's untyped at least while I get this compiler started, but I may specify or
+# even explicitl yencode Types later on, or not; we'll see.  I'll probably
+# write the Types it's expected to have or at least be similar to.
+
+# Module implicit parameters:
+#
+# Unless otherwise specified, the following implicit parameters are required by
+# every procedure in this module, for an executor running an implementation:
+# 	%r15:
+# 		Call mode and options working storage unit.
+# 		The first 7 (most significant, BE) bytes must be
+# 		(‘printf "0x%02x\n" =<< randomRIO (0x00, 0xFF)’):
+# 			0xF4 0x0D 0xCA 0x88  0x48 0x2D 0x41 (0xXX)
+#
+# 		The final (least significant) byte is an options bitfield.  Unspecified
+# 		bits must be 0.
+#
+# 		Note this is conventionally a caller-saved register, so it should be
+# 		preserved between module action calls and conventional calls.
+# 	%r14:
+# 		Exception return continuation, if overriding default.
+#
+# 		Like a left-branch handler connection for ‘Either’, specify an
+# 		alternative continuation to return to rather than ‘%rdi’ for the typical
+# 		pattern of a procedure action returning to its first address as a
+# 		continuation, optionally with 0 or more arguments.  Most errors, e.g.
+# 		syscalls that return errno's (this can be useful for e.g. specially
+# 		handling certain ) will, rather than calling ‘exit_custom’, call this
+# 		overriding handler.  For errors that aren't special fatal errors that
+# 		cannot be caught, this is analagous to a catch block.
+#
+# 		If the exception return continuation bit is enabled (bit 1,
+# 		second-most-significant bit, in the last byet in $r15), then %r14 is
+# 		used instead of the default exception return handler.  If this bit is
+# 		disabled, then %r14 is ignored for this purpose.
+#
+# 		If working storage is available, then a pattern may be for procedures
+# 		that require cleanup when unwinding, for these procedures to store the
+# 		old %r14 and set their own %r14 as a layer on top, that cleans up and
+# 		then restores the old %r14.
+#
+# 		Note this is conventionally a caller-saved register, so it should be
+# 		preserved between module action calls and conventional calls.
+#
+# 		Unless otherwise specified, this takes the following parameters:
+# 			%rdi: Numeric code.
+# 			%rsi: String size.
+# 			%rdx: String.
+# 			%rcx: 0.
+
+# Configure the platform.
+.code64
+
+.global ns_fun_ahc_module_value
+ns_fun_ahc_module_value:
+	# Platform-specific u64 byte size and Value-relative offset to the header.
+	.quad (_ns_fun_ahc_module_value_end - ns_fun_ahc_module_value)
+	.quad (_ns_fun_ahc_module_value_header - ns_fun_ahc_module_value)
+
+_ns_fun_ahc_module_value_header:
+	# Linker table, Value-relative offset (vpointer).
+	.quad (_ns_fun_ahc_module_value_ltable - ns_fun_ahc_module_value)
+	# Optional metadata and annotations vpointer (itself a Value).
+	.quad 1  # TODO
+	# Type vpointer (itself a Value).
+	.quad 1  # TODO
+	# Executor vpointer.
+	.quad (_ns_fun_ahc_module_value_executor - ns_fun_ahc_module_value)
+
+# Relative to ltable.
+#
+# Note we can just use the linker to replace the symbols here, but we should
+# not use such behaviour outside the ltable in normal circumstances.
+_ns_fun_ahc_module_value_ltable:
+	.quad (_ns_fun_ahc_module_value_ltable_end - _ns_fun_ahc_module_value_ltable)  # Size, bytes.
+	.quad 0   # Length.
+	# Offsets array (vpointers), length Length.
+	# First element is parent, the module.  (Then malloc, mfree, mrealloc?)
+	.quad (ns_root_root_value - ns_fun_ahc_module_value)  # The parent of our top-level module is ... uh, let's just say ‘root’.  (The linker can fill in the ‘ns_root_root_value’ hole for us, but only in an ltable.)
+	# TODO malloc etc.
+	.quad 0  # Offsets null terminator.
+	# Symbols array, length Length.
+	.quad 1  #.TODO parent
+	.quad 1  #.TODO rest
+	.quad 0  # Symbols null terminator.
+	.quad 0  # ltable null terminator.
+_ns_fun_ahc_module_value_ltable_end:
+
+_ns_fun_ahc_module_value_end:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# OLD: before deleting anything below, probably either move it somewhere else
+# after cleaning it up, or remove it after you're sure it's fine to remove.
+
+
+
+
+
+
+
+
 # Module information:
 #
 # This module itself is untyped.  You can add at ype system such as Haskell's

@@ -61,6 +61,7 @@ SRC_FILES = \
 	system.s \
 	util.s \
 	fun_ahc.s \
+	root.s \
 	#
 
 OBJS ?= \
@@ -69,6 +70,7 @@ OBJS ?= \
 	$(OBJ_DIR)/system.o \
 	$(OBJ_DIR)/util.o \
 	$(OBJ_DIR)/fun_ahc.o \
+	$(OBJ_DIR)/root.o \
 	#
 
 PREFIX ?= /usr
