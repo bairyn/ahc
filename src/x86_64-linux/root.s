@@ -9,11 +9,14 @@ _ns_root_root_value_header:
 	# Linker table, Value-relative offset (vpointer).
 	.quad (_ns_root_value_ltable - ns_root_root_value)
 	# Optional metadata and annotations vpointer (itself a Value).
-	.quad 1  # TODO
+	.quad (_ns_root_value_metadata - ns_root_root_value)
 	# Type vpointer (itself a Value).
-	.quad 1  # TODO
+	.quad 1  # TODO (Module type.)
 	# Executor vpointer.
 	.quad (_ns_root_root_value_executor - ns_root_root_value)
+
+_ns_root_root_value_metadata:
+	.quad 8  # Size (we have nothing else).
 
 # TODO: in ltable, probably the parent of the root value is itself.
 
