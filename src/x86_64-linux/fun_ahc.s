@@ -86,7 +86,7 @@ _ns_fun_ahc_module_value_ltable:
 	# TODO malloc etc.
 	.quad 0  # Offsets null terminator.
 	# Symbols array, length Length.
-	.quad 1  #.TODO parent
+	.asciz "_parent"
 	.quad 1  #.TODO rest
 	.quad 0  # Symbols null terminator.
 	.quad 0  # ltable null terminator.
@@ -126,6 +126,40 @@ _ns_fun_ahc_module_value_end:
 
 
 
+
+# (Note: so probably rarely does it make sense to copy a module whole in order
+# to access something inside it.  Instead, a module has a value embedded in it
+# that provides an index of values in it, and this indexer may be copied
+# (without copying the entire module) and relocated (update the linker table)
+# in order to evaluate it in order to access other things in the module.  So I
+# guess a pattern here, too, is you may have a function or whatever, and the
+# pattern to use it is not to jump to it to mutate and evolve it directly, but
+# instead just to copy it, sort of as a template or recipe for applying a
+# function or whatever, and *then* you can evaluate/execute it in your own
+# Value.  So take some random value x, and x can contain references to other
+# values embedded within its own value.  As needed or desired, x's executor can
+# then in turn execute one or more of these sub-values to evaluate a frame of
+# them at x's discretion.)
+#
+# (Note: also resource management, notably memory management, is something that
+# your direct parent can help you manage, and it can propagate upwards if even
+# the parent needs more memory or to do extra processing to manage its own
+# resources.)
+#
+# (Note: question: what should the Module type be?  What does it mean to
+# execute it?  Does it make sense for an executor to give you output, e.g. to
+# give you an index of its embedded sub-Value that has an index or attribute
+# table or whatever?)
+#
+# (Note: I guess modules like a normal ... or any ... Value is just a stated
+# ... resource holder (has memory) that - well, the executor part of a Module
+# is probably just a no-op.  Only the internal parts are the relevant parts ...
+# I don't know.  I maybe need to think through this more.)
+
+# (Note: semantics or models for output?  The output type describes the
+# resulting state of the Value and how to interpret it?  I guess you can just
+# postulate and assume types, e.g. a Module that probably just works like ()
+# with hidden internal state ... this needs more thought.  Output and types.)
 
 
 
