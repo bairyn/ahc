@@ -161,6 +161,22 @@ _ns_fun_ahc_module_value_end:
 # postulate and assume types, e.g. a Module that probably just works like ()
 # with hidden internal state ... this needs more thought.  Output and types.)
 
+# (Note: I guess the next step is to think about the type part of this.  Maybe
+# have a sort of identity-based type, by names (ultimately location or another
+# form of identity), and the type system and executor can specify ad-hoc or
+# arbitrarily what they mean, and perhaps alongside this we postulate perhaps a
+# simple set of primitives upon which composites can be formed, and here only
+# the structure of them matter, although both can be combined, and there can be
+# multiple levels of structaral equivalence: e.g. Either (Either Integer)
+# Integer Integer and Either Integer (Integer Integer) are equivalent under
+# some notions of equivalence and not equivalent under others.  (Alongside
+# this, getting better at understanding HoTT and its prereqs also seems a a
+# good idea.)  For the latter, e.g. have GADTs (‘here are the only ways to
+# produce values of this type’, and ... heck, maybe that's all you need!  So
+# next, types.  Oh, did I make a note about output?  Oh, maybe for now treat
+# it more as ad-hoc, aribtrary postulates as descriptions.  In case you were
+# onto something more, I guess when you return, probably think about the output
+# and types part of this.)
 
 
 
