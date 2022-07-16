@@ -202,6 +202,92 @@ _ns_fun_ahc_module_value_end:
 # inhabit it, to aid in more advanced type machinery, such as dependent type
 # mechanics.)
 
+# (Note: actually, at run-time you don't need a type system at all.  It's
+# optional; you can add in your own metadata or annotations if you want.  And
+# the run-time can implements its own type system.)
+#
+# (Note: now we're just providing an implementation of the Haskell
+# specification or near it.  We have lots of ways in which we can fill in the
+# details, and some are better in some ways than others.  In our view, though,
+# what is a type?  Metadata with a major role in a QA layer known as the type
+# system that also sometimes determines semantics of the data, and how we
+# compile it?)
+#
+# (Note: my current best guess as to how we view types is essentially ad-hoc
+# metadata tags, although some postulated types (or types of types) as
+# primitives like GADTs and function application gives you useful structure.
+# Propositions as types?  Where the types gives you a description, summary, or
+# property and the value gives you the details of how to arrive at that?  Where
+# your definitions (e.g. GADT constuctors and top-level values) work with the
+# type system to provide structure where it follows the patterns you are
+# interested in?  You could try out as primitives only types of the GADT kind
+# and your function application arrows - whatever the primitives are, you
+# still need to start with some primitives.)
+#
+# (Note: can I reduce a regular function to a GADT?  How about Agda addition on
+# nats?  Is it just a GADT with a constructor for every possible branch?  Say
+# left is zero, or Unit, so the answer is just the right-hand side.  Or left is
+# a successor to a nat, right is a nat, so the answer is a successor to their
+# addition.  And if you give an arbitrary nat, you just use the destructors to
+# pick a constructor for you.)
+#
+# (Note: what is a Nat, then?  A way to tell you which nat it is, or how you
+# got there.  Like a neuron in a ntework is far less meaningful in isolation,
+# but its integration helps give it meaning, the identity of a GADT type is
+# made more meaningful by the constraints of the mechanics of the type system
+# in which it resides: you're telling it the only ways the type can be reached
+# or ‘constructed’, and these exclusions and constraints from the structural
+# mechanics makes it more meaningful.  If you could construct value sfrom other
+# ways, it becomes less meaningful (or different, or possibly even more
+# meaningful, depending on what those contextual and environmental
+# modifications are).
+#
+# Hmm, so then I guess if you tried to reduce fnuction applidcation to GADTs
+# alone, then ... well, first, function application erases history: outputs are
+# equivalent, and you can't distinguish between different applications unless
+# you know the function and the inputs to it.  So adding fuction application
+# lets you forget history.
+#
+# Actually, no - I mean, you could you don't have to expose the input arguments
+# in a GADT, e.g. one representing the output of addition, but you could.
+#
+# You could - like reflection - encoding your language's type system in your
+# own type system, and then just put up a representation of compiled code -
+# e.g. just a filesystem hierarchy of files or even flat file, with contents
+# just a list of bytes.  Give it a a UTF-8 source code string, and it gives you
+# the machine code for whateve platform you want it to give you it for.  There
+# could be a straightforward model, or you can apply optimizations.
+#
+# (So I think you probably can reduce normal funtion application to GADTs, so
+# long as you associatie every possible pattern match branch with exactly one
+# GADT constructor, and if it's structured for this, probably it could be done.)
+#
+# I'll probably just go with the idea I had for now, then: types as arbitrary
+# tags with functions in the type system and sometimes semantics, with some
+# types following a structure, like GADTs.
+#
+# Next mystery to try to figure out: equality.  Looks like there are whole
+# fields like HoTT that attempt to answer this!  How does Agda do it?  Is just
+# ‘hey, I have two output representations, but here's the seed and valid rules
+# it can go through to get to either representation, and you know the rules
+# look like those that preserve equality’?  ... Wait, no it's not ‘refl : a -> a =
+# a’, but ‘refl : a = a’.  Maybe it's sort of the same except less seed and
+# more just ‘here are the rules of equality you can follow’.
+#
+# If you try to encode equality, I don't know, probably a useful one could just
+# be Lebneizian equality, where for probably the observer you care about, in
+# the attribute of the memory data, the observer tells you the data doesn't
+# make a difference to you.  You could even apply a mapping if you want to
+# treat some sets of data as equivalent.  Depending on how or what -
+#
+# Let's see.
+#
+# Actually, no, not quite that, but Lebneiziian equality not through internal
+# memory representations directly, but through structural Lebneizian equality:
+# you just set up rules and structure in place of representations and they'll
+# tell you if it's structurally equal enough or not.  Good enough for now?  I
+# guess.  Although you certainly could try to think through part more.)
+
 
 
 # Module information:
