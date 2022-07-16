@@ -179,6 +179,29 @@ _ns_fun_ahc_module_value_end:
 # and types part of this.)
 
 
+# (Note: so maybe for now go with types as basically tags (but some types like
+# those of the GADT kind can, when combined with the executor specification,
+# have a predictable structure and encoding), arbitrary and ad-hoc by default;
+# and then maybe an implementation-defined data region.  Then Values really are
+# like classes in OOP, I guess; its static methods can work like constructors
+# by using the Value itself as a blueprint to copy itself, or evaluate itself
+# by applying an input, or destroy itself.  But probably this could be kept
+# minimal, and the let the Value provide an API if desired at a higher level.
+# And the output type describes the region in memory - the object.  It's just
+# metadata.)
+#
+# (Note: and then the type system may be thought of as a sort of QA layer on
+# top.  You can use the type system to ensure correctness to some degree.)
+#
+# (Note: I may come up with a better approach later, but since currently types
+# are just metadata that the type system uses for QA and that the executor
+# might use to inform interpretation of data (and optionally to inform internal
+# Value memory access at runtime or compile-time), it may be interesting to
+# construct a relevant isomorphism between our objects and types, perhaps
+# similar to singleton types, where each unique type has exactly one value to
+# inhabit it, to aid in more advanced type machinery, such as dependent type
+# mechanics.)
+
 
 
 # Module information:
