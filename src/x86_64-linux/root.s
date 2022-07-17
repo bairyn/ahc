@@ -29,7 +29,15 @@
 #   that can be finalized by updating the impl pointer afterwards, and
 #   optionally produciiing additional output in a format specified by the same
 #   3-tuple combination).
-# - A value-static malloc API.  TODO: choose details and an implementation here.
+# - A vpointer to an implementation-defined malloc API: basically, the
+#   beginning of a record of several function pointers (like a struct of
+#   several i64s), where the function pointers are themselves vpointers,
+#   relative to the Value (not the record).  The record has fixed size and its
+#   lifetime must be the same as the Value's lifetime.  (Essentially it's 3
+#   i64s.  They may be short and delegate to a parent Value's API.  The type
+#   and executor spec will probably include a base Value register or other
+#   working storage unit in the state or environment that can be used to obtain
+#   a parent API.  The 3 actions are malloc, mfree, and mrealloc.)
 #
 # At runtime, we do not by default require types, but metadata including type
 # information can be added to a Value's implementation region according to
@@ -41,7 +49,7 @@
 # work with initial, say, 4KiB allocations where, as they grow, if they run out
 # of capacity, a new allocation twice the size is made for it, it is copied
 # over, and the old one freed.  (This can just be data embedded like a closure
-# in the malloc API; we'll fill in the details (TODO).)
+# in the malloc API.)
 
 # Configure the platform.
 .code64
