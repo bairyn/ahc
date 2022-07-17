@@ -297,6 +297,17 @@ _ns_fun_ahc_module_value_end:
 
 
 
+# 2022-07-17 Okay, I think I see how I could have this set up.  Essentially, a
+# hierarchy of Values, which are a platform-specific (implementation defined)
+# essentially type of value that is basically an object that is basically
+# either a memory region with a parent a malloc API (base location, size,
+# parent, malloc API) - impl?  pointers?  Pointers don't need to be primitive;
+# just have it be part of impl, where the type and executor spec encode a
+# parent vpointer.  Impl is a value-relative pointer (vpointer) to,
+# essentially, the real data/code of the current/last finalized state.
+
+
+
 
 
 
