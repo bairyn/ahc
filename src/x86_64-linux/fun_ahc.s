@@ -288,6 +288,26 @@ _ns_fun_ahc_module_value_end:
 # tell you if it's structurally equal enough or not.  Good enough for now?  I
 # guess.  Although you certainly could try to think through part more.)
 
+# TODO: implementation/executor-defined value interface?  e.g. for the linker
+# table format, and how Values, at least of certain types, can be called?
+# Possibly restrict it to just types of e.g. ‘MyPrime a’ or types of some kind
+# to get you started.  You may change or adapt it as you go.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Module information:
