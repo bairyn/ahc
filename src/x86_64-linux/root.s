@@ -51,6 +51,26 @@
 # over, and the old one freed.  (This can just be data embedded like a closure
 # in the malloc API.)
 
+# Module type:
+#
+# Here we document the Module type.
+#
+# Essentially, it means the Value's primary purpose is to provide a region in
+# memory containing a bunch of Values (basically everything that the module
+# exports or that supports the module), and the implementation (unlikely
+# implementations for most other types) is directly an embedded Value, of type
+# RawModuleIndex, of a more primitive form (so that we can more conveniently
+# bootstrap up modules, although you can also add your own module index format
+# with a better type).  The RawModuleIndex type means that the implementation
+# follows the format of u64 size in bytes, u64 length, null-terminated ordered array of module
+# vpointer offsets to each module member, null-terminated ordered array of
+# null-terminated c-strings of module-local symbols that name that member, u64
+# null.
+
+# TODO: oops, you forgot linker tables.  Probably just say the type (and
+# platform) determines the linker table format, e.g. what the struct fields
+# are, how they're formatted, and what they mean).
+
 # Configure the platform.
 .code64
 
