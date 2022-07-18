@@ -37,7 +37,24 @@
 #   i64s.  They may be short and delegate to a parent Value's API.  The type
 #   and executor spec will probably include a base Value register or other
 #   working storage unit in the state or environment that can be used to obtain
-#   a parent API.  The 3 actions are malloc, mfree, and mrealloc.)
+#   a parent API.  The 3 actions are malloc, mfree, and mrealloc.)  Allocates
+#   memory within the region of the Value, expanding the Value if necessary.
+# - If the Type (and executor and build platform) specify it, optionally an i64
+#   vpointer to a destructor procedure, to free the Value.
+# - If the Type (and executor and build platform) specify it, optionally an i64
+#   vpointer to a dup procedure, to copy the Value.  (If it's copy-once, then
+#   the copied value will not have its own dup/copy action.)
+# - If the Type specifies it, then to a Type-determined (and executor and
+#   platform) format, a pointer to a linker table.  To enable ordered
+#   relocation (e.g. during a dup/copy), the Value should not perform external
+#   access except through the linker table.  The linker table region is the
+#   only region able to access external locations.  The dup/copy action may
+#   modify the copied linker table to update the new locations.  The type
+#   specifies the format of the linker table, which may just be a record of
+#   vpointers for various locations or definitions in the same or in other
+#   modules, or alternatively may be machine code to perform the dereference,
+#   optionally navigating multiple layers of module (e.g. parent, parent,
+#   Control, Monad, parent, Monad).
 #
 # At runtime, we do not by default require types, but metadata including type
 # information can be added to a Value's implementation region according to
@@ -66,10 +83,6 @@
 # vpointer offsets to each module member, null-terminated ordered array of
 # null-terminated c-strings of module-local symbols that name that member, u64
 # null.
-
-# TODO: oops, you forgot linker tables.  Probably just say the type (and
-# platform) determines the linker table format, e.g. what the struct fields
-# are, how they're formatted, and what they mean).
 
 # Configure the platform.
 .code64
