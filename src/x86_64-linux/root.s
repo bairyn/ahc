@@ -78,6 +78,19 @@
 # Put all code and data in the same section.
 .text
 
+# TODO: maybe for our own Prelude to get started?:
+# - Nat
+# - List
+# - Word8
+# - various functional utilities
+#
+# - Fin
+# - Either
+# - ByteString
+# - Word64
+# - Integer
+# - PropEq
+
 
 
 
