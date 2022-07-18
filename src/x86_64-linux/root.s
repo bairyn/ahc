@@ -15,46 +15,34 @@
 # format:
 # - A u64 at the very beginning that represents the size of the region in
 #   bytes.
-# - An i64 parent vpointer (if you add this to the Value base address, you get
-#   the Value's parent base address).
-# - An i64 implementation vpointer (if you add this to the Value base address,
-#   you get the start of the implementation region normally entirely contained
-#   in the Value, and normally the implementation starts with a size u64 of the
-#   how big the implementation region is in bytes; normally the type and
-#   executor and platform combination specifies the meaning of the
-#   implementation region; often you can set up the executor state
-#   appropriately (e.g. set the right registers appropriately) and then jump to
-#   a region within the implementation region to advance the Value by one frame
-#   like a State monad, construct the new state in a new implementation region
-#   that can be finalized by updating the impl pointer afterwards, and
-#   optionally produciiing additional output in a format specified by the same
-#   3-tuple combination).
-# - A vpointer to an implementation-defined malloc API: basically, the
-#   beginning of a record of several function pointers (like a struct of
-#   several i64s), where the function pointers are themselves vpointers,
-#   relative to the Value (not the record).  The record has fixed size and its
-#   lifetime must be the same as the Value's lifetime.  (Essentially it's 3
-#   i64s.  They may be short and delegate to a parent Value's API.  The type
-#   and executor spec will probably include a base Value register or other
-#   working storage unit in the state or environment that can be used to obtain
-#   a parent API.  The 3 actions are malloc, mfree, and mrealloc.)  Allocates
-#   memory within the region of the Value, expanding the Value if necessary.
-# - If the Type (and executor and build platform) specify it, optionally an i64
-#   vpointer to a destructor procedure, to free the Value.
-# - If the Type (and executor and build platform) specify it, optionally an i64
-#   vpointer to a dup procedure, to copy the Value.  (If it's copy-once, then
-#   the copied value will not have its own dup/copy action.)
-# - If the Type specifies it, then to a Type-determined (and executor and
-#   platform) format, a pointer to a linker table.  To enable ordered
-#   relocation (e.g. during a dup/copy), the Value should not perform external
-#   access except through the linker table.  The linker table region is the
-#   only region able to access external locations.  The dup/copy action may
-#   modify the copied linker table to update the new locations.  The type
-#   specifies the format of the linker table, which may just be a record of
-#   vpointers for various locations or definitions in the same or in other
-#   modules, or alternatively may be machine code to perform the dereference,
-#   optionally navigating multiple layers of module (e.g. parent, parent,
-#   Control, Monad, parent, Monad).
+# - An i64 frame vpointer (if you add this to the Value base address, you get
+#   the start of the last/current finalized frame region normally entirely
+#   contained in the Value), where the platform, type, and executor can specify
+#   the format and encoding of the frame except we specify a minimum format
+#   here, which those can extend (this can be implemented like double buffering
+#   in OpenGL):
+#   - u64 frame size
+#   - i64 linker table vpointer, same lifetime as Value:
+#     - Type (and executor and platform) specified, but normally it starts with
+#       the following:
+#       - u64 size
+#       - i64 vpointer (not linker table) parent
+#       - i64 vpointer - the value's malloc, as specified later.  (Unless
+#         otherwise specified and configured by e.g. arguments, a new
+#         allocation is made within the Value's region, where the Value may be
+#         expanded if necessary, but the the later documentation for more
+#         information.  This might delegate to a parent malloc API.)
+#       - i64 vpointer - mfree, as specified later.  (Can free the Value this
+#         ‘mfree’ belongs to.)
+#       - i64 vpointer - mrealloc, as specified later.
+#       - Optionally, if the Type (and executor and build platform) specify it,
+#         an i64 vpointer to a destructor procedure, to free the Value.
+#       - Optionally, an i64 vpointer to a dup procedure, to copy the Value (if
+#         it's copy-once, then the copied value will not have its own dup/copy
+#         action.)
+#   - i64 implementation vpointer; the type and platform and executor determine
+#     the format of the region.  Often it starts with a size u64, but sometimes
+#     this isn't so.
 #
 # At runtime, we do not by default require types, but metadata including type
 # information can be added to a Value's implementation region according to
