@@ -92,6 +92,46 @@
 # - PropEq
 
 
+# TODO: don't forget RTOS!
+# Good think you caught htis earlier rather than later.  Easier when it's from
+# the ground up.
+#
+# RTOS: you need to track time (and space) costs, e.g. either the type or value
+# will tell you the space cost of advancing a frame, plus control over running,
+# e.g. to run for a maximum number of time units.
+#
+# It sounds like you already at least track space at the value level, but for
+# computation it'd probably be useful to get a better handle on how advancing a
+# frame affects space.
+#
+# And time?
+
+# Okay, let's define some time units:
+# - Step: one direct reduction, either advancing a frame directly or performing
+#   one redirection to another Value or two to advance (two dependencies
+#   instead of one means an executor can duplicate for parallelism, and the
+#   order doesn't matter).  Note
+#   technically this can take a long time, but often it's expected to be a
+#   simple computation to advance a frame.  Finds and builds the next value.
+# - Frame: like a step, except all dependency frame advancements have
+#   completed, so the direct frame has been advanced, rather than suspended
+#   pending dependency frame advancements.
+# - Ticks: one base synchronized unit of time upon which computation may be
+#   based.
+#
+# So advancing one frame for value V may require 7 steps, 1 to perform a
+# reduction of V directly, 1 redirect to sub-value A, 1 to perform a reduction
+# of sub-value A directly, 2 to perform a redirection of sub-value A to
+# sub-sub-values B and C (can be evaluated in parallel if supported, or just
+# emulated sequentially if there aren't enough cores available or whatever), 1
+# to perform a reduction in A (to combine the results) once B and C are done,
+# and 1 to perform a reduction in V (presumably it applies the results).
+
+# Each type ought to specify the time and space cost of advancing a frame given
+# a value, which might be constant or vary depending on the value of that type.
+
+# Now the machine code in the implementation amy be defined to suspend and
+# return after a given number of steps.
 
 
 
