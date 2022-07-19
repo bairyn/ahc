@@ -133,6 +133,20 @@
 # Now the machine code in the implementation amy be defined to suspend and
 # return after a given number of steps.
 
+# Probably the best way to handle time and space representation is through
+# reflection, where e.g. you have a GADT representable in only X many patterns
+# of machine code, and you know the time and space requirements of each, and
+# then you can write proofs with it.
+#
+# So probably besides just having reflection, we can also just be sure to keep
+# in mind practical and convenient handling of time requirements, e.g. adding a
+# field in the metadata e.g. after the impl vpointer that just says either
+# directly what the worst-case time cost is whatever units or it is a
+# continuation or callback that will calculate it for you, looking at the value
+# or data if necessary.  And we can also just maybe e.g. have a parameter that
+# specifies an optional limit on the number of steps and/or frames and/or ticks
+# to take before returning or whatever.  We can decide these details as we go along.
+
 
 
 
