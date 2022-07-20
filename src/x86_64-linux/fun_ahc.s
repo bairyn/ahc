@@ -38,7 +38,50 @@ ns_fun_ahc_funahc_list:
 # A is closed, where open means it can have constructors added?  Closed means
 # no new constructors?
 #
-# Well, hmm, if it were in the value-level approach, -  interrupted.
+# Well, hmm, if it were in the value-level approach, a List A would basically
+# be a lambda like ‘(withEnd : R) -> (withPush : A -> List A -> R) -> R’.  The
+# constructors give you such a lambda callback.  And the type constructor?
+# Well, with the design I was thinking of earlier, it would be erased.
+#
+# However, if you operated at a fundamentally type level, hmm...
+#
+# (Well, it can't be both values and types, or else you couldn't even represent
+# an Empty type, since the Empty type itself shouldn't exist, ... I guess only
+# empty types then would be forbidden via contradiction from that model.
+# Actually, even now, how would you represent an empty type?  Well, basically,
+# you wouldn't; it just wouldn't be a value or really a runtime entity at all.
+# It'd be only a figment of the type system.
+#
+# So actually already your proposed value-based model wouldn't work since you
+# can't have ... actually, wait ... no, it *could* work if types are values.
+#
+# Huh, okay.  I guess that works.)
+#
+# (And BTW, if you tried to apply the GADT-values-as-destructor-applications
+# model, then you'd find that instead of being like ‘(withCons1 : blah -> R) ->
+# (withCons2 : blah -> R) -> … -> R)’, it'd be like ‘(nothing) -> R’, or really
+# just ‘R’.  Basically, extending this pattern to the Empty type (bottom,
+# contradiction, false, whatever you want to call it) is essentially a value
+# that can be anything.)
+#
+# (Well, cool, but now you just need to find a good way to
+# implementation-definedly implement and define type-values: types as values.
+# That's the next step, and then after that is defining/implementing List.)
+#
+# Is it just a name in nature, be it via a string, a location in memory, etc.?
+# Or should it give you information about its structure?  Or some combination
+# of both, or some third alternative I haven't considered?  My first *guess* is
+# the former seems more fundamental, so while maybe as an aid you can give more
+# support information if desired, probably we'll just implement it essentially
+# as a name, although we might optionally also add non-essential information
+# like structor of GADT constructors which can be used in various propositions
+# about structural equivalence.
+#
+# TODO next steps:
+# - Think about how you want to do implementation-defined types as values.
+# - Implement List.  (Probably then you can rework the supporting documentation
+#   and context and organize the modules and such, once you have a better idea
+#   how things will play out.)
 
 
 
