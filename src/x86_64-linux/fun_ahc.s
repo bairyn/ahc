@@ -1,3 +1,83 @@
+
+
+# The AHC module.
+# TODO ns_fun_ahc_$(base64 FunAhc)
+
+# Nat.
+# TODO ns_fun_ahc_$(base64 FunAhc.Nat)
+
+# List.
+# TODO ns_fun_ahc_$(base64 FunAhc.List)
+# TODO: probably just start here next, so you don't have to keep rewriting
+# everything else the next iteration.
+
+# TODO: try to not be lazy and look at the root.s spec for these things.
+
+ns_fun_ahc_funahc_list:
+# So this is supposed to be like:
+# 	data List : A -> Type where
+# 		End : List A
+# 		Push : A -> List A -> List A
+
+# This is probably a good first Prelude definition to start with, since it
+# captures a lot and if you need to change anything, you will have already
+# invested less (sunk cost) in your current design.  But even if this doesn't
+# succeed, it's okay.
+
+# So according to what I was proposing, while the runtime can implement its own
+# type system, either at runtime or at compile-time via singletons (exactly one
+# type can be deduced from exactly one value and exactly one value can be
+# deduced from exactly one type; it's an isomorphism; and values become
+# actually types.  If you have e.g. an empty type, there is a single value to
+# represent the empty type, but actually the value is really a type, and there
+# really is no value), and the type information structure here is lost, so we
+# just have the constructors.
+#
+# TODO: can you actually just have just runtime types instead of just runtime
+# values?  How about closed vs open, and Type or better GADT is open, and List
+# A is closed, where open means it can have constructors added?  Closed means
+# no new constructors?
+#
+# Well, hmm, if it were in the value-level approach, -  interrupted.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # AHC function execution model.
 
 # This module supplies a bootstrapping Prelude for use for our compiler.  In a
