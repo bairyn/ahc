@@ -83,6 +83,77 @@ ns_fun_ahc_funahc_list:
 #   and context and organize the modules and such, once you have a better idea
 #   how things will play out.)
 
+# Well, let's see.  What is required from types as value?  I guess parameters
+# can be specified that values must be of those types.
+
+# So, for here while it's a good idea to have a type value for lists, we
+# technically don't need, as it can jjust be a compile-time only figment.
+
+# First, the type: just a fully qualified name to this module's type
+# constructor, along with a sequence of constructors.  Strictly speaking, not
+# required to run, but provided in good practice.
+# TODO type: 
+
+# TODO: End.
+
+# Push : A -> List A -> List A
+# So I think the basic pattern is this:
+# \a -> \l -> \f -> \g -> g a l
+# Which with linear types becomes:
+# \a -> \l -> \f -> \g -> del f (g a l)
+#
+# This honestly resembles a stack-based language, like Forth or whatever it's
+# called.  e.g. it could phrased as ‘take take take del take 3 rotr swap 3 rotl apply apply’
+#
+# So how do I want the machine code to advance it to look like?  Probably
+# depends on the pattern, first off.  FunApp does one ‘hole fill’ (or a dup),
+# or a nop if no argument is applied.  Probably just do that.  Do FunApps for
+# the 4 args, with appropriately steps afterward, whether hole filling or del
+# (or dup, but dup isn't used here).
+#
+# Could copies for dels be optimized out?  It seems wasteful to copy something
+# that could potentially be big, if it's only going to be discarded afterwards.
+# Consider the cost.
+#
+# (And by the way, this is inspired by IIRC the first chapter of HoTT.  This
+# pattern of represting GADTs in this way, essentially by supplying a sequence
+# of callbacks that return the return type, and then the constructor that was
+# used to construct the value is the one that corresponds to the destructor or
+# accessor used.)
+#
+# If you add optimization, then the space cost is affected by whether
+# this optimization is enabled.  I'd probably go this route, except for this
+# thought:
+#
+# You could use something like pointers instead of something more direct, since
+# pointers are cheap to copy.
+#
+# Maybe it could be like a lazy-by-default-copy.
+#
+# Hmm.  Maybe Push doesn't even need to know that there's actually an extra
+# hidden layer of dereference that somebody added there.  The caller of Push
+# could just provide a copy of a pointer to a local Value that, when advanced
+# to the next frame, will perform the actual copying, in case the value is
+# large, although it could of course be the case the value is small, too.
+#
+# So I guess a FunApp advancement can result in a few things:
+# 1) Nop, since no value is being applied (a lambda doesn't change when advanced; it's just like a constant value 3).
+# 2) Take and fill a hole, assuming the lifetime of the hole continues to be managed.
+# 3) Del.
+# 4) Dup.
+#
+# Perhaps if you can prove properties like it being re-entrant /
+# idempotent, maybe you could get by by - so long as cleanup were appropriately
+# handled for when the Value's ‘del’ is invoked - having, instead of 2 buffers
+# initially copies or near copies of each other, one modifying the other before
+# updating the impl pointer to advance the frame; just 1 actual buffer of memory where the impl
+# pointer advances within the same buffer, so long as properties like
+# idempotence are appropriately managed to make sure the optimization doesn't
+# break things.
+#
+# (And don't forget about the caller putting in place time limits before
+# suspending or returning, although I'll have to see whether it would return
+# after a step regardless.)
 
 
 
