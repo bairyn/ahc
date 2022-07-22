@@ -1,5 +1,11 @@
 
 
+# Configure the platform.
+.code64
+
+# TODO: setup module.
+.text
+
 # The AHC module.
 # TODO ns_fun_ahc_$(base64 FunAhc)
 
@@ -13,7 +19,7 @@
 
 # TODO: try to not be lazy and look at the root.s spec for these things.
 
-ns_fun_ahc_funahc_list:
+#ns_fun_ahc_funahc_list:
 # So this is supposed to be like:
 # 	data List : A -> Type where
 # 		End : List A
@@ -154,6 +160,80 @@ ns_fun_ahc_funahc_list:
 # (And don't forget about the caller putting in place time limits before
 # suspending or returning, although I'll have to see whether it would return
 # after a step regardless.)
+
+# Value: the Push cosntructor.
+#
+# This value is a normal value implemented according to our values as objects
+# model.
+.global ns_fun_ahc_FunAhc_Push
+ns_fun_ahc_FunAhc_Push:
+	# Size.
+	.quad (_ns_fun_ahc_FunAhc_Push_end - ns_fun_ahc_FunAhc_Push)
+
+	# Frame.
+	.quad (_ns_fun_ahc_FunAhc_Push_buffer0 - ns_fun_ahc_FunAhc_Push)
+
+	_ns_fun_ahc_FunAhc_Push_buffer0:
+		# Size.
+		.quad (_ns_fun_ahc_FunAhc_Push_buffer0_end - _ns_fun_ahc_FunAhc_Push_buffer0)
+
+		# Linker table vpointer.
+		.quad (_ns_fun_ahc_FunAhc_Push_ltable0 - ns_fun_ahc_FunAhc_Push)
+
+		# Impl vpointer.
+		.quad (_ns_fun_ahc_FunAhc_Push_impl0 - ns_fun_ahc_FunAhc_Push)
+	_ns_fun_ahc_FunAhc_Push_buffer0_end:
+
+	_ns_fun_ahc_FunAhc_Push_buffer1:
+		# Size.
+		.quad (_ns_fun_ahc_FunAhc_Push_buffer1_end - _ns_fun_ahc_FunAhc_Push_buffer1)
+
+		# Linker table vpointer.
+		.quad (_ns_fun_ahc_FunAhc_Push_ltable1 - ns_fun_ahc_FunAhc_Push)
+
+		# Impl vpointer.
+		.quad (_ns_fun_ahc_FunAhc_Push_impl1 - ns_fun_ahc_FunAhc_Push)
+	_ns_fun_ahc_FunAhc_Push_buffer1_end:
+
+	_ns_fun_ahc_FunAhc_Push_ltable0:
+		# Size.
+		.quad (_ns_fun_ahc_FunAhc_Push_ltable0_end - _ns_fun_ahc_FunAhc_Push_ltable0)
+
+		# TODO
+	_ns_fun_ahc_FunAhc_Push_ltable0_end:
+
+	_ns_fun_ahc_FunAhc_Push_ltable1:
+		# Size.
+		.quad (_ns_fun_ahc_FunAhc_Push_ltable1_end - _ns_fun_ahc_FunAhc_Push_ltable1)
+
+		# TODO
+	_ns_fun_ahc_FunAhc_Push_ltable1_end:
+
+	# TODO: document Params and such, for the arrow type.  Because at the root
+	# of the type of this constructor function is an arrow, although the arrow
+	# composes other types.  e.g. ‘set register X to return, Y to max
+	# steps/whatever, and execution starts at offset 16, etc.’
+	_ns_fun_ahc_FunAhc_Push_impl0:
+		# Size.
+		.quad (_ns_fun_ahc_FunAhc_Push_impl0_end - _ns_fun_ahc_FunAhc_Push_impl0)
+
+		# Placeholder.
+		.quad 0x0
+
+		# TODO
+	_ns_fun_ahc_FunAhc_Push_impl0_end:
+
+	_ns_fun_ahc_FunAhc_Push_impl1:
+		# Size.
+		.quad (_ns_fun_ahc_FunAhc_Push_impl1_end - _ns_fun_ahc_FunAhc_Push_impl1)
+
+		# Placeholder.
+		.quad 0x0
+
+		# TODO
+	_ns_fun_ahc_FunAhc_Push_impl1_end:
+
+_ns_fun_ahc_FunAhc_Push_end:
 
 
 
