@@ -220,6 +220,9 @@ ns_fun_ahc_FunAhc_Push:
 		# Placeholder.
 		.quad 0x0
 
+		# Advance a frame: check for application, and if present, take the
+		# appropriate action and swap the buffers by updating the pointer.
+
 		# TODO
 	_ns_fun_ahc_FunAhc_Push_impl0_end:
 
