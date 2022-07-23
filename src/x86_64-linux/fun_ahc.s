@@ -220,8 +220,39 @@ ns_fun_ahc_FunAhc_Push:
 		# Placeholder.
 		.quad 0x0
 
+		# Offset 16.
+		#
 		# Advance a frame: check for application, and if present, take the
 		# appropriate action and swap the buffers by updating the pointer.
+		#
+		# Parameters:
+		# %rdi: Return once the frame is advanced, with parameters:
+		# 	%rdi: Bitfield status.
+		# 	%rsi: Number of steps performed and consumed.
+		# 	%rdx: i64 change in memory claimed, in bytes.
+		# %rsi: Return on special condition, with parameters:
+		# 	%rdi: Bitfield indicating what happened:
+		# 		Bit 0: Step timeout occurred?
+		# 		Bits 1…63: unused, 0.
+		# 	%rsi: Number of steps performed and consumed.
+		# 	%rdx: i64 change in memory claimed, in bytes.
+		# %rdx: Options bitfield:
+		# 	Bit 0: Enable step timeout?
+		# 	Bit 1: Enable function application?
+		# 	Bits 1…63: unused, 0.
+		# %rcx: Step timeout; ignored if disabled.
+		# %r8: Function input parameter vpointer; ignored if disabled.
+		movq $0, %r9  # Steps.
+
+		# FuncApp?
+		testq $0x2, %rdx
+		jn 1f
+		nop
+0:
+		# TODO
+1:
+
+		# TODO: concurrency?
 
 		# TODO
 	_ns_fun_ahc_FunAhc_Push_impl0_end:
