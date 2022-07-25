@@ -244,13 +244,30 @@ ns_fun_ahc_FunAhc_Push:
 		# %r8: Function input parameter vpointer; ignored if disabled.
 		movq $0, %r9  # Steps.
 
+		# At this stage, it's basically \A : Type -> \R : Type -> \head : A ->
+		# \tail : List A -> \(withEnd : A -> R) -> \(withPush : A -> List A ->
+		# R) -> R
+
 		# FuncApp?
 		testq $0x2, %rdx
 		jn 1f
 		nop
 0:
+		# No application.  No-op.
 		# TODO
 1:
+
+		# Advance a frame and return.
+		#
+		# Actually, for our implementation, the first application is easy at
+		# runtime: we simply disregard the type.  Oh, TODO: linear types.
+		#
+		# TODO: we can mutate ourselves, right?
+		# Or do we need to mutate only memory not ultimately pointed to by
+		# frame?  That is, update the Value's root frame too when we're done.
+		# TODO: 
+		#movq _, impl_vpointer1
+		#movq _, buffer0 to buffer 1
 
 		# TODO: concurrency?
 
