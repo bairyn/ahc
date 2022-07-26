@@ -254,10 +254,46 @@ ns_fun_ahc_FunAhc_Push:
 		nop
 0:
 		# No application.  No-op.
-		# TODO
+
+		# Prepare to return.
+		movq %rdi, %rcx  # Ret.
+		movq $0, %rdx  # memory delta
+		movq $1, %rsi  # Steps.
+		movq $0, %rdi  # Status.
+
+		# Advance the frame: update buffer1's impl vpointer.
+		leaq ns_fun_ahc_FunAhc_Push(%rip), %r8
+		movq %r8, %r9
+		addq $(_ns_fun_ahc_FunAhc_Push_buffer1 - ns_fun_ahc_FunAhc_push), %r8
+		addq $16, %r8
+		addq $(_ns_fun_ahc_FunAhc_Push_impl1 - ns_fun_ahc_FunAhc_push), %r9
+		movq %r9, (%r8)
+
+		# Advance the frame: swap the buffers.
+		leaq ns_fun_ahc_FunAhc_Push(%rip), %r8
+		movq %r8, %r9
+		addq $8, %r8
+		addq $(_ns_fun_ahc_FunAhc_Push_buffer1 - ns_fun_ahc_FunAhc_push), %r9
+		movq %r9, (%r8)
+
+		# Return.
+		jmp *%rcx
+		nop
 1:
 
+		# Advance a frame and return: consume A (: Type), and (while we could
+		# alternatively delete it later in our chain), delete it.
+		movq 8(%r8), %r9
+		addq %r8, %r9  # %r9 is now the frame for the A value, probably a copy put within our own Value.
+		movq 8(%r9), %r9
+		addq %r8, %r9  # %r9 is now its linker table.
+		leaq 40(%r9), %r9  # Get del; find the right offset specified by the type for the destructor.
+		# TODO: call del.
+
 		# Advance a frame and return.
+		#
+		# We've consumed A, and while we can delet it later, we'll just call
+		# its linker table's delete method to delete it now.
 		#
 		# Actually, for our implementation, the first application is easy at
 		# runtime: we simply disregard the type.  Oh, TODO: linear types.
@@ -283,6 +319,9 @@ ns_fun_ahc_FunAhc_Push:
 
 		# TODO
 	_ns_fun_ahc_FunAhc_Push_impl1_end:
+
+	# TODO: idempotent ‘stack’, upwards growing, where writes are idempotent between swaps /
+	# advances.  Available if needed.
 
 _ns_fun_ahc_FunAhc_Push_end:
 
