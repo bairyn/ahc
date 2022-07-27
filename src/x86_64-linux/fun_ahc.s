@@ -255,6 +255,19 @@ ns_fun_ahc_FunAhc_Push:
 0:
 		# No application.  No-op.
 
+		# Before we return, check the timeout.
+		testq $0x1, %rdx
+		jz 2f
+		nop
+3:
+		cmpq $0, %rcx
+		jg 2f
+		nop
+
+		# Step time-out reached.  Abort, via %rsi.
+		# TODO
+2:
+
 		# Prepare to return.
 		movq %rdi, %rcx  # Ret.
 		movq $0, %rdx  # memory delta
