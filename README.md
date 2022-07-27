@@ -18,3 +18,6 @@ Probably also we'll have minimal dependencies, with just a working Haskell2010
 implementation.  We can provide our own libraries e.g. with a Haskell2010 AST,
 and if needed a bridge package can be created to cast between equivalent ASTs
 from separate packages.
+
+(I guess also I'll need a new name or ‘ahc’.  Amazing Haskell Compiler?  Wasn't
+there a third one?  ‘Alternative Haskell Compiler’?)
