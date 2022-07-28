@@ -1,0 +1,154 @@
+cabal-version: 2.4
+
+-- TODO: disable Cabal rules or warnings about using tabs for indentation.
+-- It's a better style: https://dmitryfrank.com/articles/indent_with_tabs_align_with_spaces
+
+name:              ahc
+-- Note: be sure the version is consistent in the 3 places it appears:
+-- 	- `ahc.cabal`
+-- 	- `CHANGELOG.md`
+-- 	- `src/Language/Haskell/Ahc/Meta/Ahc.hs`
+-- (TODO: add a check in a suitable location for consistency in these 3 places,
+-- e.g. somewhere in the Makefile.)
+version:           0.1.0.0-dev
+
+synopsis:          A Haskell Compiler
+description:
+	A Haskell2010 Compiler with support for GADT, linear type, dependent type
+	extensions, TemplateHaskell, and possibly more, and which can compile to
+	platforms without a garbage collector, with minimal dependencies, and with
+	relocatable libraries and code.
+
+	It bootstraps itself and requires no dependency other than a working
+	Haskell2010 implementation.  It exposes itself as a library, so external
+	packages such as ‘bridge-ahc-haskell-src-exts’ can be created to cast
+	between one AST definition and another and visa versa.  New platforms can
+	be added and cross-compiled to, and then the new platform will then have a
+	working ‘ahc’ compiler, alone sufficient to then bootstrap an entire
+	working Haskell2010 system.
+category:          Compilers
+homepage:          https://example.com/
+bug-reports:       https://example.com/
+
+-- The license under which the package is released.
+license-non-spdx:  Permissive OSS style.
+license:           0BSD
+license-file:      LICENSE
+author:            Byron Johnson
+maintainer:        byron@byronjohnson.net
+build-type:        Simple
+copyright:         nah
+
+extra-source-files:
+	README.md
+	CHANGELOG.md
+	Setup.hs
+	Makefile
+
+library
+	default-language: Haskell2010
+	other-extensions:
+		-- GADTs
+		-- TemplateHaskell
+
+	hs-source-dirs: src
+
+	ghc-options: -Wall
+
+	build-depends:
+		base >= 4.3,
+		--ahc,
+
+	exposed-modules:
+		Language.Haskell.Ahc.Meta.Ahc
+		-- TODO
+
+executable ahc
+	-- ‘executable’-specific attributes.
+	main-is: Language/Haskell/Ahc/Main.hs
+
+	build-depends:
+		ahc,
+
+	-- Based on *library.
+	default-language: Haskell2010
+	other-extensions:
+		-- GADTs
+		-- TemplateHaskell
+
+	hs-source-dirs: src
+
+	ghc-options: -Wall
+
+	build-depends:
+		base >= 4.3,
+		ahc,
+
+	other-modules:
+		Language.Haskell.Ahc.Meta.Ahc
+		-- TODO
+
+test-suite test-ahc
+	-- ‘test-suite’-specific attributes.
+	type: exitcode-stdio-1.0
+	main-is: Language/Haskell/Ahc/Tests/Main.hs
+
+	-- Note: the core executable and library we prefer to have minimal
+	-- dependencies, so we pull in nothing other than a working Haskell2010
+	-- implementation.  However, the test suite is not essential and is
+	-- complementary, so here we may pull in additional dependencies.
+
+	-- Based on *library.
+	default-language: Haskell2010
+	other-extensions:
+		-- GADTs
+		-- TemplateHaskell
+
+	hs-source-dirs: src
+
+	ghc-options: -Wall
+
+	build-depends:
+		base >= 4.3,
+		ahc,
+
+		-- test-suite dependencies.
+		-- HUnit-1.6.2.0
+		HUnit >= 1.6.2.0 && < 1.7,
+		-- QuickCheck-2.14.2
+		QuickCheck >= 2.14.2 && < 2.15,
+
+	other-modules:
+		Language.Haskell.Ahc.Meta.Ahc
+		-- TODO
+
+benchmark bench-ahc
+	-- ‘benchmark’-specific attributes.
+	type: exitcode-stdio-1.0
+	main-is: Language/Haskell/Ahc/Benchmark/Main.hs
+
+	-- Note: the core executable and library we prefer to have minimal
+	-- dependencies, so we pull in nothing other than a working Haskell2010
+	-- implementation.  However, the benchmark portion is not essential and is
+	-- complementary, so here we may pull in additional dependencies.
+
+	-- Based on *library.
+	default-language: Haskell2010
+	other-extensions:
+		-- GADTs
+		-- TemplateHaskell
+
+	hs-source-dirs: src
+
+	ghc-options: -Wall
+
+	build-depends:
+		base >= 4.3,
+		ahc,
+
+		-- criterion-1.5.13.0
+		criterion >= 1.5.13.0 && < 1.6,
+
+	other-modules:
+		Language.Haskell.Ahc.Meta.Ahc
+		-- TODO
