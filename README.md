@@ -21,3 +21,22 @@ from separate packages.
 
 (I guess also I'll need a new name or ‘ahc’.  Amazing Haskell Compiler?  Wasn't
 there a third one?  ‘Alternative Haskell Compiler’?)
+
+## Scratch
+
+AHC aims to be
+- Bootstrappable from Haskell2010 alone.
+- To require no RTS or for it to at least be optional.
+- TODO
+
+TODO:
+- two ahc variants: one with minimal dependencies except just Haskell2010 with
+  the ‘haskell2010’ package (not even base), perhaps with its own simple
+  implementations for various components like parsing, and then a fuller
+  variant with more dependencies.   They work the same if you ignore those
+  dependencies, but having 2 variants gives you one option with better build
+  complexity, perhaps useful for porting and bootstrapping.  In case of
+  porting, essentially, you just need a working Haskell2010 implementation
+  (possibly ahc itself, but possibly another) to build ahc, but once you build
+  ahc, you can cross-combine ahc to another platform, and that ahc
+  implementation can enable you to bootstrap an entire Haskell2010 setup.
