@@ -12,7 +12,7 @@ name:              ahc
 -- e.g. somewhere in the Makefile.)
 version:           0.1.0.0-dev
 
-synopsis:          A Haskell Compiler
+synopsis:          Alternative Haskell Compiler
 description:
 	A Haskell2010 Compiler with support for GADT, linear type, dependent type
 	extensions, TemplateHaskell, and possibly more, and which can compile to
@@ -56,8 +56,7 @@ library
 	ghc-options: -Wall
 
 	build-depends:
-		base >= 4.3,
-		--ahc,
+		haskell2010
 
 	exposed-modules:
 		Language.Haskell.Ahc.Meta.Ahc
