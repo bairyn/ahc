@@ -12,7 +12,8 @@ name:              ahc
 -- e.g. somewhere in the Makefile.)
 version:           0.1.0.0-dev
 
-synopsis:          Alternative Haskell Compiler
+synopsis:          AHC Haskell Compiler
+-- TODO: edit this description.
 description:
 	A Haskell2010 Compiler with support for GADT, linear type, dependent type
 	extensions, TemplateHaskell, and possibly more, and which can compile to
@@ -20,12 +21,17 @@ description:
 	relocatable libraries and code.
 
 	It bootstraps itself and requires no dependency other than a working
-	Haskell2010 implementation.  It exposes itself as a library, so external
-	packages such as ‘bridge-ahc-haskell-src-exts’ can be created to cast
-	between one AST definition and another and visa versa.  New platforms can
-	be added and cross-compiled to, and then the new platform will then have a
-	working ‘ahc’ compiler, alone sufficient to then bootstrap an entire
-	working Haskell2010 system.
+	Haskell2010 implementation (the stage 0 compiler).  It exposes itself as a
+	library, so external packages such as ‘bridge-ahc-haskell-src-exts’ can be
+	created to cast between one AST definition and another and visa versa.  New
+	platforms can be added and cross-compiled to, and then the new platform
+	will then have a working ‘ahc’ compiler, alone sufficient to then bootstrap
+	an entire working Haskell2010 system.
+
+	‘ahc-core’ is a minimalistic implementation designed to have minimal
+	dependencies and requirements, including no build dependencies other than
+	`haskell2010`.  However, other packages may provide libraries and
+	executables that add additional dependencies.
 category:          Compilers
 homepage:          https://example.com/
 bug-reports:       https://example.com/
@@ -37,7 +43,7 @@ license-file:      LICENSE
 author:            Byron Johnson
 maintainer:        byron@byronjohnson.net
 build-type:        Simple
-copyright:         nah
+copyright:         2022, Byron Johnson
 
 extra-source-files:
 	README.md
@@ -53,21 +59,30 @@ library
 
 	hs-source-dirs: src
 
+	-- TODO: good idea to specify these flags here?  Maybe use a flag in case
+	-- the user wants to specify alternative build flags, and have default
+	-- build settings.  Just review this.
 	ghc-options: -Wall
 
 	build-depends:
-		haskell2010
+		haskell2010,
 
 	exposed-modules:
 		Language.Haskell.Ahc.Meta.Ahc
+		Language.Haskell.Ahc.Haskell2010.Syntax.Simple
 		-- TODO
 
-executable ahc
+-- An implementation designed for portability and minimalistic requirements.
+--
+-- Other frontends may be more suitable for regular use.
+--
+-- This should only require ‘ahc-core’ and ‘haskell2010’.
+executable ahc-minimal
 	-- ‘executable’-specific attributes.
 	main-is: Language/Haskell/Ahc/Main.hs
 
 	build-depends:
-		ahc,
+		ahc-core,
 
 	-- Based on *library.
 	default-language: Haskell2010
@@ -80,8 +95,8 @@ executable ahc
 	ghc-options: -Wall
 
 	build-depends:
-		base >= 4.3,
-		ahc,
+		ahc-core,
+		haskell2010,
 
 	other-modules:
 		Language.Haskell.Ahc.Meta.Ahc
@@ -108,8 +123,8 @@ test-suite test-ahc
 	ghc-options: -Wall
 
 	build-depends:
-		base >= 4.3,
-		ahc,
+		ahc-core,
+		haskell2010,
 
 		-- test-suite dependencies.
 		-- HUnit-1.6.2.0
@@ -142,11 +157,11 @@ benchmark bench-ahc
 	ghc-options: -Wall
 
 	build-depends:
-		base >= 4.3,
-		ahc,
+		ahc-core,
+		haskell2010,
 
-		-- criterion-1.5.13.0
-		criterion >= 1.5.13.0 && < 1.6,
+		-- criterion-1.6.0.0
+		criterion >= 1.6.0.0 && < 1.7,
 
 	other-modules:
 		Language.Haskell.Ahc.Meta.Ahc

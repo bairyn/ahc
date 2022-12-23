@@ -1,4 +1,4 @@
-# History of ‘ahc’ versions.
+# History of ‘ahc-core’ versions.
 
 Note: be sure the version is consistent in the 3 places it appears (TODO: update locations):
 	- `ahc.cabal`
