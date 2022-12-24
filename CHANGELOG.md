@@ -1,10 +1,10 @@
 # History of ‘ahc’ versions.
 
-Note: be sure the version is consistent in the 3 places it appears (TODO: update locations):
-	- `ahc.cabal`
+Note: be sure the version is consistent in the 4 places it appears:
 	- `CHANGELOG.md`
-	- `src/Tollshray/Meta/Tollshray.hs`
-	- `src/Language/Haskell/Ahc/Meta/Ahc.hs`
+	- `packages/ahc-core/CHANGELOG.md`
+	- `packages/ahc-core/ahc-core.cabal`
+	- `packages/ahc-core/src/Language/Haskell2010/Ahc/Meta/Ahc.hs`
 
 ## 0.1.0.0-dev -- 2022-07-27
 

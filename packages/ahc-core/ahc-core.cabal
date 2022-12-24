@@ -1,32 +1,32 @@
-cabal-version: 2.4
+cabal-version: 3.0
 
 -- TODO: disable Cabal rules or warnings about using tabs for indentation.
--- It's a better style: https://dmitryfrank.com/articles/indent_with_tabs_align_with_spaces
+-- It's a style I like prefer: https://dmitryfrank.com/articles/indent_with_tabs_align_with_spaces
 
-name:              ahc
--- Note: be sure the version is consistent in the 3 places it appears:
--- 	- `ahc.cabal`
+name:              ahc-core
+-- Note: be sure the version is consistent in the 4 places it appears:
 -- 	- `CHANGELOG.md`
--- 	- `src/Language/Haskell/Ahc/Meta/Ahc.hs`
--- (TODO: add a check in a suitable location for consistency in these 3 places,
--- e.g. somewhere in the Makefile.)
+-- 	- `packages/ahc-core/CHANGELOG.md`
+-- 	- `packages/ahc-core/ahc-core.cabal`
+-- 	- `packages/ahc-core/src/Language/Haskell2010/Ahc/Meta/Ahc.hs`
 version:           0.1.0.0-dev
 
 synopsis:          AHC Haskell Compiler
--- TODO: edit this description.
 description:
-	A Haskell2010 Compiler with support for GADT, linear type, dependent type
-	extensions, TemplateHaskell, and possibly more, and which can compile to
-	platforms without a garbage collector, with minimal dependencies, and with
-	relocatable libraries and code.
+	(TODO: yet to be implemented) A Haskell2010 compiler with support for GADT,
+	linear type, dependent type extensions, TemplateHaskell, and more, and
+	which can compile to platforms without a garbage collector, with minimal
+	dependencies, and with relocatable libraries and code.
 
-	It bootstraps itself and requires no dependency other than a working
-	Haskell2010 implementation (the stage 0 compiler).  It exposes itself as a
-	library, so external packages such as ‘bridge-ahc-haskell-src-exts’ can be
-	created to cast between one AST definition and another and visa versa.  New
-	platforms can be added and cross-compiled to, and then the new platform
-	will then have a working ‘ahc’ compiler, alone sufficient to then bootstrap
-	an entire working Haskell2010 system.
+	It requires no dependency other than a working Haskell2010 implementation
+	(the stage 0 compiler) in a suitable development environment.  This stage 0
+	compiler may be ‘ahc’ itself, cross-compiled from another platform.  It
+	exposes itself as a library, so external packages such as
+	‘brideg-ahc-haskell-src-exts’ can be created to cast between one AST
+	definition and another and visa versa.  New platforms can be added and
+	cross-compiled to, and then the new platform will then have a working ‘ahc’
+	compiler, a Haskell2010 implementation alone sufficient to then bootstrap a
+	more complete Haskell setup.
 
 	‘ahc-core’ is a minimalistic implementation designed to have minimal
 	dependencies and requirements, including no build dependencies other than
@@ -50,27 +50,59 @@ extra-source-files:
 	CHANGELOG.md
 	Setup.hs
 	Makefile
+	src/ahc-minimal
 
-library
+flag add-default-compiler-flags
+	description:
+		Add default set of compiler flags.
+	default: True
+	manual: True
+
+flag haskell2010-package-provides-haskell2010-modules
+	description:
+		Let the ‘haskell2010’ package provide the Haskell2010 library modules
+		rather than ‘base’.
+	default: True
+	manual: False
+
+common all-components
 	default-language: Haskell2010
 	other-extensions:
 		-- GADTs
-		-- TemplateHaskell
+		-- TemplateHasskell
 
 	hs-source-dirs: src
 
-	-- TODO: good idea to specify these flags here?  Maybe use a flag in case
-	-- the user wants to specify alternative build flags, and have default
-	-- build settings.  Just review this.
-	ghc-options: -Wall
+	if flag(add-default-compiler-flags)
+		-- Disable tab warner.
+		-- It's a better style: https://dmitryfrank.com/articles/indent_with_tabs_align_with_spaces
+		ghc-options: -Wall -Wno-tabs
+
+	if flag(haskell2010-package-provides-haskell2010-modules)
+		build-depends:
+			haskell2010,
+	else
+		build-depends:
+			base >= 4.3 && < 9.5,
+
+common extended-components
+	import: all-components
 
 	build-depends:
-		haskell2010,
+		ahc-core,
+
+	other-modules:
+		Language.Haskell2010.Ahc.Meta.Ahc
+		Language.Haskell2010.Ahc.Frontends.CLI
+		Language.Haskell2010.Ahc.Syntax.Simple
+
+library
+	import: all-components
 
 	exposed-modules:
-		Language.Haskell.Ahc.Meta.Ahc
-		Language.Haskell.Ahc.Haskell2010.Syntax.Simple
-		-- TODO
+		Language.Haskell2010.Ahc.Meta.Ahc
+		Language.Haskell2010.Ahc.Frontends.CLI
+		Language.Haskell2010.Ahc.Syntax.Simple
 
 -- An implementation designed for portability and minimalistic requirements.
 --
@@ -78,91 +110,43 @@ library
 --
 -- This should only require ‘ahc-core’ and ‘haskell2010’.
 executable ahc-minimal
+	import: all-components
+	import: extended-components
+
 	-- ‘executable’-specific attributes.
-	main-is: Language/Haskell/Ahc/Main.hs
+	main-is: Language/Haskell2010/Ahc/Main.hs
 
-	build-depends:
-		ahc-core,
+test-suite ahc-minimal-test
+	import: all-components
+	import: extended-components
 
-	-- Based on *library.
-	default-language: Haskell2010
-	other-extensions:
-		-- GADTs
-		-- TemplateHaskell
-
-	hs-source-dirs: src
-
-	ghc-options: -Wall
-
-	build-depends:
-		ahc-core,
-		haskell2010,
-
-	other-modules:
-		Language.Haskell.Ahc.Meta.Ahc
-		-- TODO
-
-test-suite test-ahc
 	-- ‘test-suite’-specific attributes.
 	type: exitcode-stdio-1.0
-	main-is: Language/Haskell/Ahc/Tests/Main.hs
+	main-is: Language/Haskell2010/Ahc/Tests/Main.hs
 
 	-- Note: the core executable and library we prefer to have minimal
 	-- dependencies, so we pull in nothing other than a working Haskell2010
 	-- implementation.  However, the test suite is not essential and is
 	-- complementary, so here we may pull in additional dependencies.
-
-	-- Based on *library.
-	default-language: Haskell2010
-	other-extensions:
-		-- GADTs
-		-- TemplateHaskell
-
-	hs-source-dirs: src
-
-	ghc-options: -Wall
-
 	build-depends:
-		ahc-core,
-		haskell2010,
-
 		-- test-suite dependencies.
 		-- HUnit-1.6.2.0
 		HUnit >= 1.6.2.0 && < 1.7,
 		-- QuickCheck-2.14.2
 		QuickCheck >= 2.14.2 && < 2.15,
 
-	other-modules:
-		Language.Haskell.Ahc.Meta.Ahc
-		-- TODO
+benchmark ahc-minimal-bench
+	import: all-components
+	import: extended-components
 
-benchmark bench-ahc
 	-- ‘benchmark’-specific attributes.
 	type: exitcode-stdio-1.0
-	main-is: Language/Haskell/Ahc/Benchmark/Main.hs
+	main-is: Language/Haskell2010/Ahc/Benchmark/Main.hs
 
 	-- Note: the core executable and library we prefer to have minimal
 	-- dependencies, so we pull in nothing other than a working Haskell2010
 	-- implementation.  However, the benchmark portion is not essential and is
 	-- complementary, so here we may pull in additional dependencies.
-
-	-- Based on *library.
-	default-language: Haskell2010
-	other-extensions:
-		-- GADTs
-		-- TemplateHaskell
-
-	hs-source-dirs: src
-
-	ghc-options: -Wall
-
 	build-depends:
-		ahc-core,
-		haskell2010,
-
 		-- criterion-1.6.0.0
 		criterion >= 1.6.0.0 && < 1.7,
-
-	other-modules:
-		Language.Haskell.Ahc.Meta.Ahc
-		-- TODO
