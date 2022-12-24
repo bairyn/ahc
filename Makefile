@@ -182,14 +182,24 @@ _CMD_BUILD_PREV_SHOW_0 = bash -c
 _CMD_BUILD_PREV_SHOW_  = $(_CMD_BUILD_PREV_SHOW_0)
 _CMD_BUILD_PREV_SHOW_1 = echo -nE
 
+_PREVALIDATE_VERSION_CONSISTENCY_DEPS = \
+	./CHANGELOG.md \
+	./packages/ahc-core/CHANGELOG.md \
+	./packages/ahc-core/ahc-core.cabal \
+	./packages/ahc-core/src/Language/Haskell2010/Ahc/Meta/Ahc.hs \
+ \
+	$(EMPTY)
+
 # Fail if the versions are inconsistent in the 4 locations in which they are
 # found:
 # 	- `CHANGELOG.md`
 # 	- `packages/ahc-core/CHANGELOG.md`
 # 	- `packages/ahc-core/ahc-core.cabal`
 # 	- `packages/ahc-core/src/Language/Haskell2010/Ahc/Meta/Ahc.hs`
+# TODO: timestamp, dependencies.
 .PHONY: build-prevalidate-version-consistency
-build-prevalidate-version-consistency:
+build-prevalidate-version-consistency: $(BUILD_DIR)/prevalidate-version-consistency.stamp
+$(BUILD_DIR)/prevalidate-version-consistency.stamp: $(_PREVALIDATE_VERSION_CONSISTENCY_DEPS) | build-dirs
 	@# Print our script, then pipe it to run it.
 	@n=$$'\n' && printf -- '%s\n' " $$n\
 		#!/usr/bin/env bash $$n\
@@ -322,3 +332,5 @@ $$n\
  $$n\
 		main \"\$$@\" $$n\
 	" | sed -nEe 's@^\t@@g; 1b; $$b; p' | xargs --null -- $(_CMD_BUILD_PREV_SHOW)
+
+	touch -- "$@"
