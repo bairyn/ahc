@@ -22,7 +22,7 @@ description:
 	(the stage 0 compiler) in a suitable development environment.  This stage 0
 	compiler may be ‘ahc’ itself, cross-compiled from another platform.  It
 	exposes itself as a library, so external packages such as
-	‘brideg-ahc-haskell-src-exts’ can be created to cast between one AST
+	‘bridge-ahc-core-haskell-src-exts’ can be created to cast between one AST
 	definition and another and visa versa.  New platforms can be added and
 	cross-compiled to, and then the new platform will then have a working ‘ahc’
 	compiler, a Haskell2010 implementation alone sufficient to then bootstrap a
