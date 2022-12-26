@@ -565,13 +565,17 @@ _DIRECT_SRC_TREE_REL_DIRS = \
 	Language/Haskell2010/Ahc/Syntax \
 	Language/Haskell2010/Ahc/Tests \
  \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010 \
+ \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple \
+ \
 	$(EMPTY)
 
 _DIRECT_SRC_TREE_REL_LIB_SRCS = \
 	Language/Haskell2010/Ahc/Benchmark/Benchmark.hs \
 	Language/Haskell2010/Ahc/Frontends/CLI.hs \
 	Language/Haskell2010/Ahc/Meta/Ahc.hs \
-	Language/Haskell2010/Ahc/Syntax/Simple.hs \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST.hs \
 	Language/Haskell2010/Ahc/Tests/Tests.hs \
  \
 	$(EMPTY)

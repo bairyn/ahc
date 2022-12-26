@@ -94,7 +94,7 @@ common extended-components
 	other-modules:
 		Language.Haskell2010.Ahc.Meta.Ahc
 		Language.Haskell2010.Ahc.Frontends.CLI
-		Language.Haskell2010.Ahc.Syntax.Simple
+		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
 
 library
 	import: all-components
@@ -102,7 +102,7 @@ library
 	exposed-modules:
 		Language.Haskell2010.Ahc.Meta.Ahc
 		Language.Haskell2010.Ahc.Frontends.CLI
-		Language.Haskell2010.Ahc.Syntax.Simple
+		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
 
 -- An implementation designed for portability and minimalistic requirements.
 --
