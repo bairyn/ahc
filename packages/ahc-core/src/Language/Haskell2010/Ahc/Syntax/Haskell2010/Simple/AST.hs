@@ -4,6 +4,8 @@
  - CLI.hs
  -
  - A front-end to ‘ahc-minimal’.
+ -
+ - TODO: finish.
  -}
 
 {-# LANGUAGE Haskell2010 #-}
@@ -13,45 +15,16 @@
 -- Does not include extensions, such as permitting trailing semicolons for more
 -- convenient automatic text manipulation.
 module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
-	-- TODO
 	-- * Base structures.
 	ModuleBase(..),
 	BodyBase(..),
 	ImplDecls(..),
 	TopDecls(..),
 
-	-- * Structures wiht default linking.
+	-- * Structures with default linking.
 ) where
 
 import Prelude ()
-
-{-
-{-
-data ModuleBase data0 data2 data3 apple banana cherry etc annotation fixpoint =
-	  Foo annotation apple
-	| Bar annotation banana
--}
-
-{-
-{-
-data ModuleBase data0 data2 data3 apple banana cherry etc annotation fixpoint =
-	  Foo annotation apple (data2 MyDataType foo bar)
-	| Bar annotation banana
--}
-
-data ModuleBase data0 data2 data3 list apple banana cherry etc annotation fixpoint =
-	  Foo annotation apple (data2 MyDataType foo bar)
-	| Bar annotation banana
--}
-
--- TODO: also have a mirrored simplified type for each?  Just because even with
--- a type, probably you'll still have newtypes like Identity.  Maybe hold off
--- for now until this is omre developed, and then decide.
-
---type Module = 
--}
-
--- TODO
 
 {-
  - ----------------------------------------------------------------
