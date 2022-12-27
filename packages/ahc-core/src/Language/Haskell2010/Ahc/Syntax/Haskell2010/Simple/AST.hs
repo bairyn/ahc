@@ -101,7 +101,25 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	DclassesBase(DclassesEmpty, DclassesPush),
 	DclassBase(DerivingClass),
 
-	-- ** § 4.2.2 Type Synonym Declarations types.
+	-- ** § 4.2.3 Datatype Renamings types.
+	NewConstrBase(BasicNewtypeConstructor, RecordNewtypeConstructor),
+
+	-- ** § 4.3.1 Type Classes and Overloading types.
+	SContextBase(SimpleContextSingle, SimpleContextList),
+	SimpleClassBase(SimpleClassAssertion),
+	SimpleClassesBase(SimpleClassesEmpty, SimpleClassesPush),
+
+	-- ** § 4.3.1 Instance Declarations types.
+	InstBase(GeneralTypeConstructorInstance, AppliableGeneralTypeConstructorInstance, TypeVariableTupleInstance, ListInstance, FunctionInstance),
+	TyVarsBase(TyVarsEmpty, TyVarsPush),
+	TypeVariablesTupleBase(TypeVariablesTupleFromFirst),
+	TypeVariablesTupleRestBase(TypeVariablesTupleLast, TypeVariablesTupleNotLast),
+
+	-- ** § 4.4.2 Fixity Declarations types.
+	OpBase(VariableOperation, ConstructorOperation),
+
+	-- ** § 4.4.3 Function and Pattern Bindings types.
+
 	-- TODO
 
 	-- * Structures with default linking.
@@ -148,7 +166,6 @@ data TopDeclsBase topDecl lexemeSemicolon annotation fixpoint =
 -- § 5.2 Export Lists types.
 
 -- | A module's export list.
--- TODO: parens
 data ExportsBase lexemeLeftParenthesis exportsRest annotation fixpoint =
 	  ExportsFromBeginning annotation lexemeLeftParenthesis exportsRest
 
@@ -230,14 +247,14 @@ data ImportVarsBase var lexemeComma annotation fixpoint =
 -- These are the components of a module, especially regular declarations
 -- ('TopDeclRegular') for attributes of modules that can be exported and
 -- imported.
-data TopDeclBase data2 maybe lexemeType simpleType type_ context lexemeDoubleRightArrow lexemeEquals constrs deriving_ newConstr scontext tycls tyvar lexemeWhere cdecls qtycls inst idecls lexemeDefault lexemeLeftParenthesis topDeclDefaultTypes lexemeRightParenthesis lexemeForeign fdecl decl annotation fixpoint =
-	  TopDeclType     annotation lexemeType                                      simpleType            type_
-	| TopDeclData     annotation (maybe (data2 context  lexemeDoubleRightArrow)) simpleType            (maybe (data2 lexemeEquals constrs)) (maybe deriving_)
-	| TopDeclNewtype  annotation (maybe (data2 context  lexemeDoubleRightArrow)) simpleType            lexemeEquals                         newConstr                          (maybe deriving_)
-	| TopDeclClass    annotation (maybe (data2 scontext lexemeDoubleRightArrow)) tycls                 tyvar                                (maybe (data2 lexemeWhere cdecls))
-	| TopDeclInstance annotation (maybe (data2 scontext lexemeDoubleRightArrow)) qtycls                inst                                 (maybe (data2 lexemeWhere idecls))
-	| TopDeclDefault  annotation lexemeDefault                                   lexemeLeftParenthesis topDeclDefaultTypes                  lexemeRightParenthesis
-	| TopDeclForeign  annotation lexemeForeign                                   fdecl
+data TopDeclBase data2 maybe lexemeType simpleType type_ lexemeData context lexemeDoubleRightArrow lexemeEquals constrs deriving_ lexemeNewtype newConstr lexemeClass scontext tycls tyvar lexemeWhere cdecls lexemeInstance qtycls inst idecls lexemeDefault lexemeLeftParenthesis topDeclDefaultTypes lexemeRightParenthesis lexemeForeign fdecl decl annotation fixpoint =
+	  TopDeclType     annotation lexemeType     simpleType            type_
+	| TopDeclData     annotation lexemeData     (maybe (data2 context  lexemeDoubleRightArrow)) simpleType            (maybe (data2 lexemeEquals constrs)) (maybe deriving_)
+	| TopDeclNewtype  annotation lexemeNewtype  (maybe (data2 context  lexemeDoubleRightArrow)) simpleType            lexemeEquals                         newConstr                          (maybe deriving_)
+	| TopDeclClass    annotation lexemeClass    (maybe (data2 scontext lexemeDoubleRightArrow)) tycls                 tyvar                                (maybe (data2 lexemeWhere cdecls))
+	| TopDeclInstance annotation lexemeInstance (maybe (data2 scontext lexemeDoubleRightArrow)) qtycls                inst                                 (maybe (data2 lexemeWhere idecls))
+	| TopDeclDefault  annotation lexemeDefault  lexemeLeftParenthesis                           topDeclDefaultTypes   lexemeRightParenthesis
+	| TopDeclForeign  annotation lexemeForeign  fdecl
 	| TopDeclRegular  annotation decl
 
 -- | A list of types to specify as ‘default’ in a ‘default’ declaration.
@@ -338,6 +355,7 @@ data ATypeBase gtycon tyvar lexemeLeftParenthesis types lexemeRightParenthesis l
 	| ListType               annotation lexemeLeftAngleBracket type_ lexemeRightAngleBracket
 	| GroupedType            annotation lexemeLeftParenthesis  type_ lexemeRightParenthesis
 
+-- | A type constructor, extended with a selection of built-in type constructors.
 data GtyconBase list qtycon lexemeLeftParenthesis lexemeRightParenthesis lexemeLeftBracket lexemeRightBracket lexemeRightArrow lexemeComma annotation fixpoint =
 	  QualifiedTypeConstructor annotation qtycon
 	| UnitTypeConstructor      annotation lexemeLeftParenthesis lexemeRightParenthesis
@@ -454,9 +472,96 @@ data DclassesBase dclass lexemeComma annotation fixpoint =
 data DclassBase qtycls annotation fixpoints =
 	DerivingClass annotation qtycls
 
--- § 4.2.2 Type Synonym Declarations types.
+-- § 4.2.3 Datatype Renamings types.
 
--- | TODO
+-- | The constructor of a ‘newtype’ type.
+data NewConstrBase con atype lexemeLeftBrace var lexemeDoubleColon type_ lexemeRightBrace annotation fixpoint =
+	  BasicNewtypeConstructor  annotation con atype
+	| RecordNewtypeConstructor annotation con lexemeLeftBrace var lexemeDoubleColon type_ lexemeRightBrace
+
+-- § 4.3.1 Type Classes and Overloading types.
+
+-- | A more restricted context with support just for simple class assertions.
+--
+-- Class assertions consist of names.
+--
+-- This is used rather than the full context structure by e.g. ‘class’
+-- declarations.
+data SContextBase simpleClass simpleClasses annotation fixpoint =
+	  SimpleContextSingle annotation simpleClass
+		-- ^ Form with ommitted parentheses, requiring exactly 1 simple class.
+	| SimpleContextList   annotation simpleClasses
+		-- ^ Normal form, with parentheses.
+
+-- | A class assertion consisting of names.
+--
+-- This is found in simple contexts, which are like contexts, but they don't
+-- support applications of types to other types, as such application is not
+-- represented by a type variable name.  (e.g. ‘data’ supports full contexts,
+-- and a Haskell2010 ‘class’ declaration only supports simple contexts.)
+data SimpleClassBase qtycls tyvar annotation fixpoint =
+	SimpleClassAssertion annotation qtycls tyvar
+
+-- | A list of simple class assertions, used in simple contexts to list them out in one form.
+--
+-- This is in the form used with parentheses.
+data SimpleClassesBase simpleClass lexemeComma annotation fixpoint =
+	  SimpleClassesEmpty annotation
+	| SimpleClassesPush  annotation simpleClass lexemeComma fixpoint
+
+-- § 4.3.1 Instance Declarations types.
+
+-- | The member part of an instance declaration.
+--
+-- This is what is declared to be an instance of a type class.
+--
+-- (The context and type class have already been written.  This is what
+-- follows up through before the possible ‘where’ clause.)
+--data InstBase gtycon tyvars lexemeLeftBracket tyvar lexemeRightBracket lexemeLeftParenthesis lexemeRightArrow lexemeRightParenthesis annotation fixpoint =
+data InstBase gtycon lexemeLeftParenthesis tyvars lexemeRightParenthesis typeVariablesTuple lexemeLeftBracket tyvar lexemeRightBracket lexemeRightArrow annotation fixpoint =
+	  GeneralTypeConstructorInstance          annotation gtycon
+		-- ^ A type or a type constructor (but not in a form where it can be
+		-- further applied with type variables after it is referenced here.)
+	| AppliableGeneralTypeConstructorInstance annotation lexemeLeftParenthesis gtycon tyvars lexemeRightParenthesis
+		-- ^ Like 'GeneralTypeConstructorInstance', but it has parentheses, so it can accommodate syntax for application.
+		--
+		-- (Note: in the separate semantics phase, the spec says the vars are distinct.)
+		-- (In the syntax phase, we specify the structure of the variables.)
+	| TypeVariableTupleInstance               annotation typeVariablesTuple
+		-- (Note: again, in the separate semantics phase, the spec says the vars are distinct.)
+	| ListInstance                            annotation lexemeLeftBracket tyvar lexemeRightBracket
+		-- ^ Like 'AppliableGeneralTypeConstructorInstance' but with a sugar
+		-- syntax for list type constructor application.
+	| FunctionInstance                        annotation lexemeLeftParenthesis tyvar lexemeRightArrow tyvar lexemeRightParenthesis
+		-- ^ Like 'AppliableGeneralTypeConstructorInstance' but with a sugar
+		-- syntax for function (arrow) type constructor application.
+		--
+		-- (Note: again, in the separate semantics phase, the spec says the vars are distinct.)
+
+-- | Zero or more type variables.
+data TyVarsBase tyvar lexemeComma annotation fixpoint =
+	  TyVarsEmpty annotation
+	| TyVarsPush  annotation tyvar lexemeComma fixpoint
+
+-- | Two or more type variables, represented as a tuple.
+data TypeVariablesTupleBase lexemeLeftParenthesis tyvar typeVariablesTupleRest annotation fixpoint =
+	TypeVariablesTupleFromFirst annotation lexemeLeftParenthesis tyvar typeVariablesTupleRest
+
+-- | The rest of two or more type variables, represented as a tuple.
+data TypeVariablesTupleRestBase tyvar lexemeRightParenthesis lexemeComma annotation fixpoint =
+	  TypeVariablesTupleLast    annotation tyvar lexemeRightParenthesis
+	| TypeVariablesTupleNotLast annotation tyvar lexemeComma            fixpoint
+
+-- § 4.4.2 Fixity Declarations types.
+
+data OpBase varop conop annotation fixpoint =
+	  VariableOperation    annotation varop
+		-- ^ (Lowercase-style binary operation.)
+	| ConstructorOperation annotation conop
+		-- ^ (Upper-style binary operation.)
+
+-- § 4.4.3 Function and Pattern Bindings types.
+
 -- TODO
 
 {-
