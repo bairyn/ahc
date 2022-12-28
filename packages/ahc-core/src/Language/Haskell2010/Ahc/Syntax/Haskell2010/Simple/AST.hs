@@ -90,9 +90,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	AtypesBase(AtypesLast, AtypesNotLast),
 	ClassesBase(ClassesFromBeginning),
 	ClassesRestBase(ClassesEmpty, ClassesPush),
-	QtyclsBase(TypeClass),
-	TyclsBase(UnqualifiedTypeClass),
-	TyvarBase(TypeVariable),
+	{-
+	ClassQtyclsBase(TypeClass),
+	ClassTyclsBase(UnqualifiedTypeClass),
+	ClassTyvarBase(TypeVariable),
+	-}
 
 	-- ** § 4.2.1 Algebraic Datatype Declarations types.
 	SimpleTypeBase(NamesType),
@@ -174,6 +176,42 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	Pats1Base(Pats1FromFirst),
 	Pats1RestBase(Pats1End, Pats1Push),
 	FpatBase(FieldPattern),
+
+	-- ** § 2.2 Lexical Program Structure types.
+	ProgramBase(LexicalStructure),
+	LexemeBase(QvaridLexeme, QconidLexeme, QvarSymLexeme, QconSymLexeme, LiteralLexeme, SpecialLexeme, ReservedOpLexeme, ReservedidLexeme),
+	-- TODO
+
+	-- ** § 2.4 Identifiers and Operators types.
+	-- TODO 2.4 more.
+	UnqualifiedNameBase(UnqualifiedVaridName, UnqualifiedConidName, UnqualifiedTyvarName, UnqualifiedTyconName, UnqualifiedTyclsName, UnqualifiedModidName),
+	TyvarBase(TypeVariableName),
+	TyconBase(TypeConstructorName),
+	TyclsBase(TypeClassName),
+	ModidBase(ModuleName),
+	NameBase(VaridName, ConidName, TyconName, TyclsName, VarSymName, ConSymName),
+
+	-- ** § 2.5 Numeric Literals types.
+	DecimalBase(DecimalLiteral),
+	OctalBase(OctalLiteral),
+	HexadecimalBase(HexadecimalLiteral),
+	IntegerBase(DecimalInteger, OctalInteger, CapitalOctalInteger, HexadecimalInteger, CapitalHexadecimalInteger),
+	FloatBase(PointFloatLiteral, ExponentFloatLiteral),
+	ExponentBase(FloatExponent),
+
+	-- ** § 2.6 Character and String Literals types.
+	CharBase(CharLiteral),
+	CharLiteralInnerBase(CharLiteralInnerGraphic, CharLiteralInnerSpace, CharLiteralInnerEscape),
+	StringBase(StringLiteral),
+	StringLiteralInnerUnitBase(StringLiteralInnerGraphic, StringLiteralInnerSpace, StringLiteralInnerEscape, StringLiteralInnerGap),
+	EscapeBase(EscapedChar),
+	EscapeInnerBase(EscapedCharEsc, EscapedAscii, EscapedDecimal, EscapedOctal, EscapedHexadecimal),
+	CharEscBase(EscapedA, EscapedB, EscapedF, EscapedN, EscapedR, EscapedT, EscapedV, EscapedBackslash, EscapedDoubleQuote, EscapedSingleQuote, EscapedAmpersand),
+	AsciiBase(AsciiControl, AsciiNull, AsciiStartOfHeading, AsciiStartOfText, AsciiEndOfText, AsciiEndOfTransmission, AsciiEnquiry, AsciiAcknowledgement, AsciiBell, AsciiBackspace, AsciiHorizontalTab, AsciiLineFeed, AsciiVerticalTab, AsciiFormFeed, AsciiCarriageReturn, AsciiShiftOut, AsciiShiftIn, AsciiDataLinkEscape, AsciiDeviceControl1XON, AsciiDeviceControl2, AsciiDeviceControl3XOFF, AsciiDeviceControl4, AsciiNegativeAcknowledgement, AsciiSynchronousIdle, AsciiEndOfTransmissionBlock, AsciiCancel, AsciiEndOfMedium, AsciiSubstitute, AsciiEscape, AsciiFileSeparator, AsciiGroupSeparator, AsciiRecordSeparator, AsciiUnitSeparator, AsciiSpace, AsciiDelete),
+	CntrlBase(AsciiControlAscLarge, AsciiControlAt, AsciiControlLeftBracket, AsciiControlBackslash, AsciiControlRightBracket, AsciiControlCaret, AsciiControlUnderscore),
+	GapBase(WhitespaceGap),
+
+	-- ** Base lexemes.
 
 	-- TODO
 
@@ -457,17 +495,19 @@ data ClassesRestBase class_ lexemeComma annotation fixpoint =
 	  ClassesEmpty annotation
 	| ClassesPush  annotation class_ lexemeComma fixpoint
 
--- | A type class name, optionally with a location qualifier by module.
-data QtyclsBase data2 maybe modid lexemeDot tycls annotation fixpoint =
+{-
+-- | A type class name, optionally with a location qualifier by module, in a class context.
+data ClassQtyclsBase data2 maybe modid lexemeDot tycls annotation fixpoint =
 	TypeClass annotation (maybe (data2 modid lexemeDot)) tycls
 
 -- | An unqualified type class name.
-data TyclsBase conid annotation fixpoint =
+data ClassTyclsBase conid annotation fixpoint =
 	UnqualifiedTypeClass annotation conid
 
 -- | A type variable.
-data TyvarBase varid annotation fixpoint =
+data ClassTyvarBase varid annotation fixpoint =
 	TypeVariable annotation varid
+-}
 
 -- § 4.2.1 Algebraic Datatype Declarations types.
 
@@ -905,6 +945,240 @@ data Pats1RestBase lexemeRightBracket lexemeComma pat annotation fixpoint =
 -- components.
 data FpatBase qvar lexemeEquals pat annotation fixpoint =
 	FieldPattern annotation qvar lexemeEquals pat
+
+-- § 2.2 Lexical Program Structure types.
+
+-- | The sequence of lexical units constituting a program module.
+--
+-- It is like a sequence of characters, except the characters are grouped into
+-- low-level syntactical units like keywords, contiguous whitespace,
+-- identifiers, symbols, and so on.
+data ProgramBase list either lexeme whitespace annotation fixpoint =
+	LexicalStructure annotation (list (either lexeme whitespace))
+
+-- | A lexeme.
+--
+-- A lexeme is a low-level syntactical unit token.
+data LexemeBase qvarid qconid qvarSym qconSym literal special reservedOp reservedid annotation fixpoint =
+	  QvaridLexeme     annotation qvarid
+		-- ^ (E.g. ‘TODO’.)
+	| QconidLexeme     annotation qconid
+		-- ^ (E.g. ‘TODO’.)
+	| QvarSymLexeme    annotation qvarSym
+		-- ^ (E.g. ‘TODO’.)
+	| QconSymLexeme    annotation qconSym
+		-- ^ (E.g. ‘TODO’.)
+	| LiteralLexeme    annotation literal
+		-- ^ (E.g. ‘42’.)
+	| SpecialLexeme    annotation special
+		-- ^ (E.g. ‘TODO’.)
+	| ReservedOpLexeme annotation reservedOp
+		-- ^ (E.g. ‘TODO’.)
+	| ReservedidLexeme annotation reservedid
+		-- ^ (E.g. ‘TODO’.)
+
+-- TODO
+
+-- § 2.4 Identifiers and Operators types.
+
+-- | An unqualified name.
+data UnqualifiedNameBase varid conid tyvar tycon tycls modid annotation fixpoint =
+	  UnqualifiedVaridName annotation varid
+	| UnqualifiedConidName annotation conid
+	| UnqualifiedTyvarName annotation tyvar
+	| UnqualifiedTyconName annotation tycon
+	| UnqualifiedTyclsName annotation tycls
+	| UnqualifiedModidName annotation modid
+
+-- TODO: 2.4 more.
+
+-- | A type variable name.
+data TyvarBase conid annotation fixpoint =
+	TypeVariableName annotation conid
+
+-- | A type constructor name.
+data TyconBase varid annotation fixpoint =
+	TypeConstructorName annotation varid
+
+-- | A type class name.
+data TyclsBase conid annotation fixpoint =
+	TypeClassName annotation conid
+
+-- | A module name.
+data ModidBase data2 list conid lexemeDot annotation fixpoint =
+	ModuleName annotation (list (data2 conid lexemeDot)) conid
+
+-- | A qualifiable name.
+data NameBase qvarid qconid qtycon qtycls qvarsym qconsym annotation fixpoint =
+	  VaridName  annotation qvarid
+	| ConidName  annotation qconid
+	| TyconName  annotation qtycon
+	| TyclsName  annotation qtycls
+	| VarSymName annotation qvarsym
+	| ConSymName annotation qconsym
+
+-- | A qualifiable lowercase-style, non-symbolic variable name.
+data QvaridBase data2 maybe modid lexemeDot varid annotation fixpoint =
+	QualifiableVarid annotation (maybe (data2 modid lexemeDot)) varid
+
+-- | A qualifiable lowercase-style, non-symbolic variable name.
+data QconidBase data2 maybe modid lexemeDot conid annotation fixpoint =
+	QualifiableConid annotation (maybe (data2 modid lexemeDot)) conid
+
+-- | A qualifiable lowercase-style, non-symbolic variable name.
+data QtyconBase data2 maybe modid lexemeDot tycon annotation fixpoint =
+	QualifiableTycon annotation (maybe (data2 modid lexemeDot)) tycon
+
+-- | A qualifiable lowercase-style, non-symbolic variable name.
+data QtyclsBase data2 maybe modid lexemeDot tycls annotation fixpoint =
+	QualifiableTycls annotation (maybe (data2 modid lexemeDot)) tycls
+
+-- | A qualifiable lowercase-style, non-symbolic variable name.
+data QvarSymBase data2 maybe modid lexemeDot varSym annotation fixpoint =
+	QualifiableVarSym annotation (maybe (data2 modid lexemeDot)) varSym
+
+-- | A qualifiable lowercase-style, non-symbolic variable name.
+data QconSymBase data2 maybe modid lexemeDot conSym annotation fixpoint =
+	QualifiableConSym annotation (maybe (data2 modid lexemeDot)) conSym
+
+-- § 2.5 Numeric Literals types.
+
+-- | A decimal literal, of at least 1 digit.
+data DecimalBase list digit annotation fixpoint =
+	DecimalLiteral annotation digit (list digit)
+
+-- | An octal literal, of at least 1 octal digit.
+data OctalBase list octit annotation fixpoint =
+	OctalLiteral annotation octit (list octit)
+
+-- | A hexadecimal literal, of at least 1 hexadecimal digit.
+data HexadecimalBase list hexit annotation fixpoint =
+	HexadecimalLiteral annotation hexit (list hexit)
+
+-- | An integer literal, with a few supported base prefixes.
+data IntegerBase decimal lexeme0o octal lexeme0O lexeme0x hexadecimal lexeme0X annotation fixpoint =
+	  DecimalInteger            annotation decimal
+	| OctalInteger              annotation lexeme0o octal
+	| CapitalOctalInteger       annotation lexeme0O octal
+	| HexadecimalInteger        annotation lexeme0x hexadecimal
+	| CapitalHexadecimalInteger annotation lexeme0X hexadecimal
+
+-- | A floating point number in either point or exponent-only form.
+data FloatBase maybe decimal lexemeDot exponent annotation fixpoint =
+	  PointFloatLiteral    annotation decimal lexemeDot decimal (maybe exponent)
+	| ExponentFloatLiteral annotation decimal exponent
+
+-- | A floating point literal's exponent part.
+data ExponentBase either maybe lexemeELower lexemeE lexemePlus lexemeMinus decimal annotation fixpoint =
+	FloatExponent annotation (either lexemeELower lexemeE) (maybe (either lexemePlus lexemeMinus)) decimal
+
+-- § 2.6 Character and String Literals types.
+
+-- | A character literal, written in Haskell as e.g. ‘'x'’.
+data CharBase lexemeSingleQuote charLiteralInner annotation fixpoint =
+	CharLiteral annotation lexemeSingleQuote charLiteralInner lexemeSingleQuote
+
+-- | The part of the characteral around its prefix and suffix, its opening and
+-- closing single quote.
+data CharLiteralInnerBase graphicSansSingleQuoteOrBackslash space escapeSansBackslashAndAmpersand annotation fixpoint =
+	  CharLiteralInnerGraphic annotation graphicSansSingleQuoteOrBackslash
+	| CharLiteralInnerSpace   annotation space
+	| CharLiteralInnerEscape  annotation escapeSansBackslashAndAmpersand
+
+-- | A string literal, written in Haskell2010 as the string contents surrounded by
+-- double quotes.
+data StringBase list lexemeDoubleQuote stringLiteralInnerUnit annotation fixpoint =
+	StringLiteral annotation lexemeDoubleQuote (list stringLiteralInnerUnit) lexemeDoubleQuote
+
+-- | A unit inside a string literal: a character, escape, or gap.
+data StringLiteralInnerUnitBase graphicSansDoubleQuoteOrBackslash space escape gap annotation fixpoint =
+	  StringLiteralInnerGraphic annotation graphicSansDoubleQuoteOrBackslash
+	| StringLiteralInnerSpace   annotation space
+	| StringLiteralInnerEscape  annotation escape
+	| StringLiteralInnerGap     annotation gap
+
+-- | An escaped character.
+data EscapeBase lexemeBackslash escapeInner annotation fixpoint =
+	EscapedChar annotation lexemeBackslash escapeInner
+
+-- | An escaped character after the backslash prefix.
+data EscapeInnerBase charEsc ascii decimal lexemeOLower octal lexemeXLower hexadecimal annotation fixpoint =
+	  EscapedCharEsc     annotation charEsc
+	| EscapedAscii       annotation ascii
+	| EscapedDecimal     annotation decimal
+	| EscapedOctal       annotation lexemeOLower octal
+	| EscapedHexadecimal annotation lexemeXLower hexadecimal
+
+-- | A character that is denoted to have special meaning when escaped.
+data CharEscBase lexemeALower lexemeBLower lexemeFLower lexemeNLower lexemeRLower lexemeTLower lexemeVLower lexemeBackslash lexemeDoubleQuote lexemeSingleQuote lexemeAmpersand annotation fixpoint =
+	  EscapedA           lexemeALower
+	| EscapedB           lexemeBLower
+	| EscapedF           lexemeFLower
+	| EscapedN           lexemeNLower
+	| EscapedR           lexemeRLower
+	| EscapedT           lexemeTLower
+	| EscapedV           lexemeVLower
+	| EscapedBackslash   lexemeBackslash
+	| EscapedDoubleQuote lexemeDoubleQuote
+	| EscapedSingleQuote lexemeSingleQuote
+	| EscapedAmpersand   lexemeAmpersand
+
+-- | An ASCII control character.
+data AsciiBase lexemeCaret cntrl lexemeNUL lexemeSOH lexemeSTX lexemeETX lexemeEOT lexemeENQ lexemeACK lexemeBEL lexemeBS lexemeHT lexemeLF lexemeVT lexemeFF lexemeCR lexemeSO lexemeSI lexemeDLE lexemeDC1 lexemeDC2 lexemeDC3 lexemeDC4 lexemeNAK lexemeSYN lexemeETB lexemeCAN lexemeEM lexemeSUB lexemeESC lexemeFS lexemeGS lexemeRS lexemeUS lexemeSpace lexemeDEL annotation fixpoint =
+	  AsciiControl                           annotation lexemeCaret cntrl
+	| AsciiNull                              annotation lexemeNUL
+	| AsciiStartOfHeading                    annotation lexemeSOH
+	| AsciiStartOfText                       annotation lexemeSTX
+	| AsciiEndOfText                         annotation lexemeETX
+	| AsciiEndOfTransmission                 annotation lexemeEOT
+	| AsciiEnquiry                           annotation lexemeENQ
+	| AsciiAcknowledgement                   annotation lexemeACK
+	| AsciiBell                              annotation lexemeBEL
+	| AsciiBackspace                         annotation lexemeBS
+	| AsciiHorizontalTab                     annotation lexemeHT
+	| AsciiLineFeed                          annotation lexemeLF
+	| AsciiVerticalTab                       annotation lexemeVT
+	| AsciiFormFeed                          annotation lexemeFF
+	| AsciiCarriageReturn                    annotation lexemeCR
+	| AsciiShiftOut                          annotation lexemeSO
+	| AsciiShiftIn                           annotation lexemeSI
+	| AsciiDataLinkEscape                    annotation lexemeDLE
+	| AsciiDeviceControl1XON                 annotation lexemeDC1
+	| AsciiDeviceControl2                    annotation lexemeDC2
+	| AsciiDeviceControl3XOFF                annotation lexemeDC3
+	| AsciiDeviceControl4                    annotation lexemeDC4
+	| AsciiNegativeAcknowledgement           annotation lexemeNAK
+	| AsciiSynchronousIdle                   annotation lexemeSYN
+	| AsciiEndOfTransmissionBlock            annotation lexemeETB
+	| AsciiCancel                            annotation lexemeCAN
+	| AsciiEndOfMedium                       annotation lexemeEM
+	| AsciiSubstitute                        annotation lexemeSUB
+	| AsciiEscape                            annotation lexemeESC
+	| AsciiFileSeparator                     annotation lexemeFS
+	| AsciiGroupSeparator                    annotation lexemeGS
+	| AsciiRecordSeparator                   annotation lexemeRS
+	| AsciiUnitSeparator                     annotation lexemeUS
+	| AsciiSpace                             annotation lexemeSpace
+	| AsciiDelete                            annotation lexemeDEL
+
+-- | An ascii character that can be put after ‘\^’ to complete a control character escape sequence.
+data CntrlBase ascLarge lexemeAt lexemeLeftBracket lexemeBackslash lexemeRightBracket lexemeCaret lexemeUnderscore annotation fixpoint =
+	  AsciiControlAscLarge     annotation ascLarge
+	| AsciiControlAt           annotation lexemeAt
+	| AsciiControlLeftBracket  annotation lexemeLeftBracket
+	| AsciiControlBackslash    annotation lexemeBackslash
+	| AsciiControlRightBracket annotation lexemeRightBracket
+	| AsciiControlCaret        annotation lexemeCaret
+	| AsciiControlUnderscore   annotation lexemeUnderscore
+
+-- | An ignored gap in a Haskell-style multiline gap or other form of ignored space gap.
+--
+-- This is an escaped whitespace followed by the remaining whitespace until the
+-- terminating backslash character.
+data GapBase list lexemeBackslash whitechar annotation fixpoint =
+	WhitespaceGap annotation lexemeBackslash whitechar (list whitechar) lexemeBackslash
+
+-- Base lexemes.
 
 -- TODO
 
