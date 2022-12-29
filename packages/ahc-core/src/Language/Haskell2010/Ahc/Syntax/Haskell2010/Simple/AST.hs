@@ -211,7 +211,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	NcommentBase(MultilineComment),
 	BigAnySeqBase(EmptyBigAnySeqBase, NotNcomChar0BigAnySeqBase, ValidNcomChar0BigAnySeqBase, ValidNcomChar0_0BigAnySeqBase, ValidNcomChar0_1BigAnySeqBase),
 	BigAnySeqValidNcomChar1_0Base(NotNcomChar1_0, LeftBraceChar1_0, RightBraceChar1_0, EOPChar1_0),
-	BigAnySeqValidNcomChar1_1Base(NotNcomChar1_1, LeftBraceChar1_1, HyphenChar1_1, EOFChar1_1),
+	BigAnySeqValidNcomChar1_1Base(NotNcomChar1_1, LeftBraceChar1_1, HyphenChar1_1, EOPChar1_1),
 	BigAnyBase(GraphicBigAny, WhitecharBigAny),
 	BigAnySansNcBase(GraphicBigAnySansNc, WhitecharBigAnySansNc),
 	AnyBase(GraphicAny, SpaceAny, TabAny),
@@ -273,6 +273,21 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	QconSymBase(QualifiableConSym),
 
 	-- (Exclusion structures.)
+	VaridInnerSansAscSmallUnderscoreBase(SmallVaridInnerSansAscSmallUnderscore, LargeVaridInnerSansAscSmallUnderscore, DigitVaridInnerSansAscSmallUnderscore, SingleQuoteVaridInnerInnerSansAscSmallUnderscore),
+	SmallSansAscSmallUnderscoreBase(UnicodeSmallSansAscSmallUnderscore),
+	UniSmallSansAscBase(UnicodeSmallUniSmallSansAsc),
+	VaridBase(SmallSansAscVarid, ALowerVarid, BLowerVarid, CLowerVarid, DLowerVarid, ELowerVarid, FLowerVarid, GLowerVarid, HLowerVarid, ILowerVarid, JLowerVarid, KLowerVarid, LLowerVarid, MLowerVarid, NLowerVarid, OLowerVarid, PLowerVarid, QLowerVarid, RLowerVarid, SLowerVarid, TLowerVarid, ULowerVarid, VLowerVarid, WLowerVarid, XLowerVarid, YLowerVarid, ZLowerVarid),
+	VaridCBase(EOPVaridC, SmallSansAscVaridC, ALowerVaridC, BLowerVaridC, CLowerVaridC, DLowerVaridC, ELowerVaridC, FLowerVaridC, GLowerVaridC, HLowerVaridC, ILowerVaridC, JLowerVaridC, KLowerVaridC, LLowerVaridC, MLowerVaridC, NLowerVaridC, OLowerVaridC, PLowerVaridC, QLowerVaridC, RLowerVaridC, SLowerVaridC, TLowerVaridC, ULowerVaridC, VLowerVaridC, WLowerVaridC, XLowerVaridC, YLowerVaridC, ZLowerVaridC),
+	VaridDBase(EOPVaridD, SmallSansAscVaridD, ALowerVaridD, BLowerVaridD, CLowerVaridD, DLowerVaridD, ELowerVaridD, FLowerVaridD, GLowerVaridD, HLowerVaridD, ILowerVaridD, JLowerVaridD, KLowerVaridD, LLowerVaridD, MLowerVaridD, NLowerVaridD, OLowerVaridD, PLowerVaridD, QLowerVaridD, RLowerVaridD, SLowerVaridD, TLowerVaridD, ULowerVaridD, VLowerVaridD, WLowerVaridD, XLowerVaridD, YLowerVaridD, ZLowerVaridD),
+	VaridEBase(EOPVaridE, SmallSansAscVaridE, ALowerVaridE, BLowerVaridE, CLowerVaridE, DLowerVaridE, ELowerVaridE, FLowerVaridE, GLowerVaridE, HLowerVaridE, ILowerVaridE, JLowerVaridE, KLowerVaridE, LLowerVaridE, MLowerVaridE, NLowerVaridE, OLowerVaridE, PLowerVaridE, QLowerVaridE, RLowerVaridE, SLowerVaridE, TLowerVaridE, ULowerVaridE, VLowerVaridE, WLowerVaridE, XLowerVaridE, YLowerVaridE, ZLowerVaridE),
+	VaridFBase(EOPVaridF, SmallSansAscVaridF, ALowerVaridF, BLowerVaridF, CLowerVaridF, DLowerVaridF, ELowerVaridF, FLowerVaridF, GLowerVaridF, HLowerVaridF, ILowerVaridF, JLowerVaridF, KLowerVaridF, LLowerVaridF, MLowerVaridF, NLowerVaridF, OLowerVaridF, PLowerVaridF, QLowerVaridF, RLowerVaridF, SLowerVaridF, TLowerVaridF, ULowerVaridF, VLowerVaridF, WLowerVaridF, XLowerVaridF, YLowerVaridF, ZLowerVaridF),
+	VaridIBase(EOPVaridI, SmallSansAscVaridI, ALowerVaridI, BLowerVaridI, CLowerVaridI, DLowerVaridI, ELowerVaridI, FLowerVaridI, GLowerVaridI, HLowerVaridI, ILowerVaridI, JLowerVaridI, KLowerVaridI, LLowerVaridI, MLowerVaridI, NLowerVaridI, OLowerVaridI, PLowerVaridI, QLowerVaridI, RLowerVaridI, SLowerVaridI, TLowerVaridI, ULowerVaridI, VLowerVaridI, WLowerVaridI, XLowerVaridI, YLowerVaridI, ZLowerVaridI),
+	VaridLBase(EOPVaridL, SmallSansAscVaridL, ALowerVaridL, BLowerVaridL, CLowerVaridL, DLowerVaridL, ELowerVaridL, FLowerVaridL, GLowerVaridL, HLowerVaridL, ILowerVaridL, JLowerVaridL, KLowerVaridL, LLowerVaridL, MLowerVaridL, NLowerVaridL, OLowerVaridL, PLowerVaridL, QLowerVaridL, RLowerVaridL, SLowerVaridL, TLowerVaridL, ULowerVaridL, VLowerVaridL, WLowerVaridL, XLowerVaridL, YLowerVaridL, ZLowerVaridL),
+	VaridMBase(EOPVaridM, SmallSansAscVaridM, ALowerVaridM, BLowerVaridM, CLowerVaridM, DLowerVaridM, ELowerVaridM, FLowerVaridM, GLowerVaridM, HLowerVaridM, ILowerVaridM, JLowerVaridM, KLowerVaridM, LLowerVaridM, MLowerVaridM, NLowerVaridM, OLowerVaridM, PLowerVaridM, QLowerVaridM, RLowerVaridM, SLowerVaridM, TLowerVaridM, ULowerVaridM, VLowerVaridM, WLowerVaridM, XLowerVaridM, YLowerVaridM, ZLowerVaridM),
+	VaridNBase(EOPVaridN, SmallSansAscVaridN, ALowerVaridN, BLowerVaridN, CLowerVaridN, DLowerVaridN, ELowerVaridN, FLowerVaridN, GLowerVaridN, HLowerVaridN, ILowerVaridN, JLowerVaridN, KLowerVaridN, LLowerVaridN, MLowerVaridN, NLowerVaridN, OLowerVaridN, PLowerVaridN, QLowerVaridN, RLowerVaridN, SLowerVaridN, TLowerVaridN, ULowerVaridN, VLowerVaridN, WLowerVaridN, XLowerVaridN, YLowerVaridN, ZLowerVaridN),
+	VaridOBase(EOPVaridO, SmallSansAscVaridO, ALowerVaridO, BLowerVaridO, CLowerVaridO, DLowerVaridO, ELowerVaridO, FLowerVaridO, GLowerVaridO, HLowerVaridO, ILowerVaridO, JLowerVaridO, KLowerVaridO, LLowerVaridO, MLowerVaridO, NLowerVaridO, OLowerVaridO, PLowerVaridO, QLowerVaridO, RLowerVaridO, SLowerVaridO, TLowerVaridO, ULowerVaridO, VLowerVaridO, WLowerVaridO, XLowerVaridO, YLowerVaridO, ZLowerVaridO),
+	VaridTBase(EOPVaridT, SmallSansAscVaridT, ALowerVaridT, BLowerVaridT, CLowerVaridT, DLowerVaridT, ELowerVaridT, FLowerVaridT, GLowerVaridT, HLowerVaridT, ILowerVaridT, JLowerVaridT, KLowerVaridT, LLowerVaridT, MLowerVaridT, NLowerVaridT, OLowerVaridT, PLowerVaridT, QLowerVaridT, RLowerVaridT, SLowerVaridT, TLowerVaridT, ULowerVaridT, VLowerVaridT, WLowerVaridT, XLowerVaridT, YLowerVaridT, ZLowerVaridT),
+	VaridWBase(EOPVaridW, SmallSansAscVaridW, ALowerVaridW, BLowerVaridW, CLowerVaridW, DLowerVaridW, ELowerVaridW, FLowerVaridW, GLowerVaridW, HLowerVaridW, ILowerVaridW, JLowerVaridW, KLowerVaridW, LLowerVaridW, MLowerVaridW, NLowerVaridW, OLowerVaridW, PLowerVaridW, QLowerVaridW, RLowerVaridW, SLowerVaridW, TLowerVaridW, ULowerVaridW, VLowerVaridW, WLowerVaridW, XLowerVaridW, YLowerVaridW, ZLowerVaridW),
 	-- TODO:
 	{-
 	VaridBase(_),
@@ -1250,7 +1265,7 @@ data BigAnySeqValidNcomChar1_1Base bigAnySansNc lexicalLeftBrace bigAnySeqValidN
 	| HyphenChar1_1    annotation lexicalHyphen fixpoint
 		-- ^ It's not ‘-’, but it's ‘nc’ so we might not be able to reset to
 		-- ‘BigAnySeqBase’.
-	| EOFChar1_1       annotation lexicalEndOfParse
+	| EOPChar1_1       annotation lexicalEndOfParse
 		-- ^ We're provided with a certification that no more characters will
 		-- follow in whatever we're parsing, so since we thus know this is the
 		-- last ‘-’, this is not a ‘-’ in an ‘nc’ construct, since it's not
@@ -1300,7 +1315,7 @@ data GraphicSansNcBase small large symbolSansNc digit specialSansNc lexicalDoubl
 	| SingleQuoteGraphicSansNc annotation lexicalSingleQuote
 
 
--- | A lowercase character.
+-- | A lowercase character or underscore.
 data SmallBase ascSmall uniSmall lexicalUnderscore annotation fixpoint =
 	  AsciiSmall      annotation ascSmall
 	| UnicodeSmall    annotation uniSmall
@@ -1674,16 +1689,820 @@ data QconSymBase data2 maybe modid lexicalDot conSym annotation fixpoint =
 	QualifiableConSym annotation (maybe (data2 modid lexicalDot)) conSym
 
 -- TODO:
-{-
+
 -- (Exclusion structures.)
+
+-- | A restricted VaridInnerBase, without ascSmall, to help build 'VaridBase'.
+data VaridInnerSansAscSmallUnderscoreBase smallSansAscSmallUnderscore large digit lexicalSingleQuote annotation fixpoint =
+	  SmallVaridInnerSansAscSmallUnderscore            annotation smallSansAscSmallUnderscore
+	| LargeVaridInnerSansAscSmallUnderscore            annotation large
+	| DigitVaridInnerSansAscSmallUnderscore            annotation digit
+	| SingleQuoteVaridInnerInnerSansAscSmallUnderscore annotation lexicalSingleQuote
+
+-- | A lowercase character, except for those that are ASCII, and except underscores.
+--
+-- We'll build up ASCII characters more carefully in the restricted sets.
+data SmallSansAscSmallUnderscoreBase ascSmall uniSmallSansAscSmallUnderscore lexicalUnderscore annotation fixpoint =
+	UnicodeSmallSansAscSmallUnderscore annotation uniSmallSansAscSmallUnderscore
+
+-- | A unicode lowercase character, except those that are ASCII.
+--
+-- We'll build up ASCII characters more carefully in the restricted sets.
+data UniSmallSansAscBase lexicalUnicodeSmallSansAscUnderscore annotation fixpoint =
+	UnicodeSmallUniSmallSansAsc annotation lexicalUnicodeSmallSansAscUnderscore
 
 -- | A non-symbolic variable (lowercase-style) identifier name, excluding
 -- reserved names.
 --
 -- The structures are set up specially to exclude reserved names.
-data VaridBase annotation fixpoint =
-	TODO annotation 
+--
+-- Our approach to exclude reserved identifiers is to allow only and exactly
+-- the construction of names that we know are not excluded.  We do it a long
+-- way essentially through the pattern we use inside, of manually checking each
+-- possible next character in the set (ascii lowercase) we are restricting.
+--
+-- This structure represents from the beginning of a 'varid' (0 parsed so far
+-- for this token).
+data VaridBase list smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower varidC lexicalDLower varidD lexicalELower varidE lexicalFLower varidF lexicalGLower lexicalHLower lexicalILower varidI lexicalJLower lexicalKLower lexicalLLower varidL lexicalMLower varidM lexicalNLower varidN lexicalOLower varidO lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower varidT lexicalULower lexicalVLower lexicalWLower varidW lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	-- (We could include this if empty identifiers are included, but they are not:)
+	{-
+	  EOPVarid          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, so this identifier is empty.
+	-}
 
+	  SmallSansAscVarid annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid starts.  In fact in this
+		-- case we need no further verification, since it's outside the set we
+		-- are concerned with.
+
+	| ALowerVarid       annotation lexicalALower (list varidInner)
+		-- ^ ‘a’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| BLowerVarid       annotation lexicalBLower (list varidInner)
+		-- ^ ‘a’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| CLowerVarid       annotation lexicalCLower varidC
+		-- ^ ‘c’ starts 2 excluded identifiers.
+
+	| DLowerVarid       annotation lexicalDLower varidD
+		-- ^ ‘d’ starts 4 excluded identifiers.
+
+	| ELowerVarid       annotation lexicalELower varidE
+		-- ^ ‘e’ starts 1 excluded identifier.
+
+	| FLowerVarid       annotation lexicalFLower varidF
+		-- ^ ‘f’ starts 1 excluded identifier.
+
+	| GLowerVarid       annotation lexicalGLower (list varidInner)
+		-- ^ ‘g’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| HLowerVarid       annotation lexicalHLower (list varidInner)
+		-- ^ ‘h’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| ILowerVarid       annotation lexicalILower varidI
+		-- ‘i’ starts 7 excluded identifiers.
+
+	| JLowerVarid       annotation lexicalJLower (list varidInner)
+		-- ^ ‘j’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| KLowerVarid       annotation lexicalKLower (list varidInner)
+		-- ^ ‘k’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| LLowerVarid       annotation lexicalLLower varidL
+		-- ^ ‘l’ starts 7 excluded identifiers.
+
+	| MLowerVarid       annotation lexicalMLower varidM
+		-- ^ ‘m’ starts 1 excluded identifier.
+
+	| NLowerVarid       annotation lexicalNLower varidN
+		-- ^ ‘n’ starts 1 excluded identifier.
+
+	| OLowerVarid       annotation lexicalOLower varidO
+		-- ^ ‘n’ starts 1 excluded identifier.
+
+	| PLowerVarid       annotation lexicalPLower (list varidInner)
+		-- ^ ‘p’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| QLowerVarid       annotation lexicalQLower (list varidInner)
+		-- ^ ‘q’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| RLowerVarid       annotation lexicalRLower (list varidInner)
+		-- ^ ‘r’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| SLowerVarid       annotation lexicalSLower (list varidInner)
+		-- ^ ‘s’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| TLowerVarid       annotation lexicalTLower varidT
+		-- ^ ‘t’ starts 2 excluded identifiers.
+
+	| ULowerVarid       annotation lexicalULower (list varidInner)
+		-- ^ ‘u’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| VLowerVarid       annotation lexicalVLower (list varidInner)
+		-- ^ ‘v’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| WLowerVarid       annotation lexicalWLower varidW
+		-- ^ ‘w’ starts 1 excluded identifier.
+
+	| XLowerVarid       annotation lexicalXLower (list varidInner)
+		-- ^ ‘x’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| YLowerVarid       annotation lexicalYLower (list varidInner)
+		-- ^ ‘y’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+	| ZLowerVarid       annotation lexicalZLower (list varidInner)
+		-- ^ ‘z’ doesn't start any excluded reservedid; the rest needs no
+		-- further verification.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘c’ was parsed from the beginning.
+data VaridCBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower varidCa lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower varidCl lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridC          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘c’ is not excluded.
+	| SmallSansAscVaridC annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridC       annotation lexicalALower               varidCa
+		-- ^ ‘ca’ starts 1 excluded identifier.
+	| BLowerVaridC       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘cb’ starts no excluded identifier.
+	| CLowerVaridC       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘cc’ starts no excluded identifier.
+	| DLowerVaridC       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘cd’ starts no excluded identifier.
+	| ELowerVaridC       annotation lexicalELower               (list varidInner)
+		-- ^ ‘ce’ starts no excluded identifier.
+	| FLowerVaridC       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘cf’ starts no excluded identifier.
+	| GLowerVaridC       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘cg’ starts no excluded identifier.
+	| HLowerVaridC       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘ch’ starts no excluded identifier.
+	| ILowerVaridC       annotation lexicalILower               (list varidInner)
+		-- ^ ‘ci’ starts no excluded identifier.
+	| JLowerVaridC       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘cj’ starts no excluded identifier.
+	| KLowerVaridC       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘ck’ starts no excluded identifier.
+	| LLowerVaridC       annotation lexicalLLower               varidCl
+		-- ^ ‘cl’ starts 1 excluded identifier.
+	| MLowerVaridC       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘cm’ starts no excluded identifier.
+	| NLowerVaridC       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘cn’ starts no excluded identifier.
+	| OLowerVaridC       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘co’ starts no excluded identifier.
+	| PLowerVaridC       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘cp’ starts no excluded identifier.
+	| QLowerVaridC       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘cq’ starts no excluded identifier.
+	| RLowerVaridC       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘cr’ starts no excluded identifier.
+	| SLowerVaridC       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘cs’ starts no excluded identifier.
+	| TLowerVaridC       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘ct’ starts no excluded identifier.
+	| ULowerVaridC       annotation lexicalULower               (list varidInner)
+		-- ^ ‘cu’ starts no excluded identifier.
+	| VLowerVaridC       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘cv’ starts no excluded identifier.
+	| WLowerVaridC       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘cw’ starts no excluded identifier.
+	| XLowerVaridC       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘cx’ starts no excluded identifier.
+	| YLowerVaridC       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘cy’ starts no excluded identifier.
+	| ZLowerVaridC       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘cz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘d’ was parsed from the beginning.
+data VaridDBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower varidDa lexicalBLower lexicalCLower lexicalDLower varidDe lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridD          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘d’ is not excluded.
+	| SmallSansAscVaridD annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridD       annotation lexicalALower               varidDa
+		-- ^ ‘da’ starts 1 excluded identifier.
+	| BLowerVaridD       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘db’ starts no excluded identifier.
+	| CLowerVaridD       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘dc’ starts no excluded identifier.
+	| DLowerVaridD       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘dd’ starts no excluded identifier.
+	| ELowerVaridD       annotation lexicalELower               varidDe
+		-- ^ ‘de’ starts 2 excluded identifiers.
+	| FLowerVaridD       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘df’ starts no excluded identifier.
+	| GLowerVaridD       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘dg’ starts no excluded identifier.
+	| HLowerVaridD       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘dh’ starts no excluded identifier.
+	| ILowerVaridD       annotation lexicalILower               (list varidInner)
+		-- ^ ‘di’ starts no excluded identifier.
+	| JLowerVaridD       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘dj’ starts no excluded identifier.
+	| KLowerVaridD       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘dk’ starts no excluded identifier.
+	| LLowerVaridD       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘dl’ starts no excluded identifier.
+	| MLowerVaridD       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘dm’ starts no excluded identifier.
+	| NLowerVaridD       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘dn’ starts no excluded identifier.
+	| OLowerVaridD       annotation lexicalOLower               varidInner        (list varidInner)
+		-- ^ ‘do’ alone is excluded.  Additional characters is valid.
+	| PLowerVaridD       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘dp’ starts no excluded identifier.
+	| QLowerVaridD       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘dq’ starts no excluded identifier.
+	| RLowerVaridD       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘dr’ starts no excluded identifier.
+	| SLowerVaridD       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘ds’ starts no excluded identifier.
+	| TLowerVaridD       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘dt’ starts no excluded identifier.
+	| ULowerVaridD       annotation lexicalULower               (list varidInner)
+		-- ^ ‘du’ starts no excluded identifier.
+	| VLowerVaridD       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘dv’ starts no excluded identifier.
+	| WLowerVaridD       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘dw’ starts no excluded identifier.
+	| XLowerVaridD       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘dx’ starts no excluded identifier.
+	| YLowerVaridD       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘dy’ starts no excluded identifier.
+	| ZLowerVaridD       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘dz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘e’ was parsed from the beginning.
+data VaridEBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower varidEl lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridE          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘e’ is not excluded.
+	| SmallSansAscVaridE annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridE       annotation lexicalALower               (list varidInner)
+		-- ^ ‘ea’ starts no excluded identifier.
+	| BLowerVaridE       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘eb’ starts no excluded identifier.
+	| CLowerVaridE       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘ec’ starts no excluded identifier.
+	| DLowerVaridE       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘ed’ starts no excluded identifier.
+	| ELowerVaridE       annotation lexicalELower               (list varidInner)
+		-- ^ ‘ee’ starts no excluded identifier.
+	| FLowerVaridE       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘ef’ starts no excluded identifier.
+	| GLowerVaridE       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘eg’ starts no excluded identifier.
+	| HLowerVaridE       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘eh’ starts no excluded identifier.
+	| ILowerVaridE       annotation lexicalILower               (list varidInner)
+		-- ^ ‘ei’ starts no excluded identifier.
+	| JLowerVaridE       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘ej’ starts no excluded identifier.
+	| KLowerVaridE       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘ek’ starts no excluded identifier.
+	| LLowerVaridE       annotation lexicalLLower               varidEl
+		-- ^ ‘el’ starts 1 excluded identifier.
+	| MLowerVaridE       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘em’ starts no excluded identifier.
+	| NLowerVaridE       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘en’ starts no excluded identifier.
+	| OLowerVaridE       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘eo’ starts no excluded identifier.
+	| PLowerVaridE       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘ep’ starts no excluded identifier.
+	| QLowerVaridE       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘eq’ starts no excluded identifier.
+	| RLowerVaridE       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘er’ starts no excluded identifier.
+	| SLowerVaridE       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘es’ starts no excluded identifier.
+	| TLowerVaridE       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘et’ starts no excluded identifier.
+	| ULowerVaridE       annotation lexicalULower               (list varidInner)
+		-- ^ ‘eu’ starts no excluded identifier.
+	| VLowerVaridE       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘ev’ starts no excluded identifier.
+	| WLowerVaridE       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘ew’ starts no excluded identifier.
+	| XLowerVaridE       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘ex’ starts no excluded identifier.
+	| YLowerVaridE       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘ey’ starts no excluded identifier.
+	| ZLowerVaridE       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘ez’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘f’ was parsed from the beginning.
+data VaridFBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower varidFo lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridF          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘f’ is not excluded.
+	| SmallSansAscVaridF annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridF       annotation lexicalALower               (list varidInner)
+		-- ^ ‘fa’ starts no excluded identifier.
+	| BLowerVaridF       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘fb’ starts no excluded identifier.
+	| CLowerVaridF       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘fc’ starts no excluded identifier.
+	| DLowerVaridF       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘fd’ starts no excluded identifier.
+	| ELowerVaridF       annotation lexicalELower               (list varidInner)
+		-- ^ ‘fe’ starts no excluded identifier.
+	| FLowerVaridF       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘ff’ starts no excluded identifier.
+	| GLowerVaridF       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘fg’ starts no excluded identifier.
+	| HLowerVaridF       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘fh’ starts no excluded identifier.
+	| ILowerVaridF       annotation lexicalILower               (list varidInner)
+		-- ^ ‘fi’ starts no excluded identifier.
+	| JLowerVaridF       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘fj’ starts no excluded identifier.
+	| KLowerVaridF       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘fk’ starts no excluded identifier.
+	| LLowerVaridF       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘fl’ starts no excluded identifier.
+	| MLowerVaridF       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘fm’ starts no excluded identifier.
+	| NLowerVaridF       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘fn’ starts no excluded identifier.
+	| OLowerVaridF       annotation lexicalOLower               varidFo
+		-- ^ ‘fo’ starts 1 excluded identifier.
+	| PLowerVaridF       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘fp’ starts no excluded identifier.
+	| QLowerVaridF       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘fq’ starts no excluded identifier.
+	| RLowerVaridF       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘fr’ starts no excluded identifier.
+	| SLowerVaridF       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘fs’ starts no excluded identifier.
+	| TLowerVaridF       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘ft’ starts no excluded identifier.
+	| ULowerVaridF       annotation lexicalULower               (list varidInner)
+		-- ^ ‘fu’ starts no excluded identifier.
+	| VLowerVaridF       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘fv’ starts no excluded identifier.
+	| WLowerVaridF       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘fw’ starts no excluded identifier.
+	| XLowerVaridF       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘fx’ starts no excluded identifier.
+	| YLowerVaridF       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘fy’ starts no excluded identifier.
+	| ZLowerVaridF       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘fz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘i’ was parsed from the beginning.
+data VaridIBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower varidIm lexicalNLower varidIn lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridI          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘i’ is not excluded.
+	| SmallSansAscVaridI annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridI       annotation lexicalALower               (list varidInner)
+		-- ^ ‘ia’ starts no excluded identifier.
+	| BLowerVaridI       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘ib’ starts no excluded identifier.
+	| CLowerVaridI       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘ic’ starts no excluded identifier.
+	| DLowerVaridI       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘id’ starts no excluded identifier.
+	| ELowerVaridI       annotation lexicalELower               (list varidInner)
+		-- ^ ‘ie’ starts no excluded identifier.
+	| FLowerVaridI       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘if’ alone is excluded.  Additional characters is valid.
+	| GLowerVaridI       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘ig’ starts no excluded identifier.
+	| HLowerVaridI       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘ih’ starts no excluded identifier.
+	| ILowerVaridI       annotation lexicalILower               (list varidInner)
+		-- ^ ‘ii’ starts no excluded identifier.
+	| JLowerVaridI       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘ij’ starts no excluded identifier.
+	| KLowerVaridI       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘ik’ starts no excluded identifier.
+	| LLowerVaridI       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘il’ starts no excluded identifier.
+	| MLowerVaridI       annotation lexicalMLower               varidIm
+		-- ^ ‘im’ starts 1 excluded identifier.
+	| NLowerVaridI       annotation lexicalNLower               varidIn
+		-- ^ ‘in’ starts 5 excluded identifiers.
+	| OLowerVaridI       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘io’ starts no excluded identifier.
+	| PLowerVaridI       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘ip’ starts no excluded identifier.
+	| QLowerVaridI       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘iq’ starts no excluded identifier.
+	| RLowerVaridI       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘ir’ starts no excluded identifier.
+	| SLowerVaridI       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘is’ starts no excluded identifier.
+	| TLowerVaridI       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘it’ starts no excluded identifier.
+	| ULowerVaridI       annotation lexicalULower               (list varidInner)
+		-- ^ ‘iu’ starts no excluded identifier.
+	| VLowerVaridI       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘iv’ starts no excluded identifier.
+	| WLowerVaridI       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘iw’ starts no excluded identifier.
+	| XLowerVaridI       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘ix’ starts no excluded identifier.
+	| YLowerVaridI       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘iy’ starts no excluded identifier.
+	| ZLowerVaridI       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘iz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after an ‘l’ was parsed from the beginning.
+data VaridLBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower varidLe lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridL          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘l’ is not excluded.
+	| SmallSansAscVaridL annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridL       annotation lexicalALower               (list varidInner)
+		-- ^ ‘la’ starts no excluded identifier.
+	| BLowerVaridL       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘lb’ starts no excluded identifier.
+	| CLowerVaridL       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘lc’ starts no excluded identifier.
+	| DLowerVaridL       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘ld’ starts no excluded identifier.
+	| ELowerVaridL       annotation lexicalELower               varidLe
+		-- ^ ‘le’ starts 1 excluded identifier.
+	| FLowerVaridL       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘lf’ starts no excluded identifier.
+	| GLowerVaridL       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘lg’ starts no excluded identifier.
+	| HLowerVaridL       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘lh’ starts no excluded identifier.
+	| ILowerVaridL       annotation lexicalILower               (list varidInner)
+		-- ^ ‘li’ starts no excluded identifier.
+	| JLowerVaridL       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘lj’ starts no excluded identifier.
+	| KLowerVaridL       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘lk’ starts no excluded identifier.
+	| LLowerVaridL       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘ll’ starts no excluded identifier.
+	| MLowerVaridL       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘lm’ starts no excluded identifier.
+	| NLowerVaridL       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘ln’ starts no excluded identifier.
+	| OLowerVaridL       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘lo’ starts no excluded identifier.
+	| PLowerVaridL       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘lp’ starts no excluded identifier.
+	| QLowerVaridL       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘lq’ starts no excluded identifier.
+	| RLowerVaridL       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘lr’ starts no excluded identifier.
+	| SLowerVaridL       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘ls’ starts no excluded identifier.
+	| TLowerVaridL       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘lt’ starts no excluded identifier.
+	| ULowerVaridL       annotation lexicalULower               (list varidInner)
+		-- ^ ‘lu’ starts no excluded identifier.
+	| VLowerVaridL       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘lv’ starts no excluded identifier.
+	| WLowerVaridL       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘lw’ starts no excluded identifier.
+	| XLowerVaridL       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘lx’ starts no excluded identifier.
+	| YLowerVaridL       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘ly’ starts no excluded identifier.
+	| ZLowerVaridL       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘lz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after an ‘m’ was parsed from the beginning.
+data VaridMBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower varidMo lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridM          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘m’ is not excluded.
+	| SmallSansAscVaridM annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridM       annotation lexicalALower               (list varidInner)
+		-- ^ ‘ma’ starts no excluded identifier.
+	| BLowerVaridM       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘mb’ starts no excluded identifier.
+	| CLowerVaridM       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘mc’ starts no excluded identifier.
+	| DLowerVaridM       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘md’ starts no excluded identifier.
+	| ELowerVaridM       annotation lexicalELower               (list varidInner)
+		-- ^ ‘me’ starts no excluded identifier.
+	| FLowerVaridM       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘mf’ starts no excluded identifier.
+	| GLowerVaridM       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘mg’ starts no excluded identifier.
+	| HLowerVaridM       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘mh’ starts no excluded identifier.
+	| ILowerVaridM       annotation lexicalILower               (list varidInner)
+		-- ^ ‘mi’ starts no excluded identifier.
+	| JLowerVaridM       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘mj’ starts no excluded identifier.
+	| KLowerVaridM       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘mk’ starts no excluded identifier.
+	| LLowerVaridM       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘ml’ starts no excluded identifier.
+	| MLowerVaridM       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘mm’ starts no excluded identifier.
+	| NLowerVaridM       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘mn’ starts no excluded identifier.
+	| OLowerVaridM       annotation lexicalOLower               varidMo
+		-- ^ ‘mo’ starts 1 excluded identifier.
+	| PLowerVaridM       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘mp’ starts no excluded identifier.
+	| QLowerVaridM       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘mq’ starts no excluded identifier.
+	| RLowerVaridM       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘mr’ starts no excluded identifier.
+	| SLowerVaridM       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘ms’ starts no excluded identifier.
+	| TLowerVaridM       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘mt’ starts no excluded identifier.
+	| ULowerVaridM       annotation lexicalULower               (list varidInner)
+		-- ^ ‘mu’ starts no excluded identifier.
+	| VLowerVaridM       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘mv’ starts no excluded identifier.
+	| WLowerVaridM       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘mw’ starts no excluded identifier.
+	| XLowerVaridM       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘mx’ starts no excluded identifier.
+	| YLowerVaridM       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘my’ starts no excluded identifier.
+	| ZLowerVaridM       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘mz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after an ‘n’ was parsed from the beginning.
+data VaridNBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower varidNe lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridN          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘n’ is not excluded.
+	| SmallSansAscVaridN annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridN       annotation lexicalALower               (list varidInner)
+		-- ^ ‘na’ starts no excluded identifier.
+	| BLowerVaridN       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘nb’ starts no excluded identifier.
+	| CLowerVaridN       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘nc’ starts no excluded identifier.
+	| DLowerVaridN       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘nd’ starts no excluded identifier.
+	| ELowerVaridN       annotation lexicalELower               varidNe
+		-- ^ ‘ne’ starts 1 excluded identifier.
+	| FLowerVaridN       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘nf’ starts no excluded identifier.
+	| GLowerVaridN       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘ng’ starts no excluded identifier.
+	| HLowerVaridN       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘nh’ starts no excluded identifier.
+	| ILowerVaridN       annotation lexicalILower               (list varidInner)
+		-- ^ ‘ni’ starts no excluded identifier.
+	| JLowerVaridN       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘nj’ starts no excluded identifier.
+	| KLowerVaridN       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘nk’ starts no excluded identifier.
+	| LLowerVaridN       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘nl’ starts no excluded identifier.
+	| MLowerVaridN       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘nm’ starts no excluded identifier.
+	| NLowerVaridN       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘nn’ starts no excluded identifier.
+	| OLowerVaridN       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘no’ starts no excluded identifier.
+	| PLowerVaridN       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘np’ starts no excluded identifier.
+	| QLowerVaridN       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘nq’ starts no excluded identifier.
+	| RLowerVaridN       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘nr’ starts no excluded identifier.
+	| SLowerVaridN       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘ns’ starts no excluded identifier.
+	| TLowerVaridN       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘nt’ starts no excluded identifier.
+	| ULowerVaridN       annotation lexicalULower               (list varidInner)
+		-- ^ ‘nu’ starts no excluded identifier.
+	| VLowerVaridN       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘nv’ starts no excluded identifier.
+	| WLowerVaridN       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘nw’ starts no excluded identifier.
+	| XLowerVaridN       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘nx’ starts no excluded identifier.
+	| YLowerVaridN       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘ny’ starts no excluded identifier.
+	| ZLowerVaridN       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘nz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘d’ was parsed from the beginning.
+data VaridOBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridO          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘o’ is not excluded.
+	| SmallSansAscVaridO annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridO       annotation lexicalALower               (list varidInner)
+		-- ^ ‘oa’ starts no excluded identifier.
+	| BLowerVaridO       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘ob’ starts no excluded identifier.
+	| CLowerVaridO       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘oc’ starts no excluded identifier.
+	| DLowerVaridO       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘od’ starts no excluded identifier.
+	| ELowerVaridO       annotation lexicalELower               (list varidInner)
+		-- ^ ‘oe’ starts no excluded identifier.
+	| FLowerVaridO       annotation lexicalFLower               varidInner        (list varidInner)
+		-- ^ ‘of’ alone is excluded.  Additional characters is valid.
+	| GLowerVaridO       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘og’ starts no excluded identifier.
+	| HLowerVaridO       annotation lexicalHLower               (list varidInner)
+		-- ^ ‘oh’ starts no excluded identifier.
+	| ILowerVaridO       annotation lexicalILower               (list varidInner)
+		-- ^ ‘oi’ starts no excluded identifier.
+	| JLowerVaridO       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘oj’ starts no excluded identifier.
+	| KLowerVaridO       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘ok’ starts no excluded identifier.
+	| LLowerVaridO       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘ol’ starts no excluded identifier.
+	| MLowerVaridO       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘om’ starts no excluded identifier.
+	| NLowerVaridO       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘on’ starts no excluded identifier.
+	| OLowerVaridO       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘oo’ starts no excluded identifier.
+	| PLowerVaridO       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘op’ starts no excluded identifier.
+	| QLowerVaridO       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘oq’ starts no excluded identifier.
+	| RLowerVaridO       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘or’ starts no excluded identifier.
+	| SLowerVaridO       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘os’ starts no excluded identifier.
+	| TLowerVaridO       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘ot’ starts no excluded identifier.
+	| ULowerVaridO       annotation lexicalULower               (list varidInner)
+		-- ^ ‘ou’ starts no excluded identifier.
+	| VLowerVaridO       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘ov’ starts no excluded identifier.
+	| WLowerVaridO       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘ow’ starts no excluded identifier.
+	| XLowerVaridO       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘ox’ starts no excluded identifier.
+	| YLowerVaridO       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘oy’ starts no excluded identifier.
+	| ZLowerVaridO       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘oz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘t’ was parsed from the beginning.
+data VaridTBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower varidTh lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower varidTy lexicalZLower annotation fixpoint =
+	  EOPVaridT          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘t’ is not excluded.
+	| SmallSansAscVaridT annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridT       annotation lexicalALower               (list varidInner)
+		-- ^ ‘ta’ starts no excluded identifier.
+	| BLowerVaridT       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘tb’ starts no excluded identifier.
+	| CLowerVaridT       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘tc’ starts no excluded identifier.
+	| DLowerVaridT       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘td’ starts no excluded identifier.
+	| ELowerVaridT       annotation lexicalELower               (list varidInner)
+		-- ^ ‘te’ starts no excluded identifier.
+	| FLowerVaridT       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘tf’ starts no excluded identifier.
+	| GLowerVaridT       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘tg’ starts no excluded identifier.
+	| HLowerVaridT       annotation lexicalHLower               varidTh
+		-- ^ ‘th’ starts 1 excluded identifier.
+	| ILowerVaridT       annotation lexicalILower               (list varidInner)
+		-- ^ ‘ti’ starts no excluded identifier.
+	| JLowerVaridT       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘tj’ starts no excluded identifier.
+	| KLowerVaridT       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘tk’ starts no excluded identifier.
+	| LLowerVaridT       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘tl’ starts no excluded identifier.
+	| MLowerVaridT       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘tm’ starts no excluded identifier.
+	| NLowerVaridT       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘tn’ starts no excluded identifier.
+	| OLowerVaridT       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘to’ starts no excluded identifier.
+	| PLowerVaridT       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘tp’ starts no excluded identifier.
+	| QLowerVaridT       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘tq’ starts no excluded identifier.
+	| RLowerVaridT       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘tr’ starts no excluded identifier.
+	| SLowerVaridT       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘ts’ starts no excluded identifier.
+	| TLowerVaridT       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘tt’ starts no excluded identifier.
+	| ULowerVaridT       annotation lexicalULower               (list varidInner)
+		-- ^ ‘tu’ starts no excluded identifier.
+	| VLowerVaridT       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘tv’ starts no excluded identifier.
+	| WLowerVaridT       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘tw’ starts no excluded identifier.
+	| XLowerVaridT       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘tx’ starts no excluded identifier.
+	| YLowerVaridT       annotation lexicalYLower               varidTy
+		-- ^ ‘ty’ starts 1 excluded identifier.
+	| ZLowerVaridT       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘tz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after a ‘w’ was parsed from the beginning.
+data VaridWBase list lexicalEndOfParse smallSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower varidWh lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridW          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘w’ is not excluded.
+	| SmallSansAscVaridW annotation smallSansAscSmallUnderscore (list varidInner)
+		-- ^ Smalls we know aren't excluded are valid characters.
+	| ALowerVaridW       annotation lexicalALower               (list varidInner)
+		-- ^ ‘wa’ starts no excluded identifier.
+	| BLowerVaridW       annotation lexicalBLower               (list varidInner)
+		-- ^ ‘wb’ starts no excluded identifier.
+	| CLowerVaridW       annotation lexicalCLower               (list varidInner)
+		-- ^ ‘wc’ starts no excluded identifier.
+	| DLowerVaridW       annotation lexicalDLower               (list varidInner)
+		-- ^ ‘wd’ starts no excluded identifier.
+	| ELowerVaridW       annotation lexicalELower               (list varidInner)
+		-- ^ ‘we’ starts no excluded identifier.
+	| FLowerVaridW       annotation lexicalFLower               (list varidInner)
+		-- ^ ‘wf’ starts no excluded identifier.
+	| GLowerVaridW       annotation lexicalGLower               (list varidInner)
+		-- ^ ‘wg’ starts no excluded identifier.
+	| HLowerVaridW       annotation lexicalHLower               varidWh
+		-- ^ ‘wh’ starts 1 excluded identifier.
+	| ILowerVaridW       annotation lexicalILower               (list varidInner)
+		-- ^ ‘wi’ starts no excluded identifier.
+	| JLowerVaridW       annotation lexicalJLower               (list varidInner)
+		-- ^ ‘wj’ starts no excluded identifier.
+	| KLowerVaridW       annotation lexicalKLower               (list varidInner)
+		-- ^ ‘wk’ starts no excluded identifier.
+	| LLowerVaridW       annotation lexicalLLower               (list varidInner)
+		-- ^ ‘wl’ starts no excluded identifier.
+	| MLowerVaridW       annotation lexicalMLower               (list varidInner)
+		-- ^ ‘wm’ starts no excluded identifier.
+	| NLowerVaridW       annotation lexicalNLower               (list varidInner)
+		-- ^ ‘wn’ starts no excluded identifier.
+	| OLowerVaridW       annotation lexicalOLower               (list varidInner)
+		-- ^ ‘wo’ starts no excluded identifier.
+	| PLowerVaridW       annotation lexicalPLower               (list varidInner)
+		-- ^ ‘wp’ starts no excluded identifier.
+	| QLowerVaridW       annotation lexicalQLower               (list varidInner)
+		-- ^ ‘wq’ starts no excluded identifier.
+	| RLowerVaridW       annotation lexicalRLower               (list varidInner)
+		-- ^ ‘wr’ starts no excluded identifier.
+	| SLowerVaridW       annotation lexicalSLower               (list varidInner)
+		-- ^ ‘ws’ starts no excluded identifier.
+	| TLowerVaridW       annotation lexicalTLower               (list varidInner)
+		-- ^ ‘wt’ starts no excluded identifier.
+	| ULowerVaridW       annotation lexicalULower               (list varidInner)
+		-- ^ ‘wu’ starts no excluded identifier.
+	| VLowerVaridW       annotation lexicalVLower               (list varidInner)
+		-- ^ ‘wv’ starts no excluded identifier.
+	| WLowerVaridW       annotation lexicalWLower               (list varidInner)
+		-- ^ ‘ww’ starts no excluded identifier.
+	| XLowerVaridW       annotation lexicalXLower               (list varidInner)
+		-- ^ ‘wx’ starts no excluded identifier.
+	| YLowerVaridW       annotation lexicalYLower               (list varidInner)
+		-- ^ ‘wy’ starts no excluded identifier.
+	| ZLowerVaridW       annotation lexicalZLower               (list varidInner)
+		-- ^ ‘wz’ starts no excluded identifier.
+
+-- TODO: 3+ char keywords.
+
+{-
 -- | A symbolic variable (lowercase-style) identifier name, excluding reserved
 -- names and dash-only sequences.
 data VarsymBase annotation fixpoint =
