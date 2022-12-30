@@ -34,8 +34,6 @@
 
 {-# LANGUAGE Haskell2010 #-}
 
--- TODO: while it works without, it may be better to use lists, maybes, and repetitions rather than extra structures where there are sequences.
-
 -- | A Simple Haskell2010 syntax.
 --
 -- This module provides a strictly Haskell2010-conformant AST data structure.
@@ -50,56 +48,41 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	-- ** § 5.1 Module Structure types.
 	ModuleBase(ModuleWithHeader, ModuleWithoutHeader),
 	BodyBase(BodyImportsTops, BodyImportsOnly, BodyTopsOnly),
-	ImpDeclsBase(ImpDeclsLast, ImpDeclsNotLast),
-	TopDeclsBase(TopDeclsLast, TopDeclsNotLast),
+	ImpDeclsBase(ImpDeclSequence),
+	TopDeclsBase(TopDeclSequence),
 
 	-- ** § 5.2 Export Lists types.
-	ExportsBase(ExportsFromBeginning),
-	ExportsRestBase(ExportsLast, ExportsNotLast),
+	ExportsBase(ExportsList),
 	ExportBase(ExportVariable, ExportTypeVariable, ExportClassVariable, ExportModule),
-	ExportCnamesBase(ExportCnamesEmpty, ExportCnamesPush),
-	ExportVarsBase(ExportVarsEmpty, ExportVarsPush),
 	CnameBase(CnameVar, CnameCon),
 
 	-- ** § 5.3 Import Declarations types.
 	ImpDeclBase(ImportStatement, NullImport),
 	ImpSpecBase(ImportWhitelist, ImportBlacklist),
-	ImportAttrsBase(ImportAttrsEmpty, ImportAttrsPush),
 	ImportBase(ImportVariableAttribute, ImportTypeVariableAttribute, ImportTypeClassVariableAttribute),
-	ImportCnamesBase(ImportCnamesEmpty, ImportCnamesPush),
-	ImportVarsBase(ImportVarsEmpty, ImportVarsPush),
 
 	-- ** § 4 Declarations and Bindings types.
 	TopDeclBase(TopDeclType, TopDeclData, TopDeclNewtype, TopDeclClass, TopDeclInstance, TopDeclDefault, TopDeclForeign, TopDeclRegular),
-	TopDeclDefaultTypesBase(TopDeclDefaultTypesEmpty, TopDeclDefaultTypesPush),
-	DeclsBase(DeclarationsFromBeginning),
-	DeclsRestBase(DeclarationsEmpty, DeclarationsPush),
+	DeclsBase(Declarations),
 	DeclBase(DeclarationMeta, DeclarationValue),
-	CdeclsBase(ClassDeclarationsFromBeginning),
-	CdeclsRestBase(ClassDeclarationsEmpty, ClassDeclarationsPush),
+	CdeclsBase(ClassDeclarations),
 	CdeclBase(ClassDeclarationMeta, ClassDeclarationValue),
-	IdeclsBase(InstanceDeclarationsFromBeginning),
-	IdeclsRestBase(InstanceDeclarationsEmpty, InstanceDeclarationsPush),
+	IdeclsBase(InstanceDeclarations),
 	IdeclBase(InstanceDeclarationValue, NullInstanceDeclaration),
 	GenDeclBase(TypeDeclaration, FixityDeclaration, NullMetaDeclaration),
-	OpsBase(OperationsLast, OperationsNotLast),
-	VarsBase(VarsLast, VarsNotLast),
+	OpsBase(OpSequence),
+	VarsBase(VarSequence),
 	FixityBase(FixityInfixr, FixityInfixl, FixityInfix),
 
 	-- ** § 4.1.2 Syntax of Types types.
 	TypeBase(Type),
 	BTypeBase(TypeApplication),
 	ATypeBase(GeneralTypeConstructor, TypeVariableType, TupleType, ListType, GroupedType),
-	TypesBase(TypesFromFirst),
-	TypesRestBase(TypesLast, TypesNotLast),
 	GtyconBase(QualifiableTypeConstructor, UnitTypeConstructor, EmptyListTypeConstructor, FunctionTypeConstructor, TupleTypeConstructor),
 
 	-- ** § 4.1.3 Syntax of Class Assertions and Contexts types.
 	ContextBase(ContextSingle, Context),
 	ClassBase(AssertUnappliedTypeVariableInClass, AssertAppliedTypeVariableInClass),
-	AtypesBase(AtypesLast, AtypesNotLast),
-	ClassesBase(ClassesFromBeginning),
-	ClassesRestBase(ClassesEmpty, ClassesPush),
 	{-
 	ClassQtyclsBase(TypeClass),
 	ClassTyclsBase(UnqualifiedTypeClass),
@@ -108,16 +91,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 
 	-- ** § 4.2.1 Algebraic Datatype Declarations types.
 	SimpleTypeBase(NamesType),
-	ConstrsBase(ConstrsLast, ConstrsNotLast),
+	ConstrsBase(Constructors),
 	ConstrBase(BasicConstructor, BinaryOperatorConstructor, RecordConstructor),
-	EvalAtypesBase(EvalAtypesEmpty, EvalAtypesPush),
 	EvalAtypeBase(OrdableAtype),
-	FieldDeclsBase(FieldDeclsEmpty, FieldDeclsFromFirst),
-	FieldDeclsRestBase(FieldDeclsEnd, FieldDeclsPush),
 	FieldDeclBase(FieldDeclaration),
 	DerivingBase(DerivingClause),
-	DclassesListBase(DclassesSingle, Dclasses),
-	DclassesBase(DclassesEmpty, DclassesPush),
 	DclassBase(DerivingClass),
 
 	-- ** § 4.2.3 Datatype Renamings types.
@@ -126,13 +104,9 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	-- ** § 4.3.1 Type Classes and Overloading types.
 	SContextBase(SimpleContextSingle, SimpleContextList),
 	SimpleClassBase(SimpleClassAssertion),
-	SimpleClassesBase(SimpleClassesEmpty, SimpleClassesPush),
 
 	-- ** § 4.3.2 Instance Declarations types.
 	InstBase(GeneralTypeConstructorInstance, AppliableGeneralTypeConstructorInstance, TypeVariableTupleInstance, ListInstance, FunctionInstance),
-	TyVarsBase(TyVarsEmpty, TyVarsPush),
-	TypeVariablesTupleBase(TypeVariablesTupleFromFirst),
-	TypeVariablesTupleRestBase(TypeVariablesTupleLast, TypeVariablesTupleNotLast),
 
 	{-
 	-- ** § 4.4.2 Fixity Declarations types.
@@ -146,18 +120,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	ExpBase(TypedExpression, UntypedExpression),
 	InfixExpBase(RightInfixExpression, UnaryPrefixExpression, LeftExpression),
 	LexpBase(LambdaExpression, LetExpression, ConditionalExpression, CaseExpression, DoExpression, BaseExpression),
-	ApatsBase(ApatsLast, ApatsNotLast),
 	FexpBase(ApplicationExpression),
 	AexpBase(VariableExpression, ConstructorExpression, LiteralExpression, ParenthesesExpression, TupleExpression, ListExpression, ArithmeticSequenceExpression, ListComprehensionExpression, LeftSectionExpression, RightSectionExpression, ConstructRecordExpression, ModifyRecordExpression),
-	Exps2Base(Exps2FromFirst),
-	Exps2RestBase(Exps2Last, Exps2NotLast),
-	Exps1Base(Exps1FromFirst),
-	Exps1RestBase(Exps1End, Exps1Push),
-	QualsBase(QualsLast, QualsNotLast),
-	Fbinds0Base(Fbinds0Empty, Fbinds0FromFirst),
-	Fbinds0RestBase(Fbinds0End, Fbinds0Push),
-	Fbinds1Base(Fbinds1FromFirst),
-	Fbinds1RestBase(Fbinds1End, Fbinds1Push),
 
 	-- ** § 3.2 Variables, Constructors, Operators, and Literals types.
 	GconBase(UnitConstructor, EmptyListConstructor, TupleConstructor, QualifiableConstructor),
@@ -174,15 +138,14 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	GconSymBase(ConsListConstructor, NonbuiltinQualifiableConstructorSymbolic),
 
 	-- ** § 3.13 Case Expressions types.
-	AltsBase(AltsLast, AltsNotLast),
+	AltsBase(CaseBranches),
 	AltBase(ExpBranch, GuardedExpBranch, NullExpBranch),
-	GdpatBase(GuardBranches),
-	GuardsBase(GuardsFromFirst),
-	GuardsRestBase(GuardsEnd, GuardsPush),
+	GdpatBase(GuardClauses),
+	GuardsBase(GuardClauseGuards),
 	GuardBase(PatternGuard, LocalDeclaration, BooleanGuard),
 
 	-- ** § 3.14 Do Expressions types.
-	StmtsBase(StmtsEnd, StmtsPush),
+	StmtsBase(DoStatements),
 	StmtBase(BaseStmt, BindStmt, LetStmt, NullStmt),
 
 	-- ** § 3.15.2 Construction Using Field Labels types.
@@ -657,46 +620,27 @@ data BodyBase lexicalLeftBrace impDecls lexicalSemicolon topDecls lexicalRightBr
 	| BodyTopsOnly    annotation lexicalLeftBrace topDecls lexicalRightBrace
 
 -- | Import block.
-data ImpDeclsBase impDecl lexicalSemicolon annotation fixpoint =
-	  ImpDeclsLast    annotation impDecl
-	| ImpDeclsNotLast annotation impDecl lexicalSemicolon fixpoint
+data ImpDeclsBase data2 list impDecl lexicalSemicolon annotation fixpoint =
+	ImpDeclSequence annotation impDecl (list (data2 lexicalSemicolon impDecl))
 
 -- | Top-level declarations: what a module defines.
-data TopDeclsBase topDecl lexicalSemicolon annotation fixpoint =
-	  TopDeclsLast    annotation topDecl
-	| TopDeclsNotLast annotation topDecl lexicalSemicolon fixpoint
+data TopDeclsBase data2 list topDecl lexicalSemicolon annotation fixpoint =
+	TopDeclSequence annotation topDecl (list (data2 lexicalSemicolon topDecl))
 
 -- § 5.2 Export Lists types.
 
 -- | A module's export list.
-data ExportsBase lexicalLeftParenthesis exportsRest annotation fixpoint =
-	  ExportsFromBeginning annotation lexicalLeftParenthesis exportsRest
-
--- | The rest of a module's export list.
-data ExportsRestBase maybe export lexicalComma lexicalRightParenthesis annotation fixpoint =
-	  ExportsLast    annotation export (maybe lexicalComma) lexicalRightParenthesis
-	| ExportsNotLast annotation export lexicalComma         fixpoint
+data ExportsBase data2 maybe list lexicalLeftParenthesis export lexicalComma lexicalRightParenthesis annotation fixpoint =
+	ExportsList annotation lexicalLeftParenthesis (maybe (data2 export (list (data2 lexicalComma export)))) lexicalRightParenthesis
 
 -- | An export, in a module's export list.
 --
 -- (modid: module identifier.)
-data ExportBase data3 maybe either qvar qtycon lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis exportCnames qtycls exportVars lexicalModule modid annotation fixpoint =
+data ExportBase data2 data3 maybe either list qvar qtycon lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis cname lexicalComma qtycls var lexicalModule modid annotation fixpoint =
 	  ExportVariable      annotation qvar
-	| ExportTypeVariable  annotation qtycon        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis exportCnames lexicalRightParenthesis)))
-	| ExportClassVariable annotation qtycls        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis exportVars lexicalRightParenthesis)))
+	| ExportTypeVariable  annotation qtycon        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 cname (list (lexicalComma cname)))) lexicalRightParenthesis)))
+	| ExportClassVariable annotation qtycls        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 var   (list (lexicalComma var  )))) lexicalRightParenthesis)))
 	| ExportModule        annotation lexicalModule modid
-
--- | An ADT (‘data’) or ‘newtype’ export item.
---
--- Export a data type or newtype type and its fields and constructors.
-data ExportCnamesBase cname lexicalComma annotation fixpoint =
-	  ExportCnamesEmpty annotation
-	| ExportCnamesPush  annotation cname lexicalComma fixpoint
-
--- | Export a type class's members.
-data ExportVarsBase var lexicalComma annotation fixpoint =
-	  ExportVarsEmpty annotation
-	| ExportVarsPush  annotation var lexicalComma fixpoint
 
 -- | Export (or import, etc.) a ‘data’ or ‘newtype’'s fields (‘var’s) and constructors (‘con’s).
 data CnameBase var con annotation fixpoint =
@@ -711,37 +655,20 @@ data ImpDeclBase data2 maybe lexicalImport lexicalQualified modid lexicalAs impS
 	| NullImport      annotation
 
 -- | Import specification: what to import.
-data ImpSpecBase lexicalLeftParenthesis importAttrs lexicalRightParenthesis lexicalHiding annotation fixpoint =
-	  ImportWhitelist annotation               lexicalLeftParenthesis importAttrs lexicalRightParenthesis
+data ImpSpecBase data2 maybe list lexicalLeftParenthesis import_ lexicalComma lexicalRightParenthesis lexicalHiding annotation fixpoint =
+	  ImportWhitelist annotation               lexicalLeftParenthesis (maybe (data2 import_ (list (data2 lexicalComma import_)))) lexicalRightParenthesis
 		-- ^ Import only ….
-	| ImportBlacklist annotation lexicalHiding lexicalLeftParenthesis importAttrs lexicalRightParenthesis
+	| ImportBlacklist annotation lexicalHiding lexicalLeftParenthesis (maybe (data2 import_ (list (data2 lexicalComma import_)))) lexicalRightParenthesis
 		-- ^ Import all but ….
 
--- | List of what elements (attributes) to import from a module.
-data ImportAttrsBase maybe lexicalComma import_ annotation fixpoint =
-	  ImportAttrsEmpty annotation (maybe lexicalComma)
-	| ImportAttrsPush  annotation import_              lexicalComma fixpoint
-
 -- | An individual attribute (e.g. variable) in a list of elements to import from a module in an import statement.
-data ImportBase data3 maybe either var lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis importCnames importVars annotation fixpoint =
+data ImportBase data3 data2 maybe either list var lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis cname lexicalComma annotation fixpoint =
 	  ImportVariableAttribute          annotation var
 		-- ^ Import a regular variable from a module.
-	| ImportTypeVariableAttribute      annotation (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis importCnames lexicalRightParenthesis)))
+	| ImportTypeVariableAttribute      annotation (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 cname (list (data2 lexicalComma cname)))) lexicalRightParenthesis)))
 		-- ^ Import a ‘data’ type or ‘newtype’ type from a module.
-	| ImportTypeClassVariableAttribute annotation (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis importVars   lexicalRightParenthesis)))
+	| ImportTypeClassVariableAttribute annotation (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 var   (list (data2 lexicalComma var  )))) lexicalRightParenthesis)))
 		-- ^ Import a type class from a module.
-
--- | An ADT (‘data’) or ‘newtype’ import item.
---
--- Import a data type or newtype type and its fields and constructors from a module.
-data ImportCnamesBase cname lexicalComma annotation fixpoint =
-	  ImportCnamesEmpty annotation
-	| ImportCnamesPush  annotation cname lexicalComma fixpoint
-
--- | Import a type class's members.
-data ImportVarsBase var lexicalComma annotation fixpoint =
-	  ImportVarsEmpty annotation
-	| ImportVarsPush  annotation var lexicalComma fixpoint
 
 -- § 4 Declarations and Bindings types.
 
@@ -750,29 +677,19 @@ data ImportVarsBase var lexicalComma annotation fixpoint =
 -- These are the components of a module, especially regular declarations
 -- ('TopDeclRegular') for attributes of modules that can be exported and
 -- imported.
-data TopDeclBase data2 maybe lexicalType simpleType type_ lexicalData context lexicalDoubleRightArrow lexicalEquals constrs deriving_ lexicalNewtype newConstr lexicalClass scontext tycls tyvar lexicalWhere cdecls lexicalInstance qtycls inst idecls lexicalDefault lexicalLeftParenthesis topDeclDefaultTypes lexicalRightParenthesis lexicalForeign fdecl decl annotation fixpoint =
+data TopDeclBase data2 maybe list lexicalType simpleType type_ lexicalData context lexicalDoubleRightArrow lexicalEquals constrs deriving_ lexicalNewtype newConstr lexicalClass scontext tycls tyvar lexicalWhere cdecls lexicalInstance qtycls inst idecls lexicalDefault lexicalLeftParenthesis lexicalComma lexicalRightParenthesis lexicalForeign fdecl decl annotation fixpoint =
 	  TopDeclType     annotation lexicalType     simpleType             type_
-	| TopDeclData     annotation lexicalData     (maybe (data2 context  lexicalDoubleRightArrow)) simpleType            (maybe (data2 lexicalEquals constrs)) (maybe deriving_)
-	| TopDeclNewtype  annotation lexicalNewtype  (maybe (data2 context  lexicalDoubleRightArrow)) simpleType            lexicalEquals                         newConstr                          (maybe deriving_)
-	| TopDeclClass    annotation lexicalClass    (maybe (data2 scontext lexicalDoubleRightArrow)) tycls                 tyvar                                 (maybe (data2 lexicalWhere cdecls))
-	| TopDeclInstance annotation lexicalInstance (maybe (data2 scontext lexicalDoubleRightArrow)) qtycls                inst                                  (maybe (data2 lexicalWhere idecls))
-	| TopDeclDefault  annotation lexicalDefault  lexicalLeftParenthesis                           topDeclDefaultTypes   lexicalRightParenthesis
+	| TopDeclData     annotation lexicalData     (maybe (data2 context  lexicalDoubleRightArrow)) simpleType                                              (maybe (data2 lexicalEquals constrs)) (maybe deriving_)
+	| TopDeclNewtype  annotation lexicalNewtype  (maybe (data2 context  lexicalDoubleRightArrow)) simpleType                                              lexicalEquals                         newConstr                          (maybe deriving_)
+	| TopDeclClass    annotation lexicalClass    (maybe (data2 scontext lexicalDoubleRightArrow)) tycls                                                   tyvar                                 (maybe (data2 lexicalWhere cdecls))
+	| TopDeclInstance annotation lexicalInstance (maybe (data2 scontext lexicalDoubleRightArrow)) qtycls                                                  inst                                  (maybe (data2 lexicalWhere idecls))
+	| TopDeclDefault  annotation lexicalDefault  lexicalLeftParenthesis                           (maybe (data2 type_ (list (data2 lexicalComma type_)))) lexicalRightParenthesis
 	| TopDeclForeign  annotation lexicalForeign  fdecl
 	| TopDeclRegular  annotation decl
 
--- | A list of types to specify as ‘default’ in a ‘default’ declaration.
-data TopDeclDefaultTypesBase type_ lexicalComma annotation fixpoint =
-	  TopDeclDefaultTypesEmpty annotation
-	| TopDeclDefaultTypesPush  annotation type_ lexicalComma fixpoint
-
 -- | A block of declarations.
-data DeclsBase lexicalLeftBrace declsRest annotation fixpoint =
-	  DeclarationsFromBeginning annotation lexicalLeftBrace declsRest
-
--- | The rest of a block of declarations.
-data DeclsRestBase maybe lexicalSemicolon lexicalRightBrace decl annotation fixpoint =
-	  DeclarationsEmpty annotation (maybe lexicalSemicolon) lexicalRightBrace
-	| DeclarationsPush  annotation decl                     lexicalSemicolon  fixpoint
+data DeclsBase data2 maybe list lexicalLeftBrace decl lexicalSemicolon lexicalRightBrace annotation fixpoint =
+	Declarations annotation lexicalLeftBrace (maybe (data2 decl (list (data2 lexicalSemicolon decl)))) lexicalRightBrace
 
 -- | A regular declaration.
 --
@@ -783,13 +700,8 @@ data DeclBase either gendecl funlhs pat rhs annotation fixpoint =
 	| DeclarationValue annotation (either funlhs pat) rhs
 
 -- | A block of class-declarations inside a class definition.
-data CdeclsBase lexicalLeftBrace declsRest annotation fixpoint =
-	  ClassDeclarationsFromBeginning annotation lexicalLeftBrace declsRest
-
--- | The rest of a block of class-declarations inside a class definition.
-data CdeclsRestBase maybe lexicalSemicolon lexicalRightBrace decl annotation fixpoint =
-	  ClassDeclarationsEmpty annotation (maybe lexicalSemicolon) lexicalRightBrace
-	| ClassDeclarationsPush  annotation decl                     lexicalSemicolon  fixpoint
+data CdeclsBase data2 maybe list lexicalLeftBrace cdecl lexicalSemicolon lexicalRightBrace annotation fixpoint =
+	ClassDeclarations annotation lexicalLeftBrace (maybe (data2 cdecl (list (data2 lexicalSemicolon cdecl)))) lexicalRightBrace
 
 -- | A regular class-declaration inside a class definition.
 --
@@ -800,13 +712,8 @@ data CdeclBase either gendecl funlhs pat rhs annotation fixpoint =
 	| ClassDeclarationValue annotation (either funlhs pat) rhs
 
 -- | A block of instance-declarations inside an instance body.
-data IdeclsBase lexicalLeftBrace declsRest annotation fixpoint =
-	  InstanceDeclarationsFromBeginning annotation lexicalLeftBrace declsRest
-
--- | The rest of a block of instance-declarations inside an instance body.
-data IdeclsRestBase maybe lexicalSemicolon lexicalRightBrace decl annotation fixpoint =
-	  InstanceDeclarationsEmpty annotation (maybe lexicalSemicolon) lexicalRightBrace
-	| InstanceDeclarationsPush  annotation decl                     lexicalSemicolon  fixpoint
+data IdeclsBase data2 maybe list lexicalLeftBrace idecl lexicalSemicolon lexicalRightBrace annotation fixpoint =
+	InstanceDeclarations annotation  lexicalLeftBrace (maybe (data2 idecl (list (data2 lexicalSemicolon idecl)))) lexicalRightBrace
 
 -- | A regular instance-declaration inside an instance body.
 --
@@ -825,14 +732,12 @@ data GenDeclBase data2 maybe vars lexicalDoubleColon context lexicalDoubleRightA
 -- | A list of binary operators (not with parentheses around each).
 --
 -- Normally you'll see this list as part of a fixity declaration.
-data OpsBase op lexicalComma annotation fixpoint =
-	  OperationsLast    annotation op
-	| OperationsNotLast annotation op lexicalComma fixpoint
+data OpsBase data2 list op lexicalComma annotation fixpoint =
+	OpSequence annotation op (list (data2 lexicalComma op))
 
 -- | A list of variables, e.g in a type declaration.
-data VarsBase var lexicalComma annotation fixpoint =
-	  VarsLast    annotation var
-	| VarsNotLast annotation var lexicalComma fixpoint
+data VarsBase data2 list var lexicalComma annotation fixpoint =
+	VarSequence annotation var (list (data2 lexicalComma var))
 
 -- | A choice of fixity direction.
 data FixityBase lexicalInfixl lexicalInfixr lexicalInfix annotation fixpoint =
@@ -851,21 +756,12 @@ data BTypeBase maybe atype annotation fixpoint =
 	TypeApplication annotation (maybe fixpoint) atype
 
 -- | An applicable type, one that can be part of type application.
-data ATypeBase gtycon tyvar lexicalLeftParenthesis types lexicalRightParenthesis lexicalLeftAngleBracket type_ lexicalRightAngleBracket annotation fixpoint =
+data ATypeBase data2 list gtycon tyvar lexicalLeftParenthesis type_ lexicalComma lexicalRightParenthesis lexicalLeftAngleBracket lexicalRightAngleBracket annotation fixpoint =
 	  GeneralTypeConstructor annotation gtycon
 	| TypeVariableType       annotation tyvar
-	| TupleType              annotation lexicalLeftParenthesis  types lexicalRightParenthesis
+	| TupleType              annotation lexicalLeftParenthesis  type_ lexicalComma             type_ (list (data2 lexicalComma type_)) lexicalRightParenthesis
 	| ListType               annotation lexicalLeftAngleBracket type_ lexicalRightAngleBracket
 	| GroupedType            annotation lexicalLeftParenthesis  type_ lexicalRightParenthesis
-
--- | A tuple of at least 2 types, without the parentheses.
-data TypesBase type_ lexicalComma typesRest annotation fixpoint =
-	TypesFromFirst annotation type_ lexicalComma typesRest
-
--- | The rest of a tuple of at least 2 types.
-data TypesRestBase type_ lexicalComma annotation fixpoint =
-	  TypesLast    annotation type_
-	| TypesNotLast annotation type_ lexicalComma fixpoint
 
 -- | A type constructor, extended with a selection of built-in type constructors.
 data GtyconBase list qtycon lexicalLeftParenthesis lexicalRightParenthesis lexicalLeftBracket lexicalRightBracket lexicalRightArrow lexicalComma annotation fixpoint =
@@ -878,36 +774,18 @@ data GtyconBase list qtycon lexicalLeftParenthesis lexicalRightParenthesis lexic
 -- § 4.1.3 Syntax of Class Assertions and Contexts types.
 
 -- | The context of a type class.
-data ContextBase class_ classes annotation fixpoint =
+data ContextBase data2 maybe list class_ lexicalLeftParenthesis lexicalComma lexicalRightParenthesis annotation fixpoint =
 	  ContextSingle annotation class_
 		-- ^ The context form without parentheses, which requires the number of class assertions to be 1.
-	| Context       annotation classes
+	| Context       annotation lexicalLeftParenthesis (maybe (data2 class_ (list (data2 lexicalComma class_)))) lexicalRightParenthesis
 		-- ^ The general context form.
 
 -- | An assertion inside a context.
 --
 -- This assertion specifies that a type must be a member of a class, for what follows.
-data ClassBase qtycls tyvar lexicalLeftParenthesis atypes lexicalRightParenthesis annotation fixpoint =
+data ClassBase list qtycls tyvar lexicalLeftParenthesis atype lexicalRightParenthesis annotation fixpoint =
 	  AssertUnappliedTypeVariableInClass annotation qtycls tyvar
-	| AssertAppliedTypeVariableInClass   annotation qtycls lexicalLeftParenthesis tyvar atypes lexicalRightParenthesis
-
--- | A non-empty list of 'ATypeBase's.
---
--- This list of applicable types can appear in a type class assertion to a type
--- variable, where the resulting (applied) type is asserted to be a member of
--- the type class.
-data AtypesBase atype annotation fixpoint =
-	  AtypesLast    annotation atype
-	| AtypesNotLast annotation atype fixpoint
-
--- | A list of class assertions.
-data ClassesBase lexicalLeftParenthesis classesRest annotation fixpoint =
-	ClassesFromBeginning annotation lexicalLeftParenthesis classesRest
-
--- | The rest of a list of class assetrions.
-data ClassesRestBase class_ lexicalComma annotation fixpoint =
-	  ClassesEmpty annotation
-	| ClassesPush  annotation class_ lexicalComma fixpoint
+	| AssertAppliedTypeVariableInClass   annotation qtycls lexicalLeftParenthesis tyvar atype (list atype) lexicalRightParenthesis
 
 {-
 -- | A type class name, optionally with a location qualifier by module, in a class context.
@@ -932,62 +810,26 @@ data SimpleTypeBase list tycon tyvar annotation fixpoint =
 	NamesType annotation tycon (list tyvar)
 
 -- | One or more data constructions, for a ‘data’ ADT type declaration / definition.
-data ConstrsBase constr lexicalPipe annotation fixpoint =
-	  ConstrsLast    annotation constr
-	| ConstrsNotLast annotation constr lexicalPipe fixpoint
+data ConstrsBase data2 list constr lexicalPipe annotation fixpoint =
+	Constructors annotation constr (list (data2 lexicalPipe constr))
 
 -- | A data constructor, for a ‘data’ ADT type declaration / definition.
-data ConstrBase either con evalAtypes btype evalAtype conop lexicalLeftBrace fieldDecls lexicalRightBrace annotation fixpoints =
-	  BasicConstructor          annotation con                      evalAtypes
+data ConstrBase data2 list either maybe con evalAtype btype conop lexicalLeftBrace fieldDecl lexicalComma lexicalRightBrace annotation fixpoints =
+	  BasicConstructor          annotation con                      (list evalAtype)
 	| BinaryOperatorConstructor annotation (either btype evalAtype) conop            (either btype evalAtype)
-	| RecordConstructor         annotation con                      lexicalLeftBrace fieldDecls               lexicalRightBrace
-
--- | Zero or more a-types, where each a-type is specified to have either strict
--- or lazy evaluation order.
---
--- An optional lexeme in the semantics phase can declare an evaluation ordering
--- dependency of a constructor field before the value.
-data EvalAtypesBase evalAtype annotation fixpoint =
-	  EvalAtypesEmpty annotation
-	| EvalAtypesPush  annotation evalAtype fixpoint
+	| RecordConstructor         annotation con                      lexicalLeftBrace (maybe (data2 fieldDecl (list (data2 lexicalComma fieldDecl)))) lexicalRightBrace
 
 -- | An applicable type that optionally can have a strict evaluation order specifier applied to it.
 data EvalAtypeBase maybe lexicalExclamation atype annotation fixpoint =
 	OrdableAtype annotation (maybe lexicalExclamation) atype
-
--- | The zero or more field declarations that with the constructor name
--- constitute a record, without the braces.
-data FieldDeclsBase fieldDecl fieldDeclsRest annotation fixpoint =
-	  FieldDeclsEmpty     annotation
-	| FieldDeclsFromFirst annotation fieldDecl fieldDeclsRest
-
--- | The rest of zero or more field declarations that with the constructor name
--- constitute a record.
-data FieldDeclsRestBase lexicalComma fieldDecl annotation fixpoint =
-	  FieldDeclsEnd  annotation
-	| FieldDeclsPush annotation lexicalComma fieldDecl fixpoint
 
 -- | A field declaration is one or more field names assigned to a type.
 data FieldDeclBase either vars lexicalDoubleColon type_ evalAtype annotation fixpoint =
 	FieldDeclaration annotation vars lexicalDoubleColon (either type_ evalAtype)
 
 -- | A ‘deriving’ clause to declare automatic derivation for a ‘data’ ADT or ‘newtype’ type.
-data DerivingBase lexicalDeriving dclassesList annotation fixpoint =
-	DerivingClause annotation lexicalDeriving dclassesList
-
--- | A collection of classes to derive an instance for.
---
--- Supports omission of parentheses if there is only one class.
-data DclassesListBase either dclass lexicalLeftParenthesis dclasses lexicalRightParenthesis annotation fixpoint =
-	  DclassesSingle annotation dclass
-		-- ^ The deriving class list form without parentheses, which requires the number of listed classes to be 1.
-	| Dclasses       annotation lexicalLeftParenthesis dclasses lexicalRightParenthesis
-		-- ^ The general deriving list form.
-
--- | A list of classes to derive an instance for.
-data DclassesBase dclass lexicalComma annotation fixpoint =
-	  DclassesEmpty annotation
-	| DclassesPush  annotation dclass lexicalComma fixpoint
+data DerivingBase data3 data2 either maybe list lexicalDeriving dclass lexicalLeftParenthesis lexicalComma lexicalRightParenthesis annotation fixpoint =
+	DerivingClause annotation lexicalDeriving (either dclass (data3 lexicalLeftParenthesis (maybe (data2 dclass (list (data2 lexicalComma dclass)))) lexicalRightParenthesis))
 
 -- | A class name inside a ‘deriving’ declaration.
 data DclassBase qtycls annotation fixpoints =
@@ -1008,10 +850,10 @@ data NewConstrBase con atype lexicalLeftBrace var lexicalDoubleColon type_ lexic
 --
 -- This is used rather than the full context structure by e.g. ‘class’
 -- declarations.
-data SContextBase simpleClass simpleClasses annotation fixpoint =
+data SContextBase data2 maybe list simpleClass lexicalLeftParenthesis lexicalComma lexicalRightParenthesis annotation fixpoint =
 	  SimpleContextSingle annotation simpleClass
 		-- ^ Form with ommitted parentheses, requiring exactly 1 simple class.
-	| SimpleContextList   annotation simpleClasses
+	| SimpleContextList   annotation lexicalLeftParenthesis (maybe (data2 simpleClass (list (data2 lexicalComma simpleClass)))) lexicalRightParenthesis
 		-- ^ Normal form, with parentheses.
 
 -- | A class assertion consisting of names.
@@ -1023,13 +865,6 @@ data SContextBase simpleClass simpleClasses annotation fixpoint =
 data SimpleClassBase qtycls tyvar annotation fixpoint =
 	SimpleClassAssertion annotation qtycls tyvar
 
--- | A list of simple class assertions, used in simple contexts to list them out in one form.
---
--- This is in the form used with parentheses.
-data SimpleClassesBase simpleClass lexicalComma annotation fixpoint =
-	  SimpleClassesEmpty annotation
-	| SimpleClassesPush  annotation simpleClass lexicalComma fixpoint
-
 -- § 4.3.2 Instance Declarations types.
 
 -- | The member part of an instance declaration.
@@ -1038,40 +873,25 @@ data SimpleClassesBase simpleClass lexicalComma annotation fixpoint =
 --
 -- (The context and type class have already been written.  This is what
 -- follows up through before the possible ‘where’ clause.)
---data InstBase gtycon tyvars lexicalLeftBracket tyvar lexicalRightBracket lexicalLeftParenthesis lexicalRightArrow lexicalRightParenthesis annotation fixpoint =
-data InstBase gtycon lexicalLeftParenthesis tyvars lexicalRightParenthesis typeVariablesTuple lexicalLeftBracket tyvar lexicalRightBracket lexicalRightArrow annotation fixpoint =
+data InstBase data2 list gtycon lexicalLeftParenthesis tyvar lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalRightArrow annotation fixpoint =
 	  GeneralTypeConstructorInstance          annotation gtycon
 		-- ^ A type or a type constructor (but not in a form where it can be
 		-- further applied with type variables after it is referenced here.)
-	| AppliableGeneralTypeConstructorInstance annotation lexicalLeftParenthesis gtycon tyvars             lexicalRightParenthesis
+	| AppliableGeneralTypeConstructorInstance annotation lexicalLeftParenthesis gtycon (list tyvar)        lexicalRightParenthesis
 		-- ^ Like 'GeneralTypeConstructorInstance', but it has parentheses, so it can accommodate syntax for application.
 		--
 		-- (Note: in the separate semantics phase, the spec says the vars are distinct.)
 		-- (In the syntax phase, we specify the structure of the variables.)
-	| TypeVariableTupleInstance               annotation typeVariablesTuple
+	| TypeVariableTupleInstance               annotation lexicalLeftParenthesis tyvar  lexicalComma        tyvar (list (data2 lexicalComma tyvar)) lexicalRightParenthesis
 		-- (Note: again, in the separate semantics phase, the spec says the vars are distinct.)
-	| ListInstance                            annotation lexicalLeftBracket     tyvar lexicalRightBracket
+	| ListInstance                            annotation lexicalLeftBracket     tyvar  lexicalRightBracket
 		-- ^ Like 'AppliableGeneralTypeConstructorInstance' but with a sugar
 		-- syntax for list type constructor application.
-	| FunctionInstance                        annotation lexicalLeftParenthesis tyvar lexicalRightArrow   tyvar                   lexicalRightParenthesis
+	| FunctionInstance                        annotation lexicalLeftParenthesis tyvar  lexicalRightArrow   tyvar lexicalRightParenthesis
 		-- ^ Like 'AppliableGeneralTypeConstructorInstance' but with a sugar
 		-- syntax for function (arrow) type constructor application.
 		--
 		-- (Note: again, in the separate semantics phase, the spec says the vars are distinct.)
-
--- | Zero or more type variables.
-data TyVarsBase tyvar lexicalComma annotation fixpoint =
-	  TyVarsEmpty annotation
-	| TyVarsPush  annotation tyvar lexicalComma fixpoint
-
--- | Two or more type variables, represented as a tuple.
-data TypeVariablesTupleBase lexicalLeftParenthesis tyvar typeVariablesTupleRest annotation fixpoint =
-	TypeVariablesTupleFromFirst annotation lexicalLeftParenthesis tyvar typeVariablesTupleRest
-
--- | The rest of two or more type variables, represented as a tuple.
-data TypeVariablesTupleRestBase tyvar lexicalRightParenthesis lexicalComma annotation fixpoint =
-	  TypeVariablesTupleLast    annotation tyvar lexicalRightParenthesis
-	| TypeVariablesTupleNotLast annotation tyvar lexicalComma            fixpoint
 
 {-
 -- § 4.4.2 Fixity Declarations types.
@@ -1124,19 +944,14 @@ data InfixExpBase lexp qop lexicalMinus annotation fixpoint =
 		-- ^ An expression that is not a binary operation application on top.
 
 -- | A left-expression, one not directly a unary or binary operation application.
-data LexpBase maybe lexicalAsciiLambda apats lexicalRightArrow exp lexicalLet decls lexicalIn lexicalIf lexicalSemicolon lexicalThen lexicalElse lexicalCase lexicalOf lexicalLeftBrace alts lexicalRightBrace stmts annotation fexp fixpoint =
-	  LambdaExpression      annotation lexicalAsciiLambda    apats lexicalRightArrow        exp
+data LexpBase maybe list lexicalAsciiLambda apat lexicalRightArrow exp lexicalLet decls lexicalIn lexicalIf lexicalSemicolon lexicalThen lexicalElse lexicalCase lexicalOf lexicalLeftBrace alts lexicalRightBrace stmts annotation fexp fixpoint =
+	  LambdaExpression      annotation lexicalAsciiLambda    apat  (list apat)              lexicalRightArrow exp
 	| LetExpression         annotation lexicalLet            decls lexicalIn                exp
-	| ConditionalExpression annotation lexicalIf             exp   (maybe lexicalSemicolon) lexicalThen      exp  (maybe lexicalSemicolon) lexicalElse exp
-	| CaseExpression        annotation lexicalCase           exp   lexicalOf                lexicalLeftBrace alts lexicalRightBrace
+	| ConditionalExpression annotation lexicalIf             exp   (maybe lexicalSemicolon) lexicalThen       exp  (maybe lexicalSemicolon) lexicalElse exp
+	| CaseExpression        annotation lexicalCase           exp   lexicalOf                lexicalLeftBrace  alts lexicalRightBrace
 	| DoExpression          annotation lexicalLeftBrace      stmts lexicalRightBrace
 	| BaseExpression        annotation fexp
 		-- ^ Function application, possibly with 0-arity.
-
--- | A non-empty sequence of apat patterns.
-data ApatsBase apat annotation fixpoint =
-	  ApatsLast    annotation apat
-	| ApatsNotLast annotation apat fixpoint
 
 -- | A base expression that support for application.
 --
@@ -1149,74 +964,21 @@ data FexpBase maybe aexp annotation fixpoint =
 		-- 0-arity, not a regular ‘annotating’ expression as described above.
 
 -- | A base expression: variables, literals, or explicit groupings, etc.
-data AexpBase maybe qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis exps2 exps1 lexicalLeftBracket lexicalDotDot lexicalRightBracket lexicalPipe quals infixExp qop qopSansUnaryMinus qcon fbinds0 aexpSansQcon fbinds1 annotation fixpoint =
+data AexpBase data2 maybe list qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansUnaryMinus qcon lexicalLeftBrace fbind lexicalRightBrace aexpSansQcon fbinds1 annotation fixpoint =
 	  VariableExpression           annotation qvar
 	| ConstructorExpression        annotation gcon
 	| LiteralExpression            annotation literal
 	| ParenthesesExpression        annotation lexicalLeftParenthesis exp               lexicalRightParenthesis
-	| TupleExpression              annotation exps2
-	| ListExpression               annotation exps1
-	| ArithmeticSequenceExpression annotation lexicalLeftBracket     exp               (maybe exp)             lexicalDotDot           (maybe exp)         lexicalRightBracket
-	| ListComprehensionExpression  annotation lexicalLeftBracket     exp               lexicalPipe             quals                   lexicalRightBracket
-	| LeftSectionExpression        annotation lexicalLeftParenthesis infixExp          qop                     lexicalRightParenthesis
+	| TupleExpression              annotation lexicalLeftParenthesis exp               lexicalComma                                           exp                     (list  (data2 lexicalComma exp )) lexicalRightParenthesis
+	| ListExpression               annotation lexicalLeftBracket     exp               (list (data2 lexicalComma exp))                        lexicalRightBracket
+	| ArithmeticSequenceExpression annotation lexicalLeftBracket     exp               (maybe exp)                                            lexicalDotDot           (maybe exp)                       lexicalRightBracket
+	| ListComprehensionExpression  annotation lexicalLeftBracket     exp               lexicalPipe                                            qual                    (list  (data2 lexicalComma qual)) lexicalRightBracket
+	| LeftSectionExpression        annotation lexicalLeftParenthesis infixExp          qop                                                    lexicalRightParenthesis
 		-- ^ (The left section form of partial application, with a binary operation.)
-	| RightSectionExpression       annotation lexicalLeftParenthesis qopSansUnaryMinus infixExp                lexicalRightParenthesis
+	| RightSectionExpression       annotation lexicalLeftParenthesis qopSansUnaryMinus infixExp                                               lexicalRightParenthesis
 		-- ^ (The right section form of partial application, with a binary operation.)
-	| ConstructRecordExpression    annotation qcon                   fbinds0
-	| ModifyRecordExpression       annotation aexpSansQcon           fbinds1
-
--- | Two or more expressions in a tuple, including the parentheses.
-data Exps2Base lexicalLeftParenthesis exp lexicalComma exps2Rest annotation fixpoint =
-	Exps2FromFirst annotation lexicalLeftParenthesis exp lexicalComma exps2Rest
-
--- | The rest of two or more expressions in a tuple.
---
--- This is after the first has been handled, so we can handle the last and
--- everything in between.  We can apply a different syntax depending on which
--- of these 3 categories the element falls under (first, between, last).
-data Exps2RestBase exp lexicalRightParenthesis lexicalComma annotation fixpoint =
-	  Exps2Last     annotation exp lexicalRightParenthesis
-	| Exps2NotLast  annotation exp lexicalComma            fixpoint
-
--- | One or more expressions in a list, including the brackets.
-data Exps1Base lexicalLeftBracket exp exps1Rest annotation fixpoint =
-	Exps1FromFirst annotation lexicalLeftBracket exp exps1Rest
-
--- | The rest of one or more expressions in a list.
---
--- This is after the first has been handled, so we can handle the last and
--- everything in between.
-data Exps1RestBase lexicalRightBracket lexicalComma exp annotation fixpoint =
-	  Exps1End  annotation lexicalRightBracket
-	| Exps1Push annotation lexicalComma        exp fixpoint
-
--- | A list comprehension's qualifiers (components after the pipe).
-data QualsBase qual lexicalComma annotation fixpoint =
-	  QualsLast    annotation qual
-	| QualsNotLast annotation qual lexicalComma fixpoint
-
--- | Zero or more record field bindings, with the brackets.
---
--- This is used in record construction expressions.
-data Fbinds0Base lexicalLeftBracket lexicalRightBracket fbind fbinds0Rest annotation fixpoint =
-	  Fbinds0Empty     annotation lexicalLeftBracket lexicalRightBracket
-	| Fbinds0FromFirst annotation lexicalLeftBracket fbind               fbinds0Rest
-
--- | The rest of zero or more record field bindings.
-data Fbinds0RestBase lexicalRightBracket lexicalComma fbind annotation fixpoint =
-	  Fbinds0End  annotation lexicalRightBracket
-	| Fbinds0Push annotation lexicalComma        fbind fixpoint
-
--- | One or more record field bindings, with the brackets.
---
--- This is used in record construction expressions.
-data Fbinds1Base lexicalLeftBracket fbind fbinds1Rest annotation fixpoint =
-	Fbinds1FromFirst annotation lexicalLeftBracket fbind fbinds1Rest
-
--- | The rest of one or more record field bindings.
-data Fbinds1RestBase lexicalRightBracket lexicalComma fbind annotation fixpoint =
-	  Fbinds1End  annotation lexicalRightBracket
-	| Fbinds1Push annotation lexicalComma        fbind fixpoint
+	| ConstructRecordExpression    annotation qcon                   lexicalLeftBrace (maybe (data2 fbind (list (data2 lexicalComma fbind)))) lexicalRightBrace
+	| ModifyRecordExpression       annotation aexpSansQcon           lexicalLeftBrace fbind                                                   (list (data2 lexicalComma fbind)) lexicalRightBrace
 
 -- § 3.2 Variables, Constructors, Operators, and Literals types.
 
@@ -1295,9 +1057,8 @@ data GconSymBase lexicalColon qcon annotation fixpoint =
 -- § 3.13 Case Expressions types.
 
 -- | A non-empty sequence of ‘case’ branches.
-data AltsBase alt lexicalSemicolon annotation fixpoint =
-	  AltsLast    annotation alt
-	| AltsNotLast annotation alt lexicalSemicolon fixpoint
+data AltsBase data2 list alt lexicalSemicolon annotation fixpoint =
+	CaseBranches annotation alt (list (data2 lexicalSemicolon alt))
 
 -- | A ‘case’ branch.
 data AltBase data2 maybe pat lexicalRightArrow exp lexicalWhere decls gdpat annotation fixpoint =
@@ -1308,16 +1069,11 @@ data AltBase data2 maybe pat lexicalRightArrow exp lexicalWhere decls gdpat anno
 -- | An expression-level non-empty sequence of guard branches, themselves
 -- subbranches of a ‘case’ branch or guarded subbranch.
 data GdpatBase maybe guards lexicalRightArrow exp annotation fixpoint =
-	GuardBranches annotation guards lexicalRightArrow exp (maybe fixpoint)
+	GuardClauses annotation guards lexicalRightArrow exp (maybe fixpoint)
 
 -- | One or more guards in a single guard clause at the expression level.
-data GuardsBase lexicalPipe guard guardsRest annotation fixpoint =
-	GuardsFromFirst annotation lexicalPipe guard guardsRest
-
--- | The rest of one or more guards in a single guard clause at the expression level.
-data GuardsRestBase lexicalComma guard annotation fixpoint =
-	  GuardsEnd  annotation
-	| GuardsPush annotation lexicalComma guard
+data GuardsBase data2 list lexicalPipe guard lexicalComma annotation fixpoint =
+	GuardClauseGuards annotation lexicalPipe guard (list (data2 lexicalComma guard))
 
 -- | An expression-level guard.
 --
@@ -1330,9 +1086,8 @@ data GuardBase pat lexicalLeftArrow infixExp lexicalLet decls annotation fixpoin
 -- § 3.14 Do Expressions types.
 
 -- | Zero or more ‘do’ statements preceding an expression.
-data StmtsBase maybe exp lexicalSemicolon stmt annotation fixpoint =
-	  StmtsEnd  annotation exp (maybe lexicalSemicolon)
-	| StmtsPush annotation stmt fixpoint
+data StmtsBase list maybe exp lexicalSemicolon stmt annotation fixpoint =
+	DoStatements annotation (list stmt) exp (maybe lexicalSemicolon)
 
 -- | A ‘do’ statement.
 data StmtBase exp lexicalSemicolon pat lexicalLeftArrow lexicalLet decls annotation fixpoint =
@@ -1359,25 +1114,25 @@ data PatBase lpat qconop annotation fixpoint =
 -- | Left patterns, embeddable in right binary operations, base patterns with a
 -- few extensions like exposed arity-1+ constructor applications and negative
 -- number patterns.
-data LpatBase either apat lexicalMinus integer float gcon apats annotation fixpoint =
+data LpatBase either list apat lexicalMinus integer float gcon annotation fixpoint =
 	  BasePattern               annotation apat
 	| MinusNumberPattern        annotation lexicalMinus (either integer float)
-	| ExposedConstructorPattern annotation gcon         apats
+	| ExposedConstructorPattern annotation gcon         apat                   (list apat)
 
 -- | Base pattern.
 --
 -- (E.g. these can be parameters in a lambda expression.)
-data ApatBase data2 maybe var lexicalAt gcon qcon fpats literal lexicalUnderscore lexicalLeftParenthesis pat lexicalRightParenthesis pats2 pats1 lexicalTilde annotation fixpoint =
-	  AsPattern          annotation var (maybe (data2 lexicalAt fixpoint))
+data ApatBase data2 maybe list var lexicalAt gcon qcon lexicalLeftBrace fpat lexicalComma lexicalRightBrace literal lexicalUnderscore lexicalLeftParenthesis pat lexicalRightParenthesis lexicalLeftBracket lexicalRightBracket lexicalTilde annotation fixpoint =
+	  AsPattern          annotation var                    (maybe (data2 lexicalAt fixpoint))
 		-- ^ As-pattern: add a name and assign it to a value that matches this
 		-- pattern.
 	| ConstructorPattern annotation gcon
-	| RecordPattern      annotation qcon                   fpats
+	| RecordPattern      annotation qcon                   lexicalLeftBrace                   (maybe (data2 fpat (list (data2 lexicalComma fpat)))) lexicalRightBrace
 	| LiteralPattern     annotation literal
 	| WildcardPattern    annotation lexicalUnderscore
-	| GroupedPattern     annotation lexicalLeftParenthesis pat      lexicalRightParenthesis
-	| TuplePattern       annotation pats2
-	| ListPattern        annotation pats1
+	| GroupedPattern     annotation lexicalLeftParenthesis pat                                lexicalRightParenthesis
+	| TuplePattern       annotation lexicalLeftParenthesis pat                                lexicalComma                                          pat                 (list (data2 lexicalComma pat)) lexicalRightParenthesis
+	| ListPattern        annotation lexicalLeftBracket     pat                                (list (data2 lexicalComma pat))                       lexicalRightBracket
 	| IrrefutablePattern annotation lexicalTilde           fixpoint
 		-- ^ Lazy pattern matching, with ‘~’.
 
