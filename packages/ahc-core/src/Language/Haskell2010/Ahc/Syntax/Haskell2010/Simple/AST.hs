@@ -90,6 +90,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	TypeBase(Type),
 	BTypeBase(TypeApplication),
 	ATypeBase(GeneralTypeConstructor, TypeVariableType, TupleType, ListType, GroupedType),
+	TypesBase(TypesFromFirst),
+	TypesRestBase(TypesLast, TypesNotLast),
 	GtyconBase(QualifiableTypeConstructor, UnitTypeConstructor, EmptyListTypeConstructor, FunctionTypeConstructor, TupleTypeConstructor),
 
 	-- ** § 4.1.3 Syntax of Class Assertions and Contexts types.
@@ -108,10 +110,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	SimpleTypeBase(NamesType),
 	ConstrsBase(ConstrsLast, ConstrsNotLast),
 	ConstrBase(BasicConstructor, BinaryOperatorConstructor, RecordConstructor),
-	EvalAtypes(EvalAtypesEmpty, EvalAtypesPush),
-	EvalAtype(OrdableAtype),
-	FieldDecls(FieldDeclsEmpty, FieldDeclsPush),
-	FieldDecl(FieldDeclaration),
+	EvalAtypesBase(EvalAtypesEmpty, EvalAtypesPush),
+	EvalAtypeBase(OrdableAtype),
+	FieldDeclsBase(FieldDeclsEmpty, FieldDeclsFromFirst),
+	FieldDeclsRestBase(FieldDeclsEnd, FieldDeclsPush),
+	FieldDeclBase(FieldDeclaration),
 	DerivingBase(DerivingClause),
 	DclassesListBase(DclassesSingle, Dclasses),
 	DclassesBase(DclassesEmpty, DclassesPush),
@@ -143,7 +146,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	ExpBase(TypedExpression, UntypedExpression),
 	InfixExpBase(RightInfixExpression, UnaryPrefixExpression, LeftExpression),
 	LexpBase(LambdaExpression, LetExpression, ConditionalExpression, CaseExpression, DoExpression, BaseExpression),
-	ApatsBase(ApatsEmpty, ApatsPush),
+	ApatsBase(ApatsLast, ApatsNotLast),
 	FexpBase(ApplicationExpression),
 	AexpBase(VariableExpression, ConstructorExpression, LiteralExpression, ParenthesesExpression, TupleExpression, ListExpression, ArithmeticSequenceExpression, ListComprehensionExpression, LeftSectionExpression, RightSectionExpression, ConstructRecordExpression, ModifyRecordExpression),
 	Exps2Base(Exps2FromFirst),
@@ -169,6 +172,18 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	OpBase(NonConstructorBinaryOperator, ConstructorBinaryOperator),
 	QopBase(QualifiableNonConstructorBinaryOperator, QualifiableConstructorBinaryOperator),
 	GconSymBase(ConsListConstructor, NonbuiltinQualifiableConstructorSymbolic),
+
+	-- ** § 3.13 Case Expressions types.
+	AltsBase(AltsLast, AltsNotLast),
+	AltBase(ExpBranch, GuardedExpBranch, NullExpBranch),
+	GdpatBase(GuardBranches),
+	GuardsBase(GuardsFromFirst),
+	GuardsRestBase(GuardsEnd, GuardsPush),
+	GuardBase(PatternGuard, LocalDeclaration, BooleanGuard),
+
+	-- ** § 3.14 Do Expressions types.
+	StmtsBase(StmtsEnd, StmtsPush),
+	StmtBase(BaseStmt, BindStmt, LetStmt, NullStmt),
 
 	-- ** § 3.15.2 Construction Using Field Labels types.
 	FbindBase(FieldBinding),
@@ -427,11 +442,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 
 	-- **** Symbolic alias pseudo-lexical structures.
 	LexicalSymAliasBase(DotDotSymAlias, DoubleColonSymAlias, DoubleRightArrowSymAlias, LeftArrowSymAlias, RightArrowSymAlias),
-	LexicalDotDot(PseudoLexicalDotDot),
-	LexicalDoubleColon(PseudoLexicalDoubleColon),
-	LexicalDoubleRightArrow(PseudoLexicalDoubleRightArrow),
-	LexicalLeftArrow(PseudoLexicalLeftArrow),
-	LexicalRightArrow(PseudoLexicalRightArrow),
+	LexicalDotDotBase(PseudoLexicalDotDot),
+	LexicalDoubleColonBase(PseudoLexicalDoubleColon),
+	LexicalDoubleRightArrowBase(PseudoLexicalDoubleRightArrow),
+	LexicalLeftArrowBase(PseudoLexicalLeftArrow),
+	LexicalRightArrowBase(PseudoLexicalRightArrow),
 
 	-- **** Alias pseudo-lexical structures.
 	LexicalAliasBase(SpaceAlias, MinusAlias, AsciiLambdaAlias),
@@ -843,6 +858,15 @@ data ATypeBase gtycon tyvar lexicalLeftParenthesis types lexicalRightParenthesis
 	| ListType               annotation lexicalLeftAngleBracket type_ lexicalRightAngleBracket
 	| GroupedType            annotation lexicalLeftParenthesis  type_ lexicalRightParenthesis
 
+-- | A tuple of at least 2 types, without the parentheses.
+data TypesBase type_ lexicalComma typesRest annotation fixpoint =
+	TypesFromFirst annotation type_ lexicalComma typesRest
+
+-- | The rest of a tuple of at least 2 types.
+data TypesRestBase type_ lexicalComma annotation fixpoint =
+	  TypesLast    annotation type_
+	| TypesNotLast annotation type_ lexicalComma fixpoint
+
 -- | A type constructor, extended with a selection of built-in type constructors.
 data GtyconBase list qtycon lexicalLeftParenthesis lexicalRightParenthesis lexicalLeftBracket lexicalRightBracket lexicalRightArrow lexicalComma annotation fixpoint =
 	  QualifiableTypeConstructor annotation qtycon
@@ -923,21 +947,28 @@ data ConstrBase either con evalAtypes btype evalAtype conop lexicalLeftBrace fie
 --
 -- An optional lexeme in the semantics phase can declare an evaluation ordering
 -- dependency of a constructor field before the value.
-data EvalAtypes evalAtype annotation fixpoint =
+data EvalAtypesBase evalAtype annotation fixpoint =
 	  EvalAtypesEmpty annotation
 	| EvalAtypesPush  annotation evalAtype fixpoint
 
 -- | An applicable type that optionally can have a strict evaluation order specifier applied to it.
-data EvalAtype maybe lexicalExclamation atype annotation fixpoint =
+data EvalAtypeBase maybe lexicalExclamation atype annotation fixpoint =
 	OrdableAtype annotation (maybe lexicalExclamation) atype
 
--- | The zero or more field declarations that with the constructor name constitute a record.
-data FieldDecls fieldDecl annotation fixpoint =
-	  FieldDeclsEmpty annotation
-	| FieldDeclsPush  annotation fieldDecl fixpoint
+-- | The zero or more field declarations that with the constructor name
+-- constitute a record, without the braces.
+data FieldDeclsBase fieldDecl fieldDeclsRest annotation fixpoint =
+	  FieldDeclsEmpty     annotation
+	| FieldDeclsFromFirst annotation fieldDecl fieldDeclsRest
+
+-- | The rest of zero or more field declarations that with the constructor name
+-- constitute a record.
+data FieldDeclsRestBase lexicalComma fieldDecl annotation fixpoint =
+	  FieldDeclsEnd  annotation
+	| FieldDeclsPush annotation lexicalComma fieldDecl fixpoint
 
 -- | A field declaration is one or more field names assigned to a type.
-data FieldDecl either vars lexicalDoubleColon type_ evalAtype annotation fixpoint =
+data FieldDeclBase either vars lexicalDoubleColon type_ evalAtype annotation fixpoint =
 	FieldDeclaration annotation vars lexicalDoubleColon (either type_ evalAtype)
 
 -- | A ‘deriving’ clause to declare automatic derivation for a ‘data’ ADT or ‘newtype’ type.
@@ -1077,9 +1108,9 @@ data FunLhsBase list var apat pat varop lexicalLeftParenthesis lexicalRightParen
 --
 -- This is an expression that represents a value or what can be evaluated to
 -- a value.
-data ExpBase data2 maybe infixexp lexicalDoubleColon context lexicalDoubleRightArrow type_ annotation fixpoint =
-	  TypedExpression   annotation infixexp lexicalDoubleColon (maybe (data2 context lexicalDoubleRightArrow)) type_
-	| UntypedExpression annotation infixexp
+data ExpBase data2 maybe infixExp lexicalDoubleColon context lexicalDoubleRightArrow type_ annotation fixpoint =
+	  TypedExpression   annotation infixExp lexicalDoubleColon (maybe (data2 context lexicalDoubleRightArrow)) type_
+	| UntypedExpression annotation infixExp
 
 -- | An infixable expression.
 --
@@ -1104,8 +1135,8 @@ data LexpBase maybe lexicalAsciiLambda apats lexicalRightArrow exp lexicalLet de
 
 -- | A non-empty sequence of apat patterns.
 data ApatsBase apat annotation fixpoint =
-	  ApatsEmpty annotation
-	| ApatsPush  annotation apat fixpoint
+	  ApatsLast    annotation apat
+	| ApatsNotLast annotation apat fixpoint
 
 -- | A base expression that support for application.
 --
@@ -1118,7 +1149,7 @@ data FexpBase maybe aexp annotation fixpoint =
 		-- 0-arity, not a regular ‘annotating’ expression as described above.
 
 -- | A base expression: variables, literals, or explicit groupings, etc.
-data AexpBase maybe qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis exps2 exps1 lexicalLeftBracket lexicalDotDot lexicalRightBracket lexicalPipe quals infixexp qop qopSansUnaryMinus qcon fbinds0 aexpSansQcon fbinds1 annotation fixpoint =
+data AexpBase maybe qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis exps2 exps1 lexicalLeftBracket lexicalDotDot lexicalRightBracket lexicalPipe quals infixExp qop qopSansUnaryMinus qcon fbinds0 aexpSansQcon fbinds1 annotation fixpoint =
 	  VariableExpression           annotation qvar
 	| ConstructorExpression        annotation gcon
 	| LiteralExpression            annotation literal
@@ -1127,9 +1158,9 @@ data AexpBase maybe qvar gcon literal lexicalLeftParenthesis exp lexicalRightPar
 	| ListExpression               annotation exps1
 	| ArithmeticSequenceExpression annotation lexicalLeftBracket     exp               (maybe exp)             lexicalDotDot           (maybe exp)         lexicalRightBracket
 	| ListComprehensionExpression  annotation lexicalLeftBracket     exp               lexicalPipe             quals                   lexicalRightBracket
-	| LeftSectionExpression        annotation lexicalLeftParenthesis infixexp          qop                     lexicalRightParenthesis
+	| LeftSectionExpression        annotation lexicalLeftParenthesis infixExp          qop                     lexicalRightParenthesis
 		-- ^ (The left section form of partial application, with a binary operation.)
-	| RightSectionExpression       annotation lexicalLeftParenthesis qopSansUnaryMinus infixexp                lexicalRightParenthesis
+	| RightSectionExpression       annotation lexicalLeftParenthesis qopSansUnaryMinus infixExp                lexicalRightParenthesis
 		-- ^ (The right section form of partial application, with a binary operation.)
 	| ConstructRecordExpression    annotation qcon                   fbinds0
 	| ModifyRecordExpression       annotation aexpSansQcon           fbinds1
@@ -1260,6 +1291,55 @@ data QopBase qvarop qconop annotation fixpoint =
 data GconSymBase lexicalColon qcon annotation fixpoint =
 	  ConsListConstructor                      annotation lexicalColon
 	| NonbuiltinQualifiableConstructorSymbolic annotation qcon
+
+-- § 3.13 Case Expressions types.
+
+-- | A non-empty sequence of ‘case’ branches.
+data AltsBase alt lexicalSemicolon annotation fixpoint =
+	  AltsLast    annotation alt
+	| AltsNotLast annotation alt lexicalSemicolon fixpoint
+
+-- | A ‘case’ branch.
+data AltBase data2 maybe pat lexicalRightArrow exp lexicalWhere decls gdpat annotation fixpoint =
+	  ExpBranch        annotation pat lexicalRightArrow exp                                (maybe (data2 lexicalWhere decls))
+	| GuardedExpBranch annotation pat gdpat             (maybe (data2 lexicalWhere decls))
+	| NullExpBranch    annotation
+
+-- | An expression-level non-empty sequence of guard branches, themselves
+-- subbranches of a ‘case’ branch or guarded subbranch.
+data GdpatBase maybe guards lexicalRightArrow exp annotation fixpoint =
+	GuardBranches annotation guards lexicalRightArrow exp (maybe fixpoint)
+
+-- | One or more guards in a single guard clause at the expression level.
+data GuardsBase lexicalPipe guard guardsRest annotation fixpoint =
+	GuardsFromFirst annotation lexicalPipe guard guardsRest
+
+-- | The rest of one or more guards in a single guard clause at the expression level.
+data GuardsRestBase lexicalComma guard annotation fixpoint =
+	  GuardsEnd  annotation
+	| GuardsPush annotation lexicalComma guard
+
+-- | An expression-level guard.
+--
+-- These can be found within ‘case’ expressions.
+data GuardBase pat lexicalLeftArrow infixExp lexicalLet decls annotation fixpoint =
+	  PatternGuard     annotation pat        lexicalLeftArrow infixExp
+	| LocalDeclaration annotation lexicalLet decls
+	| BooleanGuard     annotation infixExp
+
+-- § 3.14 Do Expressions types.
+
+-- | Zero or more ‘do’ statements preceding an expression.
+data StmtsBase maybe exp lexicalSemicolon stmt annotation fixpoint =
+	  StmtsEnd  annotation exp (maybe lexicalSemicolon)
+	| StmtsPush annotation stmt fixpoint
+
+-- | A ‘do’ statement.
+data StmtBase exp lexicalSemicolon pat lexicalLeftArrow lexicalLet decls annotation fixpoint =
+	  BaseStmt annotation exp              lexicalSemicolon
+	| BindStmt annotation pat              lexicalLeftArrow exp              lexicalSemicolon
+	| LetStmt  annotation lexicalLet       decls            lexicalSemicolon
+	| NullStmt annotation lexicalSemicolon
 
 -- § 3.15.2 Construction Using Field Labels types.
 
@@ -6698,23 +6778,23 @@ data LexicalSymAliasBase lexicalDotDot lexicalDoubleColon lexicalDoubleRightArro
 	| RightArrowSymAlias       annotation lexicalRightArrow
 
 -- | The ‘..’ symbol sequence.
-data LexicalDotDot lexicalDot annotation fixpoint =
+data LexicalDotDotBase lexicalDot annotation fixpoint =
 	PseudoLexicalDotDot annotation lexicalDot lexicalDot
 
 -- | The ‘::’ symbol sequence.
-data LexicalDoubleColon lexicalColon annotation fixpoint =
+data LexicalDoubleColonBase lexicalColon annotation fixpoint =
 	PseudoLexicalDoubleColon annotation lexicalColon lexicalColon
 
 -- | The ‘=>’ symbol sequence.
-data LexicalDoubleRightArrow lexicalEquals lexicalRightAngleBracket annotation fixpoint =
+data LexicalDoubleRightArrowBase lexicalEquals lexicalRightAngleBracket annotation fixpoint =
 	PseudoLexicalDoubleRightArrow annotation lexicalEquals lexicalRightAngleBracket
 
 -- | The ‘<-’ symbol sequence.
-data LexicalLeftArrow lexicalLeftAngleBracket lexicalHyphen annotation fixpoint =
+data LexicalLeftArrowBase lexicalLeftAngleBracket lexicalHyphen annotation fixpoint =
 	PseudoLexicalLeftArrow annotation lexicalLeftAngleBracket lexicalHyphen
 
 -- | The ‘->’ symbol sequence.
-data LexicalRightArrow lexicalLeftAngleBracket lexicalHyphen lexicalRightAngleBracket annotation fixpoint =
+data LexicalRightArrowBase lexicalLeftAngleBracket lexicalHyphen lexicalRightAngleBracket annotation fixpoint =
 	PseudoLexicalRightArrow annotation lexicalHyphen lexicalRightAngleBracket
 
 -- Alias pseudo-lexical structures.
