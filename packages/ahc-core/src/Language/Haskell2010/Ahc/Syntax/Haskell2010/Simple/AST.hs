@@ -865,7 +865,7 @@ data ContextBase class_ classes annotation fixpoint =
 -- This assertion specifies that a type must be a member of a class, for what follows.
 data ClassBase qtycls tyvar lexicalLeftParenthesis atypes lexicalRightParenthesis annotation fixpoint =
 	  AssertUnappliedTypeVariableInClass annotation qtycls tyvar
-	| AssertAppliedTypeVariableInClass   annotation qtycls lexicalLeftParenthesis atypes lexicalRightParenthesis
+	| AssertAppliedTypeVariableInClass   annotation qtycls lexicalLeftParenthesis tyvar atypes lexicalRightParenthesis
 
 -- | A non-empty list of 'ATypeBase's.
 --
