@@ -65,7 +65,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	ImpDeclBase(ImportStatement, NullImport),
 	ImpSpecBase(ImportWhitelist, ImportBlacklist),
 	ImportAttrsBase(ImportAttrsEmpty, ImportAttrsPush),
-	ImportBase(ImportVariableAttribute,ImportTypeVariableAttribute,ImportTypeClassVariableAttribute),
+	ImportBase(ImportVariableAttribute, ImportTypeVariableAttribute, ImportTypeClassVariableAttribute),
 	ImportCnamesBase(ImportCnamesEmpty, ImportCnamesPush),
 	ImportVarsBase(ImportVarsEmpty, ImportVarsPush),
 
@@ -125,7 +125,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	SimpleClassBase(SimpleClassAssertion),
 	SimpleClassesBase(SimpleClassesEmpty, SimpleClassesPush),
 
-	-- ** § 4.3.1 Instance Declarations types.
+	-- ** § 4.3.2 Instance Declarations types.
 	InstBase(GeneralTypeConstructorInstance, AppliableGeneralTypeConstructorInstance, TypeVariableTupleInstance, ListInstance, FunctionInstance),
 	TyVarsBase(TyVarsEmpty, TyVarsPush),
 	TypeVariablesTupleBase(TypeVariablesTupleFromFirst),
@@ -157,7 +157,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	Fbinds1RestBase(Fbinds1End, Fbinds1Push),
 
 	-- ** § 3.2 Variables, Constructors, Operators, and Literals types.
-	GconBase(UnitConstructor, EmptyListConstuctor, TupleConstructor, QualifiableConstructor),
+	GconBase(UnitConstructor, EmptyListConstructor, TupleConstructor, QualifiableConstructor),
 	VarBase(VariableNonsymbolic, VariableSymbolic),
 	QvarBase(QualifiableVariableNonsymbolic, QualifiableVariableSymbolic),
 	ConBase(ConstructorNonsymbolic, ConstructorSymbolic),
@@ -711,9 +711,9 @@ data ImportAttrsBase maybe lexicalComma import_ annotation fixpoint =
 data ImportBase data3 maybe either var lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis importCnames importVars annotation fixpoint =
 	  ImportVariableAttribute          annotation var
 		-- ^ Import a regular variable from a module.
-	| ImportTypeVariableAttribute      annotation (maybe (either (lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (lexicalLeftParenthesis importCnames lexicalRightParenthesis)))
+	| ImportTypeVariableAttribute      annotation (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis importCnames lexicalRightParenthesis)))
 		-- ^ Import a ‘data’ type or ‘newtype’ type from a module.
-	| ImportTypeClassVariableAttribute annotation (maybe (either (lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (lexicalLeftParenthesis importVars lexicalRightParenthesis)))
+	| ImportTypeClassVariableAttribute annotation (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis importVars   lexicalRightParenthesis)))
 		-- ^ Import a type class from a module.
 
 -- | An ADT (‘data’) or ‘newtype’ import item.
@@ -941,8 +941,8 @@ data FieldDecl either vars lexicalDoubleColon type_ evalAtype annotation fixpoin
 	FieldDeclaration annotation vars lexicalDoubleColon (either type_ evalAtype)
 
 -- | A ‘deriving’ clause to declare automatic derivation for a ‘data’ ADT or ‘newtype’ type.
-data DerivingBase dclassesList annotation fixpoint =
-	DerivingClause annotation dclassesList
+data DerivingBase lexicalDeriving dclassesList annotation fixpoint =
+	DerivingClause annotation lexicalDeriving dclassesList
 
 -- | A collection of classes to derive an instance for.
 --
@@ -999,7 +999,7 @@ data SimpleClassesBase simpleClass lexicalComma annotation fixpoint =
 	  SimpleClassesEmpty annotation
 	| SimpleClassesPush  annotation simpleClass lexicalComma fixpoint
 
--- § 4.3.1 Instance Declarations types.
+-- § 4.3.2 Instance Declarations types.
 
 -- | The member part of an instance declaration.
 --
@@ -1012,17 +1012,17 @@ data InstBase gtycon lexicalLeftParenthesis tyvars lexicalRightParenthesis typeV
 	  GeneralTypeConstructorInstance          annotation gtycon
 		-- ^ A type or a type constructor (but not in a form where it can be
 		-- further applied with type variables after it is referenced here.)
-	| AppliableGeneralTypeConstructorInstance annotation lexicalLeftParenthesis gtycon tyvars lexicalRightParenthesis
+	| AppliableGeneralTypeConstructorInstance annotation lexicalLeftParenthesis gtycon tyvars             lexicalRightParenthesis
 		-- ^ Like 'GeneralTypeConstructorInstance', but it has parentheses, so it can accommodate syntax for application.
 		--
 		-- (Note: in the separate semantics phase, the spec says the vars are distinct.)
 		-- (In the syntax phase, we specify the structure of the variables.)
 	| TypeVariableTupleInstance               annotation typeVariablesTuple
 		-- (Note: again, in the separate semantics phase, the spec says the vars are distinct.)
-	| ListInstance                            annotation lexicalLeftBracket tyvar lexicalRightBracket
+	| ListInstance                            annotation lexicalLeftBracket     tyvar lexicalRightBracket
 		-- ^ Like 'AppliableGeneralTypeConstructorInstance' but with a sugar
 		-- syntax for list type constructor application.
-	| FunctionInstance                        annotation lexicalLeftParenthesis tyvar lexicalRightArrow tyvar lexicalRightParenthesis
+	| FunctionInstance                        annotation lexicalLeftParenthesis tyvar lexicalRightArrow   tyvar                   lexicalRightParenthesis
 		-- ^ Like 'AppliableGeneralTypeConstructorInstance' but with a sugar
 		-- syntax for function (arrow) type constructor application.
 		--
@@ -1125,7 +1125,7 @@ data AexpBase maybe qvar gcon literal lexicalLeftParenthesis exp lexicalRightPar
 	| ParenthesesExpression        annotation lexicalLeftParenthesis exp               lexicalRightParenthesis
 	| TupleExpression              annotation exps2
 	| ListExpression               annotation exps1
-	| ArithmeticSequenceExpression annotation lexicalLeftBracket     exp               (maybe exp)             lexicalDotDot            (maybe exp)        lexicalRightBracket
+	| ArithmeticSequenceExpression annotation lexicalLeftBracket     exp               (maybe exp)             lexicalDotDot           (maybe exp)         lexicalRightBracket
 	| ListComprehensionExpression  annotation lexicalLeftBracket     exp               lexicalPipe             quals                   lexicalRightBracket
 	| LeftSectionExpression        annotation lexicalLeftParenthesis infixexp          qop                     lexicalRightParenthesis
 		-- ^ (The left section form of partial application, with a binary operation.)
@@ -1192,7 +1192,7 @@ data Fbinds1RestBase lexicalRightBracket lexicalComma fbind annotation fixpoint 
 -- | A value constructor, extended with a selection of built-in constructors.
 data GconBase list lexicalLeftParenthesis lexicalRightParenthesis lexicalLeftBracket lexicalRightBracket lexicalComma qcon annotation fixpoint =
 	  UnitConstructor        annotation lexicalLeftParenthesis lexicalRightParenthesis
-	| EmptyListConstuctor    annotation lexicalLeftBracket     lexicalRightBracket
+	| EmptyListConstructor   annotation lexicalLeftBracket     lexicalRightBracket
 	| TupleConstructor       annotation lexicalLeftParenthesis lexicalComma            (list lexicalComma) lexicalRightParenthesis
 	| QualifiableConstructor annotation qcon
 
@@ -1287,8 +1287,8 @@ data LpatBase either apat lexicalMinus integer float gcon apats annotation fixpo
 -- | Base pattern.
 --
 -- (E.g. these can be parameters in a lambda expression.)
-data ApatBase maybe var lexicalAt gcon qcon fpats literal lexicalUnderscore lexicalLeftParenthesis pat lexicalRightParenthesis pats2 pats1 lexicalTilde annotation fixpoint =
-	  AsPattern          annotation var (maybe lexicalAt fixpoint)
+data ApatBase data2 maybe var lexicalAt gcon qcon fpats literal lexicalUnderscore lexicalLeftParenthesis pat lexicalRightParenthesis pats2 pats1 lexicalTilde annotation fixpoint =
+	  AsPattern          annotation var (maybe (data2 lexicalAt fixpoint))
 		-- ^ As-pattern: add a name and assign it to a value that matches this
 		-- pattern.
 	| ConstructorPattern annotation gcon
