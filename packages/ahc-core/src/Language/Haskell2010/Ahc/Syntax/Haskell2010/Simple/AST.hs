@@ -228,8 +228,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	SymbolBase(AsciiNonspecialSymbol, UnicodeNonspecialNonscorequoteSymbol),
 	SymbolSansNcBase(AsciiNonspecialSymbolSansNc, UnicodeNonspecialNonscorequoteSymbolSansNc),
 
-	AscSymbolBase(ExclamationAsciiSymbol, HashAsciiSymbol, DollarAsciiSymbol, PercentAsciiSymbol, AmpersandAsciiSymbol, AsteriskAsciiSymbol, PlusAsciiSymbol, DotAsciiSymbol, SlashAsciiSymbol, LeftAngleBracketAsciiSymbol, EqualsAsciiSymbol, RightAngleBracketAsciiSymbol, QuestionmarkAsciiSymbol, AtAsciiSymbol, BackslashAsciiSymbol, CaretAsciiSymbol, PipeAsciiSymbol, HyphenAsciiSymbol, TildeAsciiSymbol, ColonAsciiSymbol),
-	AscSymbolSansNcBase(ExclamationAsciiSymbolSansNc, HashAsciiSymbolSansNc, DollarAsciiSymbolSansNc, PercentAsciiSymbolSansNc, AmpersandAsciiSymbolSansNc, AsteriskAsciiSymbolSansNc, PlusAsciiSymbolSansNc, DotAsciiSymbolSansNc, SlashAsciiSymbolSansNc, LeftAngleBracketAsciiSymbolSansNc, EqualsAsciiSymbolSansNc, RightAngleBracketAsciiSymbolSansNc, QuestionmarkAsciiSymbolSansNc, AtAsciiSymbolSansNc, BackslashAsciiSymbolSansNc, CaretAsciiSymbolSansNc, PipeAsciiSymbolSansNc, TildeAsciiSymbolSansNc, ColonAsciiSymbolSansNc),
+	AscSymbolBase(ExclamationAsciiSymbol, HashAsciiSymbol, DollarAsciiSymbol, PercentAsciiSymbol, AmpersandAsciiSymbol, AsteriskAsciiSymbol, PlusAsciiSymbol, DotAsciiSymbol, SlashAsciiSymbol, LeftAngleBracketAsciiSymbol, EqualsAsciiSymbol, RightAngleBracketAsciiSymbol, QuestionMarkAsciiSymbol, AtAsciiSymbol, BackslashAsciiSymbol, CaretAsciiSymbol, PipeAsciiSymbol, HyphenAsciiSymbol, TildeAsciiSymbol, ColonAsciiSymbol),
+	AscSymbolSansNcBase(ExclamationAsciiSymbolSansNc, HashAsciiSymbolSansNc, DollarAsciiSymbolSansNc, PercentAsciiSymbolSansNc, AmpersandAsciiSymbolSansNc, AsteriskAsciiSymbolSansNc, PlusAsciiSymbolSansNc, DotAsciiSymbolSansNc, SlashAsciiSymbolSansNc, LeftAngleBracketAsciiSymbolSansNc, EqualsAsciiSymbolSansNc, RightAngleBracketAsciiSymbolSansNc, QuestionMarkAsciiSymbolSansNc, AtAsciiSymbolSansNc, BackslashAsciiSymbolSansNc, CaretAsciiSymbolSansNc, PipeAsciiSymbolSansNc, TildeAsciiSymbolSansNc, ColonAsciiSymbolSansNc),
 	UniSymbolBase(UnicodeSymbol),
 	UniSymbolSansSpecialishBase(UnicodeSymbolSansSpecialish),
 	UniSymbolSansSpecialishSansNcBase(UnicodeSymbolSansSpecialishSansNc),
@@ -354,12 +354,12 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	SymbolSansAscBase(UnicodeNonspecialNonscorequoteSymbolSansAsc),
 	UniSymbolSansSpecialishAscBase(UnicodeSymbolSansSpecialishAsc),
 	SymbolSansHyphenBase(AsciiNonspecialSymbolSansHyphen, UnicodeNonspecialNonscorequoteSymbolSansHyphen),
-	AscSymbolSansHyphenBase(ExclamationAsciiSymbolSansHyphen, HashAsciiSymbolSansHyphen, DollarAsciiSymbolSansHyphen, PercentAsciiSymbolSansHyphen, AmpersandAsciiSymbolSansHyphen, AsteriskAsciiSymbolSansHyphen, PlusAsciiSymbolSansHyphen, DotAsciiSymbolSansHyphen, SlashAsciiSymbolSansHyphen, LeftAngleBracketAsciiSymbolSansHyphen, EqualsAsciiSymbolSansHyphen, RightAngleBracketAsciiSymbolSansHyphen, QuestionmarkAsciiSymbolSansHyphen, AtAsciiSymbolSansHyphen, BackslashAsciiSymbolSansHyphen, CaretAsciiSymbolSansHyphen, PipeAsciiSymbolSansHyphen, TildeAsciiSymbolSansHyphen, ColonAsciiSymbolSansHyphen),
+	AscSymbolSansHyphenBase(ExclamationAsciiSymbolSansHyphen, HashAsciiSymbolSansHyphen, DollarAsciiSymbolSansHyphen, PercentAsciiSymbolSansHyphen, AmpersandAsciiSymbolSansHyphen, AsteriskAsciiSymbolSansHyphen, PlusAsciiSymbolSansHyphen, DotAsciiSymbolSansHyphen, SlashAsciiSymbolSansHyphen, LeftAngleBracketAsciiSymbolSansHyphen, EqualsAsciiSymbolSansHyphen, RightAngleBracketAsciiSymbolSansHyphen, QuestionMarkAsciiSymbolSansHyphen, AtAsciiSymbolSansHyphen, BackslashAsciiSymbolSansHyphen, CaretAsciiSymbolSansHyphen, PipeAsciiSymbolSansHyphen, TildeAsciiSymbolSansHyphen, ColonAsciiSymbolSansHyphen),
 	UniSymbolSansSpecialishHyphenBase(UnicodeSymbolSansSpecialishHyphen),
 	VarSymBase(UniVarSym, ExclamationVarSym, HashVarSym, DollarVarSym, PercentVarSym, AmpersandVarSym, AsteriskVarSym, PlusVarSym, DotVarSym, SlashVarSym, LeftAngleBracketVarSym, RightAngleBracketVarSym, QuestionMarkVarSym, CaretVarSym, HyphenVarSym, DotExclamationVarSym, DotHashVarSym, DotDollarVarSym, DotPercentVarSym, DotAmpersandVarSym, DotAsteriskVarSym, DotPlusVarSym, DotSlashVarSym, DotLeftAngleBracketVarSym, DotEqualsVarSym, DotRightAngleBracketVarSym, DotQuestionMarkVarSym, DotAtVarSym, DotBackslashVarSym, DotCaretVarSym, DotPipeVarSym, DotHyphenVarSym, DotTildeVarSym, DotColonVarSym, LeftAngleBracketExclamationVarSym, LeftAngleBracketHashVarSym, LeftAngleBracketDollarVarSym, LeftAngleBracketPercentVarSym, LeftAngleBracketAmpersandVarSym, LeftAngleBracketAsteriskVarSym, LeftAngleBracketPlusVarSym, LeftAngleBracketDotVarSym, LeftAngleBracketSlashVarSym, LeftAngleBracketLeftAngleBracketVarSym, LeftAngleBracketEqualsVarSym, LeftAngleBracketRightAngleBracketVarSym, LeftAngleBracketQuestionMarkVarSym, LeftAngleBracketAtVarSym, LeftAngleBracketBackslashVarSym, LeftAngleBracketCaretVarSym, LeftAngleBracketPipeVarSym, LeftAngleBracketTildeVarSym, LeftAngleBracketColonVarSym, EqualsExclamationVarSym, EqualsHashVarSym, EqualsDollarVarSym, EqualsPercentVarSym, EqualsAmpersandVarSym, EqualsAsteriskVarSym, EqualsPlusVarSym, EqualsDotVarSym, EqualsSlashVarSym, EqualsLeftAngleBracketVarSym, EqualsEqualsVarSym, EqualsQuestionMarkVarSym, EqualsAtVarSym, EqualsBackslashVarSym, EqualsCaretVarSym, EqualsPipeVarSym, EqualsHyphenVarSym, EqualsTildeMarkVarSym, EqualsColonMarkVarSym, AtVarSym, BackslashVarSym, PipeVarSym, HyphenExclamationVarSym, HyphenHashVarSym, HyphenDollarVarSym, HyphenPercentVarSym, HyphenAmpersandVarSym, HyphenAsteriskVarSym, HyphenPlusVarSym, HyphenDotVarSym, HyphenSlashVarSym, HyphenLeftAngleBracketVarSym, HyphenEqualsVarSym, HyphenQuestionMarkVarSym, HyphenAtVarSym, HyphenBackslashVarSym, HyphenCaretVarSym, HyphenPipeVarSym, HyphenTildeVarSym, HyphenColonVarSym, TildeVarSym, ColonExclamationVarSym, ColonHashVarSym, ColonDollarVarSym, ColonPercentVarSym, ColonAmpersandVarSym, ColonAsteriskVarSym, ColonPlusVarSym, ColonDotVarSym, ColonSlashVarSym, ColonLeftAngleBracketVarSym, ColonEqualsVarSym, ColonRightAngleBracketVarSym, ColonQuestionMarkVarSym, ColonAtVarSym, ColonBackslashVarSym, ColonCaretVarSym, ColonPipeVarSym, ColonHyphenVarSym, ColonTildeVarSym, DotDotVarSym, LeftAngleBracketHyphenVarSym, EqualsRightAngleBracketVarSym, HyphenRightAngleBracketVarSym, HyphenHyphenVarSym),
 
 	SymbolSansColonBase(AsciiNonspecialSymbolSansColon, UnicodeNonspecialNonscorequoteSymbolSansColon),
-	AscSymbolSansColonBase(ExclamationAsciiSymbolSansColon, HashAsciiSymbolSansColon, DollarAsciiSymbolSansColon, PercentAsciiSymbolSansColon, AmpersandAsciiSymbolSansColon, AsteriskAsciiSymbolSansColon, PlusAsciiSymbolSansColon, DotAsciiSymbolSansColon, SlashAsciiSymbolSansColon, LeftAngleBracketAsciiSymbolSansColon, EqualsAsciiSymbolSansColon, RightAngleBracketAsciiSymbolSansColon, QuestionmarkAsciiSymbolSansColon, AtAsciiSymbolSansColon, BackslashAsciiSymbolSansColon, CaretAsciiSymbolSansColon, PipeAsciiSymbolSansColon, HyphenAsciiSymbolSansColon, TildeAsciiSymbolSansColon),
+	AscSymbolSansColonBase(ExclamationAsciiSymbolSansColon, HashAsciiSymbolSansColon, DollarAsciiSymbolSansColon, PercentAsciiSymbolSansColon, AmpersandAsciiSymbolSansColon, AsteriskAsciiSymbolSansColon, PlusAsciiSymbolSansColon, DotAsciiSymbolSansColon, SlashAsciiSymbolSansColon, LeftAngleBracketAsciiSymbolSansColon, EqualsAsciiSymbolSansColon, RightAngleBracketAsciiSymbolSansColon, QuestionMarkAsciiSymbolSansColon, AtAsciiSymbolSansColon, BackslashAsciiSymbolSansColon, CaretAsciiSymbolSansColon, PipeAsciiSymbolSansColon, HyphenAsciiSymbolSansColon, TildeAsciiSymbolSansColon),
 	UniSymbolSansSpecialishColonBase(UnicodeSymbolSansSpecialishColon),
 	ConSymBase(Len3ConSym, Len2ConSym),
 
@@ -391,8 +391,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 
 	-- $pseudoFoundationalLexicalStructures
 
+	LexicalPseudoBase(PseudoLexicalNonsymKeyword, PseudoLexicalNonsymNonkeyword, PseudoLexicalSymAlias, PseudoLexicalAlias, PseudoLexicalNumPrefix),
+
 	-- **** Non-symbolic keyword pseudo-lexical structures.
 
+	LexicalNonsymKeywordBase(CaseNonsymKeyword, ClassNonsymKeyword, DataNonsymKeyword, DefaultNonsymKeyword, DerivingNonsymKeyword, DoNonsymKeyword, ElseNonsymKeyword, ForeignNonsymKeyword, IfNonsymKeyword, ImportNonsymKeyword, InNonsymKeyword, InfixNonsymKeyword, InfixlNonsymKeyword, InfixrNonsymKeyword, InstanceNonsymKeyword, LetNonsymKeyword, ModuleNonsymKeyword, NewtypeNonsymKeyword, OfNonsymKeyword, ThenNonsymKeyword, TypeNonsymKeyword, WhereNonsymKeyword),
 	LexicalCaseBase(PseudoLexicalCase),
 	LexicalClassBase(PseudoLexicalClass),
 	LexicalDataBase(PseudoLexicalData),
@@ -416,7 +419,28 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	LexicalTypeBase(PseudoLexicalType),
 	LexicalWhereBase(PseudoLexicalWhere),
 
+	-- **** Non-symbolic non-keyword pseudo-lexical structures.
+	LexicalNonsymNonkeywordBase(AsNonsymNonkeyword, HidingNonsymNonkeyword, QualifiedNonsymNonkeyword),
+	LexicalAsBase(PseudoLexicalAs),
+	LexicalHidingBase(PseudoLexicalHiding),
+	LexicalQualifiedBase(PseudoLexicalQualified),
+
+	-- **** Symbolic alias pseudo-lexical structures.
+	LexicalSymAliasBase(DotDotSymAlias, DoubleColonSymAlias, DoubleRightArrowSymAlias, LeftArrowSymAlias, RightArrowSymAlias),
+	LexicalDotDot(PseudoLexicalDotDot),
+	LexicalDoubleColon(PseudoLexicalDoubleColon),
+	LexicalDoubleRightArrow(PseudoLexicalDoubleRightArrow),
+	LexicalLeftArrow(PseudoLexicalLeftArrow),
+	LexicalRightArrow(PseudoLexicalRightArrow),
+
+	-- **** Alias pseudo-lexical structures.
+	LexicalAliasBase(SpaceAlias, MinusAlias, AsciiLambdaAlias),
+	LexicalSpaceBase(PseudoLexicalSpace),
+	LexicalMinusBase(PseudoLexicalMinus),
+	LexicalAsciiLambdaBase(PseudoLexicalAsciiLambda),
+
 	-- **** Non-symbolic numeric literal prefix pseudo-lexical structures.
+	LexicalNumPrefixBase(N0oNumPrefix, N0ONumPrefix, N0xNumPrefix, N0XNumPrefix),
 	Lexical0oBase(PseudoLexical0o),
 	Lexical0OBase(PseudoLexical0O),
 	Lexical0xBase(PseudoLexical0x),
@@ -426,8 +450,160 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 
 	-- $lexicalFoundation
 
-	--LexicalFoundation(_),
-	-- TODO
+	LexicalFoundation(
+		LexicalFoundationPrimitives,
+
+		_lexicalFoundationPrimitives_lexicalEndOfParse                                                     ,
+
+		_lexicalFoundationPrimitives_lexicalUnicodeDigit                                                   ,
+		_lexicalFoundationPrimitives_lexicalUnicodeLarge                                                   ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSmall                                                   ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbol                                                  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeWhitespaceChar                                          ,
+
+		_lexicalFoundationPrimitives_lexicalUnicodeSmallSansAscUnderscore                                  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuote       ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteAscii  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteColon  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteHyphen ,
+
+		_lexicalFoundationPrimitives_lexicalNUL                                                            ,
+		_lexicalFoundationPrimitives_lexicalSOH                                                            ,
+		_lexicalFoundationPrimitives_lexicalSTX                                                            ,
+		_lexicalFoundationPrimitives_lexicalETX                                                            ,
+		_lexicalFoundationPrimitives_lexicalEOT                                                            ,
+		_lexicalFoundationPrimitives_lexicalENQ                                                            ,
+		_lexicalFoundationPrimitives_lexicalACK                                                            ,
+		_lexicalFoundationPrimitives_lexicalBEL                                                            ,
+		_lexicalFoundationPrimitives_lexicalBS                                                             ,
+		_lexicalFoundationPrimitives_lexicalHT                                                             ,
+		_lexicalFoundationPrimitives_lexicalLF                                                             ,
+		_lexicalFoundationPrimitives_lexicalVT                                                             ,
+		_lexicalFoundationPrimitives_lexicalFF                                                             ,
+		_lexicalFoundationPrimitives_lexicalCR                                                             ,
+		_lexicalFoundationPrimitives_lexicalSO                                                             ,
+		_lexicalFoundationPrimitives_lexicalSI                                                             ,
+		_lexicalFoundationPrimitives_lexicalDLE                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC1                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC2                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC3                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC4                                                            ,
+		_lexicalFoundationPrimitives_lexicalNAK                                                            ,
+		_lexicalFoundationPrimitives_lexicalSYN                                                            ,
+		_lexicalFoundationPrimitives_lexicalETB                                                            ,
+		_lexicalFoundationPrimitives_lexicalCAN                                                            ,
+		_lexicalFoundationPrimitives_lexicalEM                                                             ,
+		_lexicalFoundationPrimitives_lexicalSUB                                                            ,
+		_lexicalFoundationPrimitives_lexicalESC                                                            ,
+		_lexicalFoundationPrimitives_lexicalFS                                                             ,
+		_lexicalFoundationPrimitives_lexicalGS                                                             ,
+		_lexicalFoundationPrimitives_lexicalRS                                                             ,
+		_lexicalFoundationPrimitives_lexicalUS                                                             ,
+
+		_lexicalFoundationPrimitives_lexicalSP                                                             ,
+		_lexicalFoundationPrimitives_lexicalExclamation                                                    ,
+		_lexicalFoundationPrimitives_lexicalDoubleQuote                                                    ,
+		_lexicalFoundationPrimitives_lexicalHash                                                           ,
+		_lexicalFoundationPrimitives_lexicalDollar                                                         ,
+		_lexicalFoundationPrimitives_lexicalPercent                                                        ,
+		_lexicalFoundationPrimitives_lexicalAmpersand                                                      ,
+		_lexicalFoundationPrimitives_lexicalSingleQuote                                                    ,
+		_lexicalFoundationPrimitives_lexicalLeftParenthesis                                                ,
+		_lexicalFoundationPrimitives_lexicalRightParenthesis                                               ,
+		_lexicalFoundationPrimitives_lexicalAsterisk                                                       ,
+		_lexicalFoundationPrimitives_lexicalPlus                                                           ,
+		_lexicalFoundationPrimitives_lexicalComma                                                          ,
+		_lexicalFoundationPrimitives_lexicalHyphen                                                         ,
+		_lexicalFoundationPrimitives_lexicalDot                                                            ,
+		_lexicalFoundationPrimitives_lexicalSlash                                                          ,
+
+		_lexicalFoundationPrimitives_lexical0                                                              ,
+		_lexicalFoundationPrimitives_lexical1                                                              ,
+		_lexicalFoundationPrimitives_lexical2                                                              ,
+		_lexicalFoundationPrimitives_lexical3                                                              ,
+		_lexicalFoundationPrimitives_lexical4                                                              ,
+		_lexicalFoundationPrimitives_lexical5                                                              ,
+		_lexicalFoundationPrimitives_lexical6                                                              ,
+		_lexicalFoundationPrimitives_lexical7                                                              ,
+		_lexicalFoundationPrimitives_lexical8                                                              ,
+		_lexicalFoundationPrimitives_lexical9                                                              ,
+
+		_lexicalFoundationPrimitives_lexicalColon                                                          ,
+		_lexicalFoundationPrimitives_lexicalSemicolon                                                      ,
+		_lexicalFoundationPrimitives_lexicalLeftAngleBracket                                               ,
+		_lexicalFoundationPrimitives_lexicalEquals                                                         ,
+		_lexicalFoundationPrimitives_lexicalRightAngleBracket                                              ,
+		_lexicalFoundationPrimitives_lexicalQuestionMark                                                   ,
+		_lexicalFoundationPrimitives_lexicalAt                                                             ,
+
+		_lexicalFoundationPrimitives_lexicalA                                                              ,
+		_lexicalFoundationPrimitives_lexicalB                                                              ,
+		_lexicalFoundationPrimitives_lexicalC                                                              ,
+		_lexicalFoundationPrimitives_lexicalD                                                              ,
+		_lexicalFoundationPrimitives_lexicalE                                                              ,
+		_lexicalFoundationPrimitives_lexicalF                                                              ,
+		_lexicalFoundationPrimitives_lexicalG                                                              ,
+		_lexicalFoundationPrimitives_lexicalH                                                              ,
+		_lexicalFoundationPrimitives_lexicalI                                                              ,
+		_lexicalFoundationPrimitives_lexicalJ                                                              ,
+		_lexicalFoundationPrimitives_lexicalK                                                              ,
+		_lexicalFoundationPrimitives_lexicalL                                                              ,
+		_lexicalFoundationPrimitives_lexicalM                                                              ,
+		_lexicalFoundationPrimitives_lexicalN                                                              ,
+		_lexicalFoundationPrimitives_lexicalO                                                              ,
+		_lexicalFoundationPrimitives_lexicalP                                                              ,
+		_lexicalFoundationPrimitives_lexicalQ                                                              ,
+		_lexicalFoundationPrimitives_lexicalR                                                              ,
+		_lexicalFoundationPrimitives_lexicalS                                                              ,
+		_lexicalFoundationPrimitives_lexicalT                                                              ,
+		_lexicalFoundationPrimitives_lexicalU                                                              ,
+		_lexicalFoundationPrimitives_lexicalV                                                              ,
+		_lexicalFoundationPrimitives_lexicalW                                                              ,
+		_lexicalFoundationPrimitives_lexicalX                                                              ,
+		_lexicalFoundationPrimitives_lexicalY                                                              ,
+		_lexicalFoundationPrimitives_lexicalZ                                                              ,
+
+		_lexicalFoundationPrimitives_lexicalLeftBracket                                                    ,
+		_lexicalFoundationPrimitives_lexicalBackslash                                                      ,
+		_lexicalFoundationPrimitives_lexicalRightBracket                                                   ,
+		_lexicalFoundationPrimitives_lexicalCaret                                                          ,
+		_lexicalFoundationPrimitives_lexicalUnderscore                                                     ,
+		_lexicalFoundationPrimitives_lexicalBacktick                                                       ,
+
+		_lexicalFoundationPrimitives_lexicalALower                                                         ,
+		_lexicalFoundationPrimitives_lexicalBLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalCLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalDLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalELower                                                         ,
+		_lexicalFoundationPrimitives_lexicalFLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalGLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalHLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalILower                                                         ,
+		_lexicalFoundationPrimitives_lexicalJLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalKLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalLLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalMLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalNLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalOLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalPLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalQLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalRLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalSLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalTLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalULower                                                         ,
+		_lexicalFoundationPrimitives_lexicalVLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalWLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalXLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalYLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalZLower                                                         ,
+
+		_lexicalFoundationPrimitives_lexicalLeftBrace                                                      ,
+		_lexicalFoundationPrimitives_lexicalPipe                                                           ,
+		_lexicalFoundationPrimitives_lexicalRightBrace                                                     ,
+		_lexicalFoundationPrimitives_lexicalTilde                                                          ,
+
+		_lexicalFoundationPrimitives_lexicalDEL
+	),
 
 	-- * Structures with default linking.
 
@@ -917,12 +1093,12 @@ data InfixExpBase lexp qop lexicalMinus annotation fixpoint =
 		-- ^ An expression that is not a binary operation application on top.
 
 -- | A left-expression, one not directly a unary or binary operation application.
-data LexpBase maybe lexicalLambda apats lexicalRightArrow exp lexicalLet decls lexicalIn lexicalIf lexicalSemicolon lexicalThen lexicalElse lexicalCase lexicalOf lexicalLeftBrace alts lexicalRightBrace stmts annotation fexp fixpoint =
-	  LambdaExpression      annotation lexicalLambda    apats lexicalRightArrow        exp
-	| LetExpression         annotation lexicalLet       decls lexicalIn                exp
-	| ConditionalExpression annotation lexicalIf        exp   (maybe lexicalSemicolon) lexicalThen      exp  (maybe lexicalSemicolon) lexicalElse exp
-	| CaseExpression        annotation lexicalCase      exp   lexicalOf                lexicalLeftBrace alts lexicalRightBrace
-	| DoExpression          annotation lexicalLeftBrace stmts lexicalRightBrace
+data LexpBase maybe lexicalAsciiLambda apats lexicalRightArrow exp lexicalLet decls lexicalIn lexicalIf lexicalSemicolon lexicalThen lexicalElse lexicalCase lexicalOf lexicalLeftBrace alts lexicalRightBrace stmts annotation fexp fixpoint =
+	  LambdaExpression      annotation lexicalAsciiLambda    apats lexicalRightArrow        exp
+	| LetExpression         annotation lexicalLet            decls lexicalIn                exp
+	| ConditionalExpression annotation lexicalIf             exp   (maybe lexicalSemicolon) lexicalThen      exp  (maybe lexicalSemicolon) lexicalElse exp
+	| CaseExpression        annotation lexicalCase           exp   lexicalOf                lexicalLeftBrace alts lexicalRightBrace
+	| DoExpression          annotation lexicalLeftBrace      stmts lexicalRightBrace
 	| BaseExpression        annotation fexp
 		-- ^ Function application, possibly with 0-arity.
 
@@ -1527,7 +1703,7 @@ data AscSymbolBase lexicalExclamation lexicalHash lexicalDollar lexicalPercent l
 	| LeftAngleBracketAsciiSymbol  annotation lexicalLeftAngleBracket
 	| EqualsAsciiSymbol            annotation lexicalEquals
 	| RightAngleBracketAsciiSymbol annotation lexicalRightAngleBracket
-	| QuestionmarkAsciiSymbol      annotation lexicalQuestionMark
+	| QuestionMarkAsciiSymbol      annotation lexicalQuestionMark
 	| AtAsciiSymbol                annotation lexicalAt
 	| BackslashAsciiSymbol         annotation lexicalBackslash
 	| CaretAsciiSymbol             annotation lexicalCaret
@@ -1553,7 +1729,7 @@ data AscSymbolSansNcBase lexicalExclamation lexicalHash lexicalDollar lexicalPer
 	| LeftAngleBracketAsciiSymbolSansNc  annotation lexicalLeftAngleBracket
 	| EqualsAsciiSymbolSansNc            annotation lexicalEquals
 	| RightAngleBracketAsciiSymbolSansNc annotation lexicalRightAngleBracket
-	| QuestionmarkAsciiSymbolSansNc      annotation lexicalQuestionMark
+	| QuestionMarkAsciiSymbolSansNc      annotation lexicalQuestionMark
 	| AtAsciiSymbolSansNc                annotation lexicalAt
 	| BackslashAsciiSymbolSansNc         annotation lexicalBackslash
 	| CaretAsciiSymbolSansNc             annotation lexicalCaret
@@ -5875,7 +6051,7 @@ data AscSymbolSansHyphenBase lexicalExclamation lexicalHash lexicalDollar lexica
 	| LeftAngleBracketAsciiSymbolSansHyphen  annotation lexicalLeftAngleBracket
 	| EqualsAsciiSymbolSansHyphen            annotation lexicalEquals
 	| RightAngleBracketAsciiSymbolSansHyphen annotation lexicalRightAngleBracket
-	| QuestionmarkAsciiSymbolSansHyphen      annotation lexicalQuestionMark
+	| QuestionMarkAsciiSymbolSansHyphen      annotation lexicalQuestionMark
 	| AtAsciiSymbolSansHyphen                annotation lexicalAt
 	| BackslashAsciiSymbolSansHyphen         annotation lexicalBackslash
 	| CaretAsciiSymbolSansHyphen             annotation lexicalCaret
@@ -5894,7 +6070,7 @@ data UniSymbolSansSpecialishHyphenBase lexicalUnicodeSymbolSansSpecialUnderscore
 -- names and dash-only sequences.
 --
 -- Here we just provide a simpler enumeration of possibilities.
-data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexicalDollar lexicalPercent lexicalAmpersand lexicalAsterisk lexicalPlus lexicalDot lexicalSlash lexicalLeftAngleBracket lexicalRightAngleBracket lexicalQuestionmark lexicalCaret lexicalHyphen lexicalEquals lexicalAt lexicalBackslash lexicalPipe lexicalTilde lexicalColon symbolSansHyphen annotation fixpoint =
+data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexicalDollar lexicalPercent lexicalAmpersand lexicalAsterisk lexicalPlus lexicalDot lexicalSlash lexicalLeftAngleBracket lexicalRightAngleBracket lexicalQuestionMark lexicalCaret lexicalHyphen lexicalEquals lexicalAt lexicalBackslash lexicalPipe lexicalTilde lexicalColon symbolSansHyphen annotation fixpoint =
 	  UniVarSym                               annotation symbolSansAsc            (list symbol)
 	-- ^ A single-symbol non-ASCII name is valid (we know it isn't ‘:’), as is
 	-- anything that starts with it.
@@ -5923,7 +6099,7 @@ data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexical
 	--   ‘=’ is not valid.
 	| RightAngleBracketVarSym                 annotation lexicalRightAngleBracket (list symbol)
 	-- ^ ‘>’* is valid.
-	| QuestionMarkVarSym                      annotation lexicalQuestionmark      (list symbol)
+	| QuestionMarkVarSym                      annotation lexicalQuestionMark      (list symbol)
 	-- ^ ‘?’* is valid.
 	--AtVarSym
 	--   ‘@’ is not valid.
@@ -5964,7 +6140,7 @@ data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexical
 	-- ^ ‘.=’* is valid.
 	| DotRightAngleBracketVarSym              annotation lexicalDot               lexicalRightAngleBracket  (list symbol)
 	-- ^ ‘.>’* is valid.
-	| DotQuestionMarkVarSym                   annotation lexicalDot               lexicalQuestionmark       (list symbol)
+	| DotQuestionMarkVarSym                   annotation lexicalDot               lexicalQuestionMark       (list symbol)
 	-- ^ ‘.?’* is valid.
 	| DotAtVarSym                             annotation lexicalDot               lexicalAt                 (list symbol)
 	-- ^ ‘.@’* is valid.
@@ -6005,7 +6181,7 @@ data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexical
 	-- ^ ‘<=’* is valid.
 	| LeftAngleBracketRightAngleBracketVarSym annotation lexicalLeftAngleBracket  lexicalRightAngleBracket  (list symbol)
 	-- ^ ‘<>’* is valid.
-	| LeftAngleBracketQuestionMarkVarSym      annotation lexicalLeftAngleBracket  lexicalQuestionmark       (list symbol)
+	| LeftAngleBracketQuestionMarkVarSym      annotation lexicalLeftAngleBracket  lexicalQuestionMark       (list symbol)
 	-- ^ ‘<?’* is valid.
 	| LeftAngleBracketAtVarSym                annotation lexicalLeftAngleBracket  lexicalAt                 (list symbol)
 	-- ^ ‘<@’* is valid.
@@ -6046,7 +6222,7 @@ data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexical
 	-- ^ ‘==’* is valid.
 	--EqualsRightAngleBracketVarSym
 	--   ‘=>’ is not valid.
-	| EqualsQuestionMarkVarSym                annotation lexicalEquals            lexicalQuestionmark       (list symbol)
+	| EqualsQuestionMarkVarSym                annotation lexicalEquals            lexicalQuestionMark       (list symbol)
 	-- ^ ‘=?’* is valid.
 	| EqualsAtVarSym                          annotation lexicalEquals            lexicalAt                 (list symbol)
 	-- ^ ‘=@’* is valid.
@@ -6096,7 +6272,7 @@ data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexical
 	-- ^ ‘-=’* is valid.
 	--HyphenRightAngleBracketVarSym
 	--   ‘->’ is not valid.
-	| HyphenQuestionMarkVarSym                annotation lexicalHyphen            lexicalQuestionmark       (list symbol)
+	| HyphenQuestionMarkVarSym                annotation lexicalHyphen            lexicalQuestionMark       (list symbol)
 	-- ^ ‘-?’* is valid.
 	| HyphenAtVarSym                          annotation lexicalHyphen            lexicalAt                 (list symbol)
 	-- ^ ‘-@’* is valid.
@@ -6140,7 +6316,7 @@ data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexical
 	-- ^ ‘:=’* is valid.
 	| ColonRightAngleBracketVarSym            annotation lexicalColon             lexicalRightAngleBracket  (list symbol)
 	-- ^ ‘:>’* is valid.
-	| ColonQuestionMarkVarSym                 annotation lexicalColon             lexicalQuestionmark       (list symbol)
+	| ColonQuestionMarkVarSym                 annotation lexicalColon             lexicalQuestionMark       (list symbol)
 	-- ^ ‘:?’* is valid.
 	| ColonAtVarSym                           annotation lexicalColon             lexicalAt                 (list symbol)
 	-- ^ ‘:@’* is valid.
@@ -6180,7 +6356,7 @@ data SymbolSansColonBase ascSymbolSansColon uniSymbolSansSpecialishColon annotat
 -- | An ASCII symbol except special characters, underscore, quote characters, and hyphens.
 --
 -- This is to help build 'VarSymBase'.
-data AscSymbolSansColonBase lexicalExclamation lexicalHash lexicalDollar lexicalPercent lexicalAmpersand lexicalAsterisk lexicalPlus lexicalDot lexicalSlash lexicalLeftAngleBracket lexicalEquals lexicalRightAngleBracket lexicalQuestionmark lexicalAt lexicalBackslash lexicalCaret lexicalPipe lexicalHyphen lexicalTilde annotation fixpoint =
+data AscSymbolSansColonBase lexicalExclamation lexicalHash lexicalDollar lexicalPercent lexicalAmpersand lexicalAsterisk lexicalPlus lexicalDot lexicalSlash lexicalLeftAngleBracket lexicalEquals lexicalRightAngleBracket lexicalQuestionMark lexicalAt lexicalBackslash lexicalCaret lexicalPipe lexicalHyphen lexicalTilde annotation fixpoint =
 	  ExclamationAsciiSymbolSansColon       annotation lexicalExclamation
 	| HashAsciiSymbolSansColon              annotation lexicalHash
 	| DollarAsciiSymbolSansColon            annotation lexicalDollar
@@ -6193,7 +6369,7 @@ data AscSymbolSansColonBase lexicalExclamation lexicalHash lexicalDollar lexical
 	| LeftAngleBracketAsciiSymbolSansColon  annotation lexicalLeftAngleBracket
 	| EqualsAsciiSymbolSansColon            annotation lexicalEquals
 	| RightAngleBracketAsciiSymbolSansColon annotation lexicalRightAngleBracket
-	| QuestionmarkAsciiSymbolSansColon      annotation lexicalQuestionmark
+	| QuestionMarkAsciiSymbolSansColon      annotation lexicalQuestionMark
 	| AtAsciiSymbolSansColon                annotation lexicalAt
 	| BackslashAsciiSymbolSansColon         annotation lexicalBackslash
 	| CaretAsciiSymbolSansColon             annotation lexicalCaret
@@ -6369,7 +6545,39 @@ data GapBase list lexicalBackslash whitechar annotation fixpoint =
 -- Keyword aliases and numeric literal prefixes that just reduce to foundational lexical structures like
 -- character representations.
 
+data LexicalPseudoBase lexicalNonsymKeyword lexicalNonsymNonkeyword lexicalSymAlias lexicalAlias lexicalNumPrefix annotation fixpoint =
+	  PseudoLexicalNonsymKeyword    annotation lexicalNonsymKeyword
+	| PseudoLexicalNonsymNonkeyword annotation lexicalNonsymNonkeyword
+	| PseudoLexicalSymAlias         annotation lexicalSymAlias
+	| PseudoLexicalAlias            annotation lexicalAlias
+	| PseudoLexicalNumPrefix        annotation lexicalNumPrefix
+
 -- Non-symbolic keyword pseudo-lexical structures.
+
+-- | A non-symbolic pseudo-lexical keyword.
+data LexicalNonsymKeywordBase lexicalCase lexicalClass lexicalData lexicalDefault lexicalDeriving lexicalDo lexicalElse lexicalForeign lexicalIf lexicalImport lexicalIn lexicalInfix lexicalInfixl lexicalInfixr lexicalInstance lexicalLet lexicalModule lexicalNewtype lexicalOf lexicalThen lexicalType lexicalWhere annotation fixpoint =
+	  CaseNonsymKeyword     annotation lexicalCase
+	| ClassNonsymKeyword    annotation lexicalClass
+	| DataNonsymKeyword     annotation lexicalData
+	| DefaultNonsymKeyword  annotation lexicalDefault
+	| DerivingNonsymKeyword annotation lexicalDeriving
+	| DoNonsymKeyword       annotation lexicalDo
+	| ElseNonsymKeyword     annotation lexicalElse
+	| ForeignNonsymKeyword  annotation lexicalForeign
+	| IfNonsymKeyword       annotation lexicalIf
+	| ImportNonsymKeyword   annotation lexicalImport
+	| InNonsymKeyword       annotation lexicalIn
+	| InfixNonsymKeyword    annotation lexicalInfix
+	| InfixlNonsymKeyword   annotation lexicalInfixl
+	| InfixrNonsymKeyword   annotation lexicalInfixr
+	| InstanceNonsymKeyword annotation lexicalInstance
+	| LetNonsymKeyword      annotation lexicalLet
+	| ModuleNonsymKeyword   annotation lexicalModule
+	| NewtypeNonsymKeyword  annotation lexicalNewtype
+	| OfNonsymKeyword       annotation lexicalOf
+	| ThenNonsymKeyword     annotation lexicalThen
+	| TypeNonsymKeyword     annotation lexicalType
+	| WhereNonsymKeyword    annotation lexicalWhere
 
 -- | The ‘case’ keyword.
 data LexicalCaseBase lexicalCLower lexicalALower lexicalSLower lexicalELower annotation fixpoint =
@@ -6459,7 +6667,84 @@ data LexicalTypeBase lexicalTLower lexicalYLower lexicalPLower lexicalELower ann
 data LexicalWhereBase lexicalWLower lexicalHLower lexicalELower lexicalRLower annotation fixpoint =
 	PseudoLexicalWhere annotation lexicalWLower lexicalHLower lexicalELower lexicalRLower lexicalELower
 
+-- Non-symbolic non-keyword pseudo-lexical structures.
+
+-- | A non-symbolic pseudo-lexical non-keyword.
+data LexicalNonsymNonkeywordBase lexicalAs lexicalHiding lexicalQualified annotation fixpoint =
+	  AsNonsymNonkeyword        annotation lexicalAs
+	| HidingNonsymNonkeyword    annotation lexicalHiding
+	| QualifiedNonsymNonkeyword annotation lexicalQualified
+
+-- | The ‘as’ word.
+data LexicalAsBase lexemeALower lexemeSLower annotation fixpoint =
+	PseudoLexicalAs annotation lexemeALower lexemeSLower
+
+-- | The ‘hiding’ word.
+data LexicalHidingBase lexemeHLower lexemeILower lexemeDLower lexemeNLower lexemeGLower annotation fixpoint =
+	PseudoLexicalHiding annotation lexemeHLower lexemeILower lexemeDLower lexemeILower lexemeNLower lexemeGLower
+
+-- | The ‘qualified’ word.
+data LexicalQualifiedBase lexemeHLower lexemeILower lexemeDLower lexemeNLower lexemeGLower annotation fixpoint =
+	PseudoLexicalQualified annotation lexemeHLower lexemeILower lexemeDLower lexemeILower lexemeNLower lexemeGLower
+
+-- Symbolic alias pseudo-lexical structures.
+
+-- | A symbolic pseudo-lexical alias.
+data LexicalSymAliasBase lexicalDotDot lexicalDoubleColon lexicalDoubleRightArrow lexicalLeftArrow lexicalRightArrow annotation fixpoint =
+	  DotDotSymAlias           annotation lexicalDotDot
+	| DoubleColonSymAlias      annotation lexicalDoubleColon
+	| DoubleRightArrowSymAlias annotation lexicalDoubleRightArrow
+	| LeftArrowSymAlias        annotation lexicalLeftArrow
+	| RightArrowSymAlias       annotation lexicalRightArrow
+
+-- | The ‘..’ symbol sequence.
+data LexicalDotDot lexicalDot annotation fixpoint =
+	PseudoLexicalDotDot annotation lexicalDot lexicalDot
+
+-- | The ‘::’ symbol sequence.
+data LexicalDoubleColon lexicalColon annotation fixpoint =
+	PseudoLexicalDoubleColon annotation lexicalColon lexicalColon
+
+-- | The ‘=>’ symbol sequence.
+data LexicalDoubleRightArrow lexicalEquals lexicalRightAngleBracket annotation fixpoint =
+	PseudoLexicalDoubleRightArrow annotation lexicalEquals lexicalRightAngleBracket
+
+-- | The ‘<-’ symbol sequence.
+data LexicalLeftArrow lexicalLeftAngleBracket lexicalHyphen annotation fixpoint =
+	PseudoLexicalLeftArrow annotation lexicalLeftAngleBracket lexicalHyphen
+
+-- | The ‘->’ symbol sequence.
+data LexicalRightArrow lexicalLeftAngleBracket lexicalHyphen lexicalRightAngleBracket annotation fixpoint =
+	PseudoLexicalRightArrow annotation lexicalHyphen lexicalRightAngleBracket
+
+-- Alias pseudo-lexical structures.
+
+-- | A pseudo-lexical alias.
+data LexicalAliasBase lexicalSpace lexicalMinus lexicalAsciiLambda annotation fixpoint =
+	  SpaceAlias       annotation lexicalSpace
+	| MinusAlias       annotation lexicalMinus
+	| AsciiLambdaAlias annotation lexicalAsciiLambda
+
+-- | An alias for the space character.
+data LexicalSpaceBase lexemeSP annotation fixpoint =
+	PseudoLexicalSpace annotation lexemeSP
+
+-- | An alias for the hyphen character.
+data LexicalMinusBase lexemeHyphen annotation fixpoint =
+	PseudoLexicalMinus annotation lexemeHyphen
+
+-- | An alias for the backslash character.
+data LexicalAsciiLambdaBase lexemeBackslash annotation fixpoint =
+	PseudoLexicalAsciiLambda annotation lexemeBackslash
+
 -- Non-symbolic numeric literal prefix pseudo-lexical structures.
+
+-- | A pseudo-lexical alias.
+data LexicalNumPrefixBase lexical0o lexical0O lexical0x lexical0X annotation fixpoint =
+	  N0oNumPrefix annotation lexical0o
+	| N0ONumPrefix annotation lexical0O
+	| N0xNumPrefix annotation lexical0x
+	| N0XNumPrefix annotation lexical0X
 
 -- | The ‘0o’ octal literal prefix.
 data Lexical0oBase lexical0 lexicalOLower annotation fixpoint =
@@ -6493,14 +6778,171 @@ data Lexical0XBase lexical0 lexicalX annotation fixpoint =
 --
 -- This record is like a type class, and values of this record provide a
 -- complete foundation to build AST types, as they ultimately reduce to types
--- referenced by fields in this record.
+-- referenced by fields in this record.  (Credit: ‘Scrap your type classes’.)
 --
 -- The terminals are mostly individual characters, with a few exceptions such
 -- as groups, exclusions, and certifications.
---data LexicalFoundation annotation fixpoint =
-	-- TODO
+--
+-- Unfortunately this is made a bit more clunky without builtin dependent
+-- types, when types are not values, built-in anyway.  With type values, we
+-- could hide the types away in this record and extract them as needed.  A
+-- 'LexicalFoundation' argument could be provided for default linking and
+-- normally a default value could be used to implement the foundation.
+--
+-- Instead of making them hidable, we add every type as a type variable.
+data LexicalFoundation typeValue lexicalEndOfParse lexicalUnicodeDigit lexicalUnicodeLarge lexicalUnicodeSmall lexicalUnicodeSymbol lexicalUnicodeWhitespaceChar lexicalUnicodeSmallSansAscUnderscore lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuote lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteAscii lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteColon lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteHyphen lexicalNUL lexicalSOH lexicalSTX lexicalETX lexicalEOT lexicalENQ lexicalACK lexicalBEL lexicalBS lexicalHT lexicalLF lexicalVT lexicalFF lexicalCR lexicalSO lexicalSI lexicalDLE lexicalDC1 lexicalDC2 lexicalDC3 lexicalDC4 lexicalNAK lexicalSYN lexicalETB lexicalCAN lexicalEM lexicalSUB lexicalESC lexicalFS lexicalGS lexicalRS lexicalUS lexicalSP lexicalExclamation lexicalDoubleQuote lexicalHash lexicalDollar lexicalPercent lexicalAmpersand lexicalSingleQuote lexicalLeftParenthesis lexicalRightParenthesis lexicalAsterisk lexicalPlus lexicalComma lexicalHyphen lexicalDot lexicalSlash lexical0 lexical1 lexical2 lexical3 lexical4 lexical5 lexical6 lexical7 lexical8 lexical9 lexicalColon lexicalSemicolon lexicalLeftAngleBracket lexicalEquals lexicalRightAngleBracket lexicalQuestionMark lexicalAt lexicalA lexicalB lexicalC lexicalD lexicalE lexicalF lexicalG lexicalH lexicalI lexicalJ lexicalK lexicalL lexicalM lexicalN lexicalO lexicalP lexicalQ lexicalR lexicalS lexicalT lexicalU lexicalV lexicalW lexicalX lexicalY lexicalZ lexicalLeftBracket lexicalBackslash lexicalRightBracket lexicalCaret lexicalUnderscore lexicalBacktick lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower lexicalLeftBrace lexicalPipe lexicalRightBrace lexicalTilde lexicalDEL annotation fixpoint =
+	LexicalFoundationPrimitives {
+		_lexicalFoundationPrimitives_lexicalEndOfParse                                                     :: typeValue lexicalEndOfParse                                                     ,
 
--- TODO
+		_lexicalFoundationPrimitives_lexicalUnicodeDigit                                                   :: typeValue lexicalUnicodeDigit                                                   ,
+		_lexicalFoundationPrimitives_lexicalUnicodeLarge                                                   :: typeValue lexicalUnicodeLarge                                                   ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSmall                                                   :: typeValue lexicalUnicodeSmall                                                   ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbol                                                  :: typeValue lexicalUnicodeSymbol                                                  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeWhitespaceChar                                          :: typeValue lexicalUnicodeWhitespaceChar                                          ,
+
+		_lexicalFoundationPrimitives_lexicalUnicodeSmallSansAscUnderscore                                  :: typeValue lexicalUnicodeSmallSansAscUnderscore                                  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuote       :: typeValue lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuote       ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteAscii  :: typeValue lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteAscii  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteColon  :: typeValue lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteColon  ,
+		_lexicalFoundationPrimitives_lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteHyphen :: typeValue lexicalUnicodeSymbolSansSpecialUnderscoreDoubleQuoteSingleQuoteHyphen ,
+
+		_lexicalFoundationPrimitives_lexicalNUL                                                            :: typeValue lexicalNUL                                                            ,
+		_lexicalFoundationPrimitives_lexicalSOH                                                            :: typeValue lexicalSOH                                                            ,
+		_lexicalFoundationPrimitives_lexicalSTX                                                            :: typeValue lexicalSTX                                                            ,
+		_lexicalFoundationPrimitives_lexicalETX                                                            :: typeValue lexicalETX                                                            ,
+		_lexicalFoundationPrimitives_lexicalEOT                                                            :: typeValue lexicalEOT                                                            ,
+		_lexicalFoundationPrimitives_lexicalENQ                                                            :: typeValue lexicalENQ                                                            ,
+		_lexicalFoundationPrimitives_lexicalACK                                                            :: typeValue lexicalACK                                                            ,
+		_lexicalFoundationPrimitives_lexicalBEL                                                            :: typeValue lexicalBEL                                                            ,
+		_lexicalFoundationPrimitives_lexicalBS                                                             :: typeValue lexicalBS                                                             ,
+		_lexicalFoundationPrimitives_lexicalHT                                                             :: typeValue lexicalHT                                                             ,
+		_lexicalFoundationPrimitives_lexicalLF                                                             :: typeValue lexicalLF                                                             ,
+		_lexicalFoundationPrimitives_lexicalVT                                                             :: typeValue lexicalVT                                                             ,
+		_lexicalFoundationPrimitives_lexicalFF                                                             :: typeValue lexicalFF                                                             ,
+		_lexicalFoundationPrimitives_lexicalCR                                                             :: typeValue lexicalCR                                                             ,
+		_lexicalFoundationPrimitives_lexicalSO                                                             :: typeValue lexicalSO                                                             ,
+		_lexicalFoundationPrimitives_lexicalSI                                                             :: typeValue lexicalSI                                                             ,
+		_lexicalFoundationPrimitives_lexicalDLE                                                            :: typeValue lexicalDLE                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC1                                                            :: typeValue lexicalDC1                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC2                                                            :: typeValue lexicalDC2                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC3                                                            :: typeValue lexicalDC3                                                            ,
+		_lexicalFoundationPrimitives_lexicalDC4                                                            :: typeValue lexicalDC4                                                            ,
+		_lexicalFoundationPrimitives_lexicalNAK                                                            :: typeValue lexicalNAK                                                            ,
+		_lexicalFoundationPrimitives_lexicalSYN                                                            :: typeValue lexicalSYN                                                            ,
+		_lexicalFoundationPrimitives_lexicalETB                                                            :: typeValue lexicalETB                                                            ,
+		_lexicalFoundationPrimitives_lexicalCAN                                                            :: typeValue lexicalCAN                                                            ,
+		_lexicalFoundationPrimitives_lexicalEM                                                             :: typeValue lexicalEM                                                             ,
+		_lexicalFoundationPrimitives_lexicalSUB                                                            :: typeValue lexicalSUB                                                            ,
+		_lexicalFoundationPrimitives_lexicalESC                                                            :: typeValue lexicalESC                                                            ,
+		_lexicalFoundationPrimitives_lexicalFS                                                             :: typeValue lexicalFS                                                             ,
+		_lexicalFoundationPrimitives_lexicalGS                                                             :: typeValue lexicalGS                                                             ,
+		_lexicalFoundationPrimitives_lexicalRS                                                             :: typeValue lexicalRS                                                             ,
+		_lexicalFoundationPrimitives_lexicalUS                                                             :: typeValue lexicalUS                                                             ,
+
+		_lexicalFoundationPrimitives_lexicalSP                                                             :: typeValue lexicalSP                                                             ,
+		_lexicalFoundationPrimitives_lexicalExclamation                                                    :: typeValue lexicalExclamation                                                    ,
+		_lexicalFoundationPrimitives_lexicalDoubleQuote                                                    :: typeValue lexicalDoubleQuote                                                    ,
+		_lexicalFoundationPrimitives_lexicalHash                                                           :: typeValue lexicalHash                                                           ,
+		_lexicalFoundationPrimitives_lexicalDollar                                                         :: typeValue lexicalDollar                                                         ,
+		_lexicalFoundationPrimitives_lexicalPercent                                                        :: typeValue lexicalPercent                                                        ,
+		_lexicalFoundationPrimitives_lexicalAmpersand                                                      :: typeValue lexicalAmpersand                                                      ,
+		_lexicalFoundationPrimitives_lexicalSingleQuote                                                    :: typeValue lexicalSingleQuote                                                    ,
+		_lexicalFoundationPrimitives_lexicalLeftParenthesis                                                :: typeValue lexicalLeftParenthesis                                                ,
+		_lexicalFoundationPrimitives_lexicalRightParenthesis                                               :: typeValue lexicalRightParenthesis                                               ,
+		_lexicalFoundationPrimitives_lexicalAsterisk                                                       :: typeValue lexicalAsterisk                                                       ,
+		_lexicalFoundationPrimitives_lexicalPlus                                                           :: typeValue lexicalPlus                                                           ,
+		_lexicalFoundationPrimitives_lexicalComma                                                          :: typeValue lexicalComma                                                          ,
+		_lexicalFoundationPrimitives_lexicalHyphen                                                         :: typeValue lexicalHyphen                                                         ,
+		_lexicalFoundationPrimitives_lexicalDot                                                            :: typeValue lexicalDot                                                            ,
+		_lexicalFoundationPrimitives_lexicalSlash                                                          :: typeValue lexicalSlash                                                          ,
+
+		_lexicalFoundationPrimitives_lexical0                                                              :: typeValue lexical0                                                              ,
+		_lexicalFoundationPrimitives_lexical1                                                              :: typeValue lexical1                                                              ,
+		_lexicalFoundationPrimitives_lexical2                                                              :: typeValue lexical2                                                              ,
+		_lexicalFoundationPrimitives_lexical3                                                              :: typeValue lexical3                                                              ,
+		_lexicalFoundationPrimitives_lexical4                                                              :: typeValue lexical4                                                              ,
+		_lexicalFoundationPrimitives_lexical5                                                              :: typeValue lexical5                                                              ,
+		_lexicalFoundationPrimitives_lexical6                                                              :: typeValue lexical6                                                              ,
+		_lexicalFoundationPrimitives_lexical7                                                              :: typeValue lexical7                                                              ,
+		_lexicalFoundationPrimitives_lexical8                                                              :: typeValue lexical8                                                              ,
+		_lexicalFoundationPrimitives_lexical9                                                              :: typeValue lexical9                                                              ,
+
+		_lexicalFoundationPrimitives_lexicalColon                                                          :: typeValue lexicalColon                                                          ,
+		_lexicalFoundationPrimitives_lexicalSemicolon                                                      :: typeValue lexicalSemicolon                                                      ,
+		_lexicalFoundationPrimitives_lexicalLeftAngleBracket                                               :: typeValue lexicalLeftAngleBracket                                               ,
+		_lexicalFoundationPrimitives_lexicalEquals                                                         :: typeValue lexicalEquals                                                         ,
+		_lexicalFoundationPrimitives_lexicalRightAngleBracket                                              :: typeValue lexicalRightAngleBracket                                              ,
+		_lexicalFoundationPrimitives_lexicalQuestionMark                                                   :: typeValue lexicalQuestionMark                                                   ,
+		_lexicalFoundationPrimitives_lexicalAt                                                             :: typeValue lexicalAt                                                             ,
+
+		_lexicalFoundationPrimitives_lexicalA                                                              :: typeValue lexicalA                                                              ,
+		_lexicalFoundationPrimitives_lexicalB                                                              :: typeValue lexicalB                                                              ,
+		_lexicalFoundationPrimitives_lexicalC                                                              :: typeValue lexicalC                                                              ,
+		_lexicalFoundationPrimitives_lexicalD                                                              :: typeValue lexicalD                                                              ,
+		_lexicalFoundationPrimitives_lexicalE                                                              :: typeValue lexicalE                                                              ,
+		_lexicalFoundationPrimitives_lexicalF                                                              :: typeValue lexicalF                                                              ,
+		_lexicalFoundationPrimitives_lexicalG                                                              :: typeValue lexicalG                                                              ,
+		_lexicalFoundationPrimitives_lexicalH                                                              :: typeValue lexicalH                                                              ,
+		_lexicalFoundationPrimitives_lexicalI                                                              :: typeValue lexicalI                                                              ,
+		_lexicalFoundationPrimitives_lexicalJ                                                              :: typeValue lexicalJ                                                              ,
+		_lexicalFoundationPrimitives_lexicalK                                                              :: typeValue lexicalK                                                              ,
+		_lexicalFoundationPrimitives_lexicalL                                                              :: typeValue lexicalL                                                              ,
+		_lexicalFoundationPrimitives_lexicalM                                                              :: typeValue lexicalM                                                              ,
+		_lexicalFoundationPrimitives_lexicalN                                                              :: typeValue lexicalN                                                              ,
+		_lexicalFoundationPrimitives_lexicalO                                                              :: typeValue lexicalO                                                              ,
+		_lexicalFoundationPrimitives_lexicalP                                                              :: typeValue lexicalP                                                              ,
+		_lexicalFoundationPrimitives_lexicalQ                                                              :: typeValue lexicalQ                                                              ,
+		_lexicalFoundationPrimitives_lexicalR                                                              :: typeValue lexicalR                                                              ,
+		_lexicalFoundationPrimitives_lexicalS                                                              :: typeValue lexicalS                                                              ,
+		_lexicalFoundationPrimitives_lexicalT                                                              :: typeValue lexicalT                                                              ,
+		_lexicalFoundationPrimitives_lexicalU                                                              :: typeValue lexicalU                                                              ,
+		_lexicalFoundationPrimitives_lexicalV                                                              :: typeValue lexicalV                                                              ,
+		_lexicalFoundationPrimitives_lexicalW                                                              :: typeValue lexicalW                                                              ,
+		_lexicalFoundationPrimitives_lexicalX                                                              :: typeValue lexicalX                                                              ,
+		_lexicalFoundationPrimitives_lexicalY                                                              :: typeValue lexicalY                                                              ,
+		_lexicalFoundationPrimitives_lexicalZ                                                              :: typeValue lexicalZ                                                              ,
+
+		_lexicalFoundationPrimitives_lexicalLeftBracket                                                    :: typeValue lexicalLeftBracket                                                    ,
+		_lexicalFoundationPrimitives_lexicalBackslash                                                      :: typeValue lexicalBackslash                                                      ,
+		_lexicalFoundationPrimitives_lexicalRightBracket                                                   :: typeValue lexicalRightBracket                                                   ,
+		_lexicalFoundationPrimitives_lexicalCaret                                                          :: typeValue lexicalCaret                                                          ,
+		_lexicalFoundationPrimitives_lexicalUnderscore                                                     :: typeValue lexicalUnderscore                                                     ,
+		_lexicalFoundationPrimitives_lexicalBacktick                                                       :: typeValue lexicalBacktick                                                       ,
+
+		_lexicalFoundationPrimitives_lexicalALower                                                         :: typeValue lexicalALower                                                         ,
+		_lexicalFoundationPrimitives_lexicalBLower                                                         :: typeValue lexicalBLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalCLower                                                         :: typeValue lexicalCLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalDLower                                                         :: typeValue lexicalDLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalELower                                                         :: typeValue lexicalELower                                                         ,
+		_lexicalFoundationPrimitives_lexicalFLower                                                         :: typeValue lexicalFLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalGLower                                                         :: typeValue lexicalGLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalHLower                                                         :: typeValue lexicalHLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalILower                                                         :: typeValue lexicalILower                                                         ,
+		_lexicalFoundationPrimitives_lexicalJLower                                                         :: typeValue lexicalJLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalKLower                                                         :: typeValue lexicalKLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalLLower                                                         :: typeValue lexicalLLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalMLower                                                         :: typeValue lexicalMLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalNLower                                                         :: typeValue lexicalNLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalOLower                                                         :: typeValue lexicalOLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalPLower                                                         :: typeValue lexicalPLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalQLower                                                         :: typeValue lexicalQLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalRLower                                                         :: typeValue lexicalRLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalSLower                                                         :: typeValue lexicalSLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalTLower                                                         :: typeValue lexicalTLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalULower                                                         :: typeValue lexicalULower                                                         ,
+		_lexicalFoundationPrimitives_lexicalVLower                                                         :: typeValue lexicalVLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalWLower                                                         :: typeValue lexicalWLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalXLower                                                         :: typeValue lexicalXLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalYLower                                                         :: typeValue lexicalYLower                                                         ,
+		_lexicalFoundationPrimitives_lexicalZLower                                                         :: typeValue lexicalZLower                                                         ,
+
+		_lexicalFoundationPrimitives_lexicalLeftBrace                                                      :: typeValue lexicalLeftBrace                                                      ,
+		_lexicalFoundationPrimitives_lexicalPipe                                                           :: typeValue lexicalPipe                                                           ,
+		_lexicalFoundationPrimitives_lexicalRightBrace                                                     :: typeValue lexicalRightBrace                                                     ,
+		_lexicalFoundationPrimitives_lexicalTilde                                                          :: typeValue lexicalTilde                                                          ,
+
+		_lexicalFoundationPrimitives_lexicalDEL                                                            :: typeValue lexicalDEL
+	}
 
 {-
  - ----------------------------------------------------------------
