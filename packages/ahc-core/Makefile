@@ -589,6 +589,10 @@ _DIRECT_SRC_TREE_REL_DIRS = \
  \
 	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple \
  \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST \
+ \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base \
+ \
 	$(EMPTY)
 
 _DIRECT_SRC_TREE_REL_LIB_SRCS = \
@@ -596,6 +600,10 @@ _DIRECT_SRC_TREE_REL_LIB_SRCS = \
 	Language/Haskell2010/Ahc/Frontends/CLI.hs \
 	Language/Haskell2010/Ahc/Meta/Ahc.hs \
 	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST.hs \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base.hs \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base/ExclusionStructures.hs \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base/RegularStructures.hs \
+	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/DefaultLinking.hs \
 	Language/Haskell2010/Ahc/Tests/Tests.hs \
  \
 	$(EMPTY)
