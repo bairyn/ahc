@@ -28,8 +28,6 @@
  - least in reverse group order.)
  -
  - (Long lines here are a compromise for some consistencies.)
- -
- - TODO: finish.
  -}
 
 {-# LANGUAGE Haskell2010 #-}
@@ -7371,7 +7369,5 @@ data LexicalFoundationBase lexicalEndOfParseKey lexicalUnicodeDigitKey lexicalUn
  -}
 
 -- Intra-module linking.
-
--- TODO: available option: annotationLexer annotationGrammar.  (Note that our linking method requires selecting lexeme annotations from what we have.)
 
 -- TODO
