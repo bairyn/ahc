@@ -92,6 +92,7 @@ common extended-components
 		ahc-core,
 
 	other-modules:
+		Language.Haskell2010.Ahc.Data.Fixed
 		Language.Haskell2010.Ahc.Meta.Ahc
 		Language.Haskell2010.Ahc.Frontends.CLI
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
@@ -105,6 +106,7 @@ library
 	import: all-components
 
 	exposed-modules:
+		Language.Haskell2010.Ahc.Data.Fixed
 		Language.Haskell2010.Ahc.Meta.Ahc
 		Language.Haskell2010.Ahc.Frontends.CLI
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
