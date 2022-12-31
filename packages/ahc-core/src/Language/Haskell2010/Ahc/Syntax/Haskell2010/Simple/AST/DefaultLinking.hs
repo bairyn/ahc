@@ -52,6 +52,21 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 
 	-- *** Lexical structures.
 
+	-- **** Symbolic alias pseudo-lexical structures.
+
+	LexicalSymAliasF(MkLexicalSymAliasF, _unLexicalSymAliasF),
+	LexicalSymAlias,
+	LexicalDotDotF(MkLexicalDotDotF, _unLexicalDotDotF),
+	LexicalDotDot,
+	LexicalDoubleColonF(MkLexicalDoubleColonF, _unLexicalDoubleColonF),
+	LexicalDoubleColon,
+	LexicalDoubleRightArrowF(MkLexicalDoubleRightArrowF, _unLexicalDoubleRightArrowF),
+	LexicalDoubleRightArrow,
+	LexicalLeftArrowF(MkLexicalLeftArrowF, _unLexicalLeftArrowF),
+	LexicalLeftArrow,
+	LexicalRightArrowF(MkLexicalRightArrowF, _unLexicalRightArrowF),
+	LexicalRightArrow,
+
 	-- **** Alias pseudo-lexical structures.
 	LexicalAliasF(MkLexicalAliasF, _unLexicalAliasF),
 	LexicalAlias,
@@ -112,6 +127,38 @@ type LexicalFoundation k z s l typeValue = LexicalFoundationBase Proxy.Proxy Lex
 -- Lexical structures.
 
 -- TODO
+
+-- Symbolic alias pseudo-lexical structures.
+
+-- | 'LexicalSymAliasBase' with fewer unresolved variables, with default linking.
+newtype LexicalSymAliasF k z s l lexicalAnnotation annotation fixpoint = MkLexicalSymAliasF { _unLexicalSymAliasF :: (LexicalSymAliasBase (LexicalDotDot k z s l lexicalAnnotation lexicalAnnotation) (LexicalDoubleColon k z s l lexicalAnnotation lexicalAnnotation) (LexicalDoubleRightArrow k z s l lexicalAnnotation lexicalAnnotation) (LexicalLeftArrow k z s l lexicalAnnotation lexicalAnnotation) (LexicalRightArrow k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalSymAliasF'
+type LexicalSymAlias k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalSymAliasF k z s l lexicalAnnotation annotation)
+
+-- | 'LexicalDotDotArrowBase' with fewer unresolved variables, with default linking.
+newtype LexicalDotDotF k z s l lexicalAnnotation annotation fixpoint = MkLexicalDotDotF { _unLexicalDotDotF :: (LexicalDotDotBase (l (LexicalDotKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalDotDotArrowF'
+type LexicalDotDot k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalDotDotF k z s l lexicalAnnotation annotation)
+
+-- | 'LexicalDoubleColonArrowBase' with fewer unresolved variables, with default linking.
+newtype LexicalDoubleColonF k z s l lexicalAnnotation annotation fixpoint = MkLexicalDoubleColonF { _unLexicalDoubleColonF :: (LexicalDoubleColonBase (l (LexicalColonKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalDoubleColonArrowF'
+type LexicalDoubleColon k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalDoubleColonF k z s l lexicalAnnotation annotation)
+
+-- | 'LexicalDoubleRightArrowBase' with fewer unresolved variables, with default linking.
+newtype LexicalDoubleRightArrowF k z s l lexicalAnnotation annotation fixpoint = MkLexicalDoubleRightArrowF { _unLexicalDoubleRightArrowF :: (LexicalDoubleRightArrowBase (l (LexicalEqualsKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalDoubleRightArrowF'
+type LexicalDoubleRightArrow k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalDoubleRightArrowF k z s l lexicalAnnotation annotation)
+
+-- | 'LexicalLeftArrowBase' with fewer unresolved variables, with default linking.
+newtype LexicalLeftArrowF k z s l lexicalAnnotation annotation fixpoint = MkLexicalLeftArrowF { _unLexicalLeftArrowF :: (LexicalLeftArrowBase (l (LexicalLeftAngleBracketKeyBase k z s)) (l (LexicalHyphenKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalLeftArrowF'
+type LexicalLeftArrow k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalLeftArrowF k z s l lexicalAnnotation annotation)
+
+-- | 'LexicalRightArrowBase' with fewer unresolved variables, with default linking.
+newtype LexicalRightArrowF k z s l lexicalAnnotation annotation fixpoint = MkLexicalRightArrowF { _unLexicalRightArrowF :: (LexicalRightArrowBase (l (LexicalHyphenKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalRightArrowF'
+type LexicalRightArrow k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalRightArrowF k z s l lexicalAnnotation annotation)
 
 -- Alias pseudo-lexical structures.
 
