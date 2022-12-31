@@ -1850,7 +1850,7 @@ data LexicalLeftArrowBase lexicalLeftAngleBracket lexicalHyphen annotation fixpo
 	PseudoLexicalLeftArrow annotation lexicalLeftAngleBracket lexicalHyphen
 
 -- | The ‘->’ symbol sequence.
-data LexicalRightArrowBase lexicalLeftAngleBracket lexicalHyphen lexicalRightAngleBracket annotation fixpoint =
+data LexicalRightArrowBase lexicalHyphen lexicalRightAngleBracket annotation fixpoint =
 	PseudoLexicalRightArrow annotation lexicalHyphen lexicalRightAngleBracket
 
 -- Alias pseudo-lexical structures.
