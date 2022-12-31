@@ -1812,16 +1812,16 @@ data LexicalNonsymNonkeywordBase lexicalAs lexicalHiding lexicalQualified annota
 	| QualifiedNonsymNonkeyword annotation lexicalQualified
 
 -- | The ‘as’ word.
-data LexicalAsBase lexemeALower lexemeSLower annotation fixpoint =
-	PseudoLexicalAs annotation lexemeALower lexemeSLower
+data LexicalAsBase lexicalALower lexicalSLower annotation fixpoint =
+	PseudoLexicalAs annotation lexicalALower lexicalSLower
 
 -- | The ‘hiding’ word.
-data LexicalHidingBase lexemeHLower lexemeILower lexemeDLower lexemeNLower lexemeGLower annotation fixpoint =
-	PseudoLexicalHiding annotation lexemeHLower lexemeILower lexemeDLower lexemeILower lexemeNLower lexemeGLower
+data LexicalHidingBase lexicalHLower lexicalILower lexicalDLower lexicalNLower lexicalGLower annotation fixpoint =
+	PseudoLexicalHiding annotation lexicalHLower lexicalILower lexicalDLower lexicalILower lexicalNLower lexicalGLower
 
 -- | The ‘qualified’ word.
-data LexicalQualifiedBase lexemeHLower lexemeILower lexemeDLower lexemeNLower lexemeGLower annotation fixpoint =
-	PseudoLexicalQualified annotation lexemeHLower lexemeILower lexemeDLower lexemeILower lexemeNLower lexemeGLower
+data LexicalQualifiedBase lexicalHLower lexicalILower lexicalDLower lexicalNLower lexicalGLower annotation fixpoint =
+	PseudoLexicalQualified annotation lexicalHLower lexicalILower lexicalDLower lexicalILower lexicalNLower lexicalGLower
 
 -- Symbolic alias pseudo-lexical structures.
 
@@ -1862,16 +1862,16 @@ data LexicalAliasBase lexicalSpace lexicalMinus lexicalAsciiLambda annotation fi
 	| AsciiLambdaAlias annotation lexicalAsciiLambda
 
 -- | An alias for the space character.
-data LexicalSpaceBase lexemeSP annotation fixpoint =
-	PseudoLexicalSpace annotation lexemeSP
+data LexicalSpaceBase lexicalSP annotation fixpoint =
+	PseudoLexicalSpace annotation lexicalSP
 
 -- | An alias for the hyphen character.
-data LexicalMinusBase lexemeHyphen annotation fixpoint =
-	PseudoLexicalMinus annotation lexemeHyphen
+data LexicalMinusBase lexicalHyphen annotation fixpoint =
+	PseudoLexicalMinus annotation lexicalHyphen
 
 -- | An alias for the backslash character.
-data LexicalAsciiLambdaBase lexemeBackslash annotation fixpoint =
-	PseudoLexicalAsciiLambda annotation lexemeBackslash
+data LexicalAsciiLambdaBase lexicalBackslash annotation fixpoint =
+	PseudoLexicalAsciiLambda annotation lexicalBackslash
 
 -- Non-symbolic numeric literal prefix pseudo-lexical structures.
 
