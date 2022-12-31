@@ -358,8 +358,8 @@ import Prelude ()
 --
 -- There are 139 keys, so the sum should total 138.
 --
--- ‘lexicalTypeIndexer (LexicalEndOfParseKey z s)’ is expected to correspond to
--- the actual ‘lexicalEndOfParseKey’ type itself.
+-- ‘lexicalTypeIndexer (lexicalEndOfParseKey lexicalTypeIndexerKey z s)’ is
+-- expected to correspond to the actual ‘lexicalEndOfParseKey’ type itself.
 type LexicalEndOfParseKeyBase lexicalTypeIndexerKeyCons z s = lexicalTypeIndexerKeyCons (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s z)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))) z
 
 -- | A key to a lexical foundation type indexer to get the type for
