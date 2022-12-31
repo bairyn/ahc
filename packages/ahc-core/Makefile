@@ -767,6 +767,8 @@ $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base/ExclusionStructures$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
+$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/DefaultLinking$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
+
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Tests/Main$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Tests/Tests$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
 # Configuration for build-prevalidate-import-consistency.
