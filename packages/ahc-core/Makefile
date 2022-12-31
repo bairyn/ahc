@@ -628,6 +628,7 @@ _DIRECT_SRC_TREE_REL_DIRS = \
 _DIRECT_SRC_TREE_REL_LIB_SRCS = \
 	Language/Haskell2010/Ahc/Benchmark/Benchmark.hs \
 	Language/Haskell2010/Ahc/Data/Fixed.hs \
+	Language/Haskell2010/Ahc/Data/Proxy.hs \
 	Language/Haskell2010/Ahc/Frontends/CLI.hs \
 	Language/Haskell2010/Ahc/Meta/Ahc.hs \
 	Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST.hs \
@@ -759,6 +760,10 @@ $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Benchmark/Main$(_DIRECT_BU
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Main$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Frontends/CLI$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
+$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/DefaultLinking$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Data/Fixed$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
+
+$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/DefaultLinking$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Data/Proxy$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
+
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/DefaultLinking$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
@@ -826,7 +831,7 @@ $(BUILD_DIR)/prevalidate-import-consistency.stamp: $(_PREVALIDATE_IMPORT_CONSIST
 				local srcModSedSafe=\"\" $$n\
 				srcModSedSafe=\"\$$(printf -- '%s\\n' \"\$${srcMod}\" | sed -nEe 's/[^[:alnum:]]/\\\\&/g; p')\" $$n\
 				local srcImports=\"\" $$n\
-				srcImports=\"\$$(sed -nEe '/^(import\\s+(|qualified\\s+))((Language\\.Haskell2010\\.Ahc)([.[:alnum:]]*))(|\\s+(|as\\s+)(|\\(.*))\$$/{s//\\3/g; p; b;}; d' < \"\$${src}\" | sed -nEe 's/^/'\"\$${srcModSedSafe}\"' -> &/g; p')\" $$n\
+				srcImports=\"\$$(sed -nEe '/^(import\\s+(|qualified\\s+))((Language\\.Haskell2010\\.Ahc)([.[:alnum:]]*))(|\\s+(|as\\s+[.[:alnum:]]+)(|\\(.*))\$$/{s//\\3/g; p; b;}; d' < \"\$${src}\" | sed -nEe 's/^/'\"\$${srcModSedSafe}\"' -> &/g; p')\" $$n\
 				srcsImports=\"\$$(printf -- '%s\\n' \"\$${srcsImports}\" \"\$${srcImports}\")\" $$n\
 			done $$n\
 			srcsImports=\"\$$(printf -- '%s\\n' \"\$${srcsImports}\" | sort -h | uniq | sed -nEe '/./p; d')\" $$n\

@@ -93,6 +93,7 @@ common extended-components
 
 	other-modules:
 		Language.Haskell2010.Ahc.Data.Fixed
+		Language.Haskell2010.Ahc.Data.Proxy
 		Language.Haskell2010.Ahc.Meta.Ahc
 		Language.Haskell2010.Ahc.Frontends.CLI
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
@@ -107,6 +108,7 @@ library
 
 	exposed-modules:
 		Language.Haskell2010.Ahc.Data.Fixed
+		Language.Haskell2010.Ahc.Data.Proxy
 		Language.Haskell2010.Ahc.Meta.Ahc
 		Language.Haskell2010.Ahc.Frontends.CLI
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
