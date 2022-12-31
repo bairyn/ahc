@@ -196,7 +196,6 @@ _PREVALIDATE_VERSION_CONSISTENCY_DEPS = \
 # 	- `packages/ahc-core/CHANGELOG.md`
 # 	- `packages/ahc-core/ahc-core.cabal`
 # 	- `packages/ahc-core/src/Language/Haskell2010/Ahc/Meta/Ahc.hs`
-# TODO: timestamp, dependencies.
 .PHONY: build-prevalidate-version-consistency
 build-prevalidate-version-consistency: $(BUILD_DIR)/prevalidate-version-consistency.stamp
 $(BUILD_DIR)/prevalidate-version-consistency.stamp: $(_PREVALIDATE_VERSION_CONSISTENCY_DEPS) | build-dirs
