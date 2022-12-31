@@ -25,10 +25,12 @@
 -- provided similar to this one, that provides a default lexical foundation.)
 --
 -- The chosen pattern here chooses the following variables needed to complete
--- building up the module instantiations:
--- - lexicalAnnotation: all section 2 structures.
--- - grammarAnnotation: all section 3-5 structures.
--- - TODO: TODO update this part.
+-- building up the module instantiations; these may be used as needed by the
+-- definitions here, and the rest of the variables are instantiated:
+-- - k z s l           : 4 variables encode the type record 'LexicalFoundation'.
+-- - lexicalAnnotation : all non-top-level section 2 structures.
+-- - grammarAnnotation : all non-top-level section 3-5 structures.
+-- - annotation        : top-level annotation.
 --
 -- Finally, this module uses 'Language.Haskell2010.Ahc.Data.Fixed.Fixed' to
 -- wrap each structure to provide F-algebra style recursion.  (This is not
@@ -90,10 +92,10 @@ type LexicalFoundation k z s l typeValue = LexicalFoundationBase Proxy.Proxy Lex
 
 -- Non-symbolic numeric literal prefix pseudo-lexical structures.
 
--- | TODO
-newtype Lexical0XF k z s l lexicalAnnotation fixpoint = MkLexical0XF { _unLexical0XF :: (Lexical0XBase (l (Lexical0KeyBase k z s)) (l (LexicalXKeyBase k z s)) lexicalAnnotation fixpoint) }
--- | TODO
-type Lexical0x k z s l lexicalAnnotation = Fixed.Fix (Lexical0XF k z s l lexicalAnnotation)
+-- | 'Lexical0XBase' with fewer unresolved variables, with default linking.
+newtype Lexical0XF k z s l annotation fixpoint = MkLexical0XF { _unLexical0XF :: (Lexical0XBase (l (Lexical0KeyBase k z s)) (l (LexicalXKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'Lexical0XF'
+type Lexical0x k z s l annotation = Fixed.Fix (Lexical0XF k z s l annotation)
 
 -- TODO
 
