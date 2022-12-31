@@ -97,6 +97,7 @@ common extended-components
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStructures
+		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.LexicalFoundation
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStructures
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking
 
@@ -109,6 +110,7 @@ library
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStructures
+		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.LexicalFoundation
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStructures
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking
 
