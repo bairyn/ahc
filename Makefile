@@ -34,7 +34,7 @@ help:
 	@printf '%s\n' "	help              : Show this help text."
 	@printf '%s\n' "	clean             : Clean."
 	@printf '%s\n' "	build             : Run a full build."
-	@printf '%s\n' "	build-prevalidate : Prevalidation."
+	@printf '%s\n' "	build-prevalidate : Prevalidation (just top-level prevalidation)."
 	@printf '%s\n' ""
 	@printf '%s\n' "Useful configuration:"
 	@printf '%s\n' "	BUILD_DIR=…            :"

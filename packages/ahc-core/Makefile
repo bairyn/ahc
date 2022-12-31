@@ -35,7 +35,7 @@ help:
 	@printf '%s\n' "	help              : Show this help text."
 	@printf '%s\n' "	clean             : Clean."
 	@printf '%s\n' "	build             : Run a full build."
-	@printf '%s\n' "	build-prevalidate : Prevalidation."
+	@printf '%s\n' "	build-prevalidate : Prevalidation (just top-level prevalidation)."
 	@printf '%s\n' ""
 	@printf '%s\n' "Useful configuration:"
 	@printf '%s\n' "	BUILD_DIR=…            :"
@@ -147,7 +147,24 @@ build-ahc-minimal: $(BUILD_DIR)/ahc-minimal | build-dirs
 
 # Prevalidation.
 .PHONY: build-prevalidate
-build-prevalidate:
+build-prevalidate: build-prevalidate-import-consistency
+
+# Configuration for ‘build-prevalidate’
+DEBUG_SHOW_PREVALIDATOR_SCRIPTS ?= 0
+
+# Configuration for ‘build-prevalidate-version-consistency’.
+BASH ?= bash
+
+# Use ‘bash -c’ or ‘echo -nE’?
+_CMD_BUILD_PREV_SHOW   = $(_CMD_BUILD_PREV_SHOW_$(DEBUG_SHOW_PREVALIDATOR_SCRIPTS))
+_CMD_BUILD_PREV_SHOW_0 = bash -c
+_CMD_BUILD_PREV_SHOW_  = $(_CMD_BUILD_PREV_SHOW_0)
+_CMD_BUILD_PREV_SHOW_1 = echo -nE
+
+_PREVALIDATE_IMPORT_CONSISTENCY_DEPS = \
+	$(_DIRECT_BUILD_SRCS) \
+ \
+	$(EMPTY)
 
 # ################################################################
 # Main build section.
@@ -727,21 +744,13 @@ $(BUILD_DIR)/direct-builddir/$(_DIRECT_BUILD_MAIN): $(_DIRECT_BUILD_LIB_OBJS) $(
 	$(HC_STAGE0_LINK) $(HC_STAGE0_LINK_FLAGS) $(HC_STAGE0_LINK_OUT_PREFIX_FLAGS) "$@" $(HC_STAGE0_LINK_OUT_SUFFIX_FLAGS) $(HC_STAGE0_LINK_IN_PREFIX_FLAGS) $^ $(HC_STAGE0_LINK_IN_SUFFIX_FLAGS) $(HC_STAGE0_LINK_DEPIN_PREFIX_FLAGS) $(HC_STAGE0_LINK_DEPIN_SUFFIX_FLAGS)
 
 # ################################################################
-# Manual dependency declarations.
+# Manual dependency declarations (import statements).
 # ################################################################
 
 # Since we support building by hand, we must be aware of dependencies made
 # though ‘import’ statements.  For each intra-package import, we must add a
 # dependency rule in this section of the form: 
 # 	$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/…Importer…$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/…Imported…$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
-
-# TODO: prevalidate consistency:
-# 	% grep -E -nre '^import\s*(|qualified)\s*Language.Haskell2010.Ahc'
-# 	Syntax/Haskell2010/Simple/AST/Base.hs:23:import Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStructures
-# 	Syntax/Haskell2010/Simple/AST/Base.hs:24:import Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStructures
-# 	Tests/Main.hs:17:import qualified Language.Haskell2010.Ahc.Tests.Tests (main)
-# 	Benchmark/Main.hs:17:import qualified Language.Haskell2010.Ahc.Benchmark.Benchmark (main)
-# 	Main.hs:14:import qualified Language.Haskell2010.Ahc.Frontends.CLI (main)
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base/RegularStructures$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
@@ -751,7 +760,131 @@ $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Tests/Main$(_DIRECT_BUILD_
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Benchmark/Main$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Benchmark/Benchmark$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
-$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Main$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Frontends/Cli$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
+$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Main$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Frontends/CLI$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
+
+# Configuration for build-prevalidate-import-consistency.
+PREVALIDATOR_ENABLE_IMPORT_CONSISTENCY ?= $(DEFAULT_PREVALIDATOR_ENABLE_IMPORT_CONSISTENCY)
+
+DEFAULT_PREVALIDATOR_ENABLE_IMPORT_CONSISTENCY = 1
+
+_PREVALIDATOR_IMPORT_CONSISTENCY_TARGETS   = $(_PREVALIDATOR_IMPORT_CONSISTENCY_TARGETS_$(PREVALIDATOR_ENABLE_IMPORT_CONSISTENCY))
+_PREVALIDATOR_IMPORT_CONSISTENCY_TARGETS_  = _PREVALIDATOR_IMPORT_CONSISTENCY_TARGETS_0
+_PREVALIDATOR_IMPORT_CONSISTENCY_TARGETS_0 =
+_PREVALIDATOR_IMPORT_CONSISTENCY_TARGETS_1 = $(BUILD_DIR)/prevalidate-import-consistency.stamp
+
+# Fail if we detect an intra-package import that we don't list in our Makefile
+# or visa versa.  This prevalidator assumes that there are multiple
+# intra-package imports and source files.
+.PHONY: build-prevalidate-import-consistency
+build-prevalidate-import-consistency: $(_PREVALIDATOR_IMPORT_CONSISTENCY_TARGETS)
+$(BUILD_DIR)/prevalidate-import-consistency.stamp: $(_PREVALIDATE_IMPORT_CONSISTENCY_DEPS) | build-dirs
+	@# Print our script, then pipe it to run it.
+	@n=$$'\n' && printf -- '%s\n' " $$n\
+		#!/usr/bin/env bash $$n\
+		set -ueE -o pipefail $$n\
+		trap 'echo \"An error (code \$$?) occurred on line \$${LINENO:-} from ‘\$${BASH_SOURCE[0]:-}’; aborting…\" 1>&2' ERR $$n\
+ $$n\
+		main() { $$n\
+			# First collect all source imports. $$n\
+			# Make a variable holding lines like: $$n\
+			# 	Language/Haskell/2010/Ahc/Syntax/Haskell2010/Simple/Ast/Base <- Language/Haskell/2010/Ahc/Syntax/Haskell2010/Simple/Ast/Base/RegularStructures $$n\
+			# 	Language/Haskell/2010/Ahc/Syntax/Haskell2010/Simple/Ast/Base <- Language/Haskell/2010/Ahc/Syntax/Haskell2010/Simple/Ast/Base/ExclusionStructures $$n\
+			# 	Language/Haskell/2010/Ahc/Syntax/Haskell2010/Tests/Main <- Language/Haskell/2010/Ahc/Syntax/Haskell2010/Tests/Tests $$n\
+			# 	… $$n\
+			local srcs=\"\" $$n\
+			srcs=\"\$$(find './src/Language/Haskell2010/Ahc' -regextype egrep -iname '*.hs' -type f -regex '^(|(|\\.\\/)src\\/Language\\/Haskell2010\\/Ahc\\/)([[:alnum:]]+\\/)*([[:alnum:]]+)(\\.hs)\$$')\" $$n\
+ $$n\
+			# (Make sure we haven't found <= 1 files.) $$n\
+			local numSrcsIfNonempty=\"\" $$n\
+			numSrcsIfNonempty=\"\$$(printf -- '%s\\n' \"\$${srcs}\" | wc -l)\" $$n\
+			if [[ \"\$${numSrcsIfNonempty}\" -le \"1\" ]]; then $$n\
+				printf -- '%s\\n' \"Error: build-prevalidate-import-consistency: internal error: we failed to find source files, as we only detected a count <= 1.\" 1>&2 $$n\
+				printf -- '%s\\n' \"	srcs              : \$$srcs\" 1>&2 $$n\
+				printf -- '%s\\n' \"	numSrcsIfNonempty : \$$numSrcsIfNonempty\" 1>&2 $$n\
+				# Skip the default error printer, since we already $$n\
+				# printed one. $$n\
+				exec false $$n\
+			fi $$n\
+ $$n\
+			# Scan for intra-package imports. $$n\
+			local srcsImports=\"\" $$n\
+			srcsImports=\"\" $$n\
+			for src in \$$srcs; do $$n\
+				local srcMod=\"\" $$n\
+				srcMod=\"\$$(printf -- '%s\\n' \"\$${src}\" | sed -nEe 's/\\.hs\$$//g; s@^(|\\./)(|src/)@@g; s@/@.@g; p; d')\" $$n\
+				local srcModSedSafe=\"\" $$n\
+				srcModSedSafe=\"\$$(printf -- '%s\\n' \"\$${srcMod}\" | sed -nEe 's/[^[:alnum:]]/\\\\&/g; p')\" $$n\
+				local srcImports=\"\" $$n\
+				srcImports=\"\$$(sed -nEe '/^(import\\s+(|qualified\\s+))((Language\\.Haskell2010\\.Ahc)([.[:alnum:]]*))(|\\s+(|as\\s+)(|\\(.*))\$$/{s//\\3/g; p; b;}; d' < \"\$${src}\" | sed -nEe 's/^/'\"\$${srcModSedSafe}\"' -> &/g; p')\" $$n\
+				srcsImports=\"\$$(printf -- '%s\\n' \"\$${srcsImports}\" \"\$${srcImports}\")\" $$n\
+			done $$n\
+			srcsImports=\"\$$(printf -- '%s\\n' \"\$${srcsImports}\" | sort -h | uniq | sed -nEe '/./p; d')\" $$n\
+ $$n\
+			# (Make sure we haven't found <= 1 imports.) $$n\
+			local numSrcsImportsIfNonempty=\"\" $$n\
+			numSrcsImportsIfNonempty=\"\$$(printf -- '%s\\n' \"\$${srcsImports}\" | wc -l)\" $$n\
+			if [[ \"\$${numSrcsImportsIfNonempty}\" -le \"1\" ]]; then $$n\
+				printf -- '%s\\n' \"Error: build-prevalidate-import-consistency: internal error: we failed to find source imports, as we only detected a count <= 1.\" 1>&2 $$n\
+				printf -- '%s\\n' \"	srcsImports              : \$$srcsImports\" 1>&2 $$n\
+				printf -- '%s\\n' \"	numSrcsImportsIfNonempty : \$$numSrcsImportsIfNonempty\" 1>&2 $$n\
+				# Skip the default error printer, since we already $$n\
+				# printed one. $$n\
+				exec false $$n\
+			fi $$n\
+ $$n\
+			# For debugging. $$n\
+			if false; then $$n\
+				printf -- '%s\\n' \"Found intra-package imports:\" \"\$${srcsImports}\" 1>&2 $$n\
+			fi $$n\
+ $$n\
+			# Scan our own Makefile import declarations for dependencies. $$n\
+			local makefileImports=\"\" $$n\
+			makefileImports=\"\" $$n\
+			makefileImports=\"\$$(sed -nEe '/^(\\\$$\\(BUILD_DIR\\)\\/direct-builddir\\/)(Language\\/Haskell2010\\/Ahc\\/)((([/[:alnum:]])+)([[:alnum:]]+))(\\\$$\\(_DIRECT_BUILD_ART_SUFF\\):\\s*\\\$$\\(BUILD_DIR\\)\\/direct-builddir\\/)(Language\\/Haskell2010\\/Ahc\\/)((([/[:alnum:]])+)([[:alnum:]]+))\\\$$\\(_DIRECT_BUILD_ART_SUFF\\)(|\\s+.*)\$$/{s//\\2\\3.hs -> \\8\\9.hs/g; s/\\.hs//g; s@/@.@g; p; b; }; d' < \"./Makefile\")\" $$n\
+			makefileImports=\"\$$(printf -- '%s\\n' \"\$${makefileImports}\" | sort -h | uniq | sed -nEe '/./p; d')\" $$n\
+ $$n\
+			# For debugging. $$n\
+			if false; then $$n\
+				printf -- '%s\\n' \"Found Makefile imports:\" \"\$${makefileImports}\" 1>&2 $$n\
+			fi $$n\
+ $$n\
+			# (Make sure we haven't found <= 1 makefile imports.) $$n\
+			local numMakefileImportsIfNonempty=\"\" $$n\
+			numMakefileImportsIfNonempty=\"\$$(printf -- '%s\\n' \"\$${makefileImports}\" | wc -l)\" $$n\
+			if [[ \"\$${numMakefileImportsIfNonempty}\" -le \"1\" ]]; then $$n\
+				printf -- '%s\\n' \"Error: build-prevalidate-import-consistency: internal error: we failed to find makefile imports, as we only detected a count <= 1.\" 1>&2 $$n\
+				printf -- '%s\\n' \"	makefileImports              : \$$makefileImports\" 1>&2 $$n\
+				printf -- '%s\\n' \"	numMakefileImportsIfNonempty : \$$numMakefileImportsIfNonempty\" 1>&2 $$n\
+				# Skip the default error printer, since we already $$n\
+				# printed one. $$n\
+				exec false $$n\
+			fi $$n\
+ $$n\
+			# (Make sure the graphs match.) $$n\
+			if [[ \"\$${makefileImports}\" != \"\$${srcsImports}\" ]]; then $$n\
+				printf -- '%s\\n' \"Error: build-prevalidate-import-consistency: error: we detected Makefile's known intra-package imports is not equivalent to the source file intra-package imports.\" 1>&2 $$n\
+				printf -- '%s\\n' \"	Please make sure the Makefile's ‘Manual dependency declarations (import statements)’\" 1>&2 $$n\
+				printf -- '%s\\n' \"	section is up-to-date with the source's intra-package import statements.’\" 1>&2 $$n\
+				printf -- '%s\\n' \"\" 1>&2 $$n\
+				if false; then $$n\
+					printf -- '%s\\n' \"	makefileImports : \$$makefileImports\" 1>&2 $$n\
+					printf -- '%s\\n' \"	srcsImports     : \$$srcsImports\" 1>&2 $$n\
+					printf -- '%s\\n' \"\" 1>&2 $$n\
+				fi $$n\
+				printf -- '%s\\n' \"	Printing diff, actual to expected (makefile to srcs)…\" 1>&2 $$n\
+				diff -u --color=always <(printf -- '%s\\n' \"\$${makefileImports}\") <(printf -- '%s\\n' \"\$${srcsImports}\") $$n\
+				# Skip the default error printer, since we already $$n\
+				# printed one. $$n\
+				exec false $$n\
+			fi $$n\
+ $$n\
+			: \"Passed version consistency check.  (No output.)\" $$n\
+		} $$n$$n\
+ $$n\
+		main \"\$$@\" $$n\
+	" | sed -nEe 's@^\t@@g; 1b; $$b; p' | xargs --null -- $(_CMD_BUILD_PREV_SHOW)
+
+	touch -- "$@"
 
 # ################################################################
 # Multi-stage configuration.
