@@ -28,7 +28,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStru
 
 	-- ** § 2.4 Identifiers and Operators types.
 
-	-- *** § Exclusion structures types.
+	-- *** Exclusion structures types.
 	-- | In contrast with the rest of this module group, this section much less
 	-- dense in that more details and complexity is used to encode the simple
 	-- idea of keyword exclusion, which is what this section is all about.  (An
