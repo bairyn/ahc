@@ -249,8 +249,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	StringBase(StringLiteralString),
 	StringLiteralInnerUnitBase(StringLiteralInnerGraphic, StringLiteralInnerSpace, StringLiteralInnerEscape, StringLiteralInnerGap),
 	EscapeBase(EscapedChar),
+	EscapeSansBackslashAndAmpersandBase(EscapedCharSansBackslashAndAmpersand),
 	EscapeInnerBase(EscapedCharEsc, EscapedAscii, EscapedDecimal, EscapedOctal, EscapedHexadecimal),
+	EscapeInnerSansAmpersandBase(EscapedCharEscSansAmpersand, EscapedAsciiSansAmpersand, EscapedDecimalSansAmpersand, EscapedOctalSansAmpersand, EscapedHexadecimalSansAmpersand),
 	CharEscBase(EscapedA, EscapedB, EscapedF, EscapedN, EscapedR, EscapedT, EscapedV, EscapedBackslash, EscapedDoubleQuote, EscapedSingleQuote, EscapedAmpersand),
+	CharEscSansAmpersandBase(EscapedASansAmpersand, EscapedBSansAmpersand, EscapedFSansAmpersand, EscapedNSansAmpersand, EscapedRSansAmpersand, EscapedTSansAmpersand, EscapedVSansAmpersand, EscapedBackslashSansAmpersand, EscapedDoubleQuoteSansAmpersand, EscapedSingleQuoteSansAmpersand),
 	AsciiBase(AsciiControl, AsciiNull, AsciiStartOfHeading, AsciiStartOfText, AsciiEndOfText, AsciiEndOfTransmission, AsciiEnquiry, AsciiAcknowledgement, AsciiBell, AsciiBackspace, AsciiHorizontalTab, AsciiLineFeed, AsciiVerticalTab, AsciiFormFeed, AsciiCarriageReturn, AsciiShiftOut, AsciiShiftIn, AsciiDataLinkEscape, AsciiDeviceControl1XON, AsciiDeviceControl2, AsciiDeviceControl3XOFF, AsciiDeviceControl4, AsciiNegativeAcknowledgement, AsciiSynchronousIdle, AsciiEndOfTransmissionBlock, AsciiCancel, AsciiEndOfMedium, AsciiSubstitute, AsciiEscape, AsciiFileSeparator, AsciiGroupSeparator, AsciiRecordSeparator, AsciiUnitSeparator, AsciiSpace, AsciiDelete),
 	CntrlBase(AsciiControlAscLarge, AsciiControlAt, AsciiControlLeftBracket, AsciiControlBackslash, AsciiControlRightBracket, AsciiControlCaret, AsciiControlUnderscore),
 	GapBase(WhitespaceGap),
@@ -1661,6 +1664,10 @@ data StringLiteralInnerUnitBase graphicSansDoubleQuoteOrBackslash space escape g
 data EscapeBase lexicalBackslash escapeInner annotation fixpoint =
 	EscapedChar annotation lexicalBackslash escapeInner
 
+-- | 'EscapeBase' excluding ‘\&’.
+data EscapeSansBackslashAndAmpersandBase lexicalBackslash escapeInnerSansAmpersand annotation fixpoint =
+	EscapedCharSansBackslashAndAmpersand annotation lexicalBackslash escapeInnerSansAmpersand
+
 -- | An escaped character after the backslash prefix.
 data EscapeInnerBase charEsc ascii decimal lexicalOLower octal lexicalXLower hexadecimal annotation fixpoint =
 	  EscapedCharEsc     annotation charEsc
@@ -1668,6 +1675,14 @@ data EscapeInnerBase charEsc ascii decimal lexicalOLower octal lexicalXLower hex
 	| EscapedDecimal     annotation decimal
 	| EscapedOctal       annotation lexicalOLower octal
 	| EscapedHexadecimal annotation lexicalXLower hexadecimal
+
+-- | 'EscapeInnerBase' excluding ‘&’ (after the ‘\’).
+data EscapeInnerSansAmpersandBase charEscSansAmpersand ascii decimal lexicalOLower octal lexicalXLower hexadecimal annotation fixpoint =
+	  EscapedCharEscSansAmpersand     annotation charEscSansAmpersand
+	| EscapedAsciiSansAmpersand       annotation ascii
+	| EscapedDecimalSansAmpersand     annotation decimal
+	| EscapedOctalSansAmpersand       annotation lexicalOLower octal
+	| EscapedHexadecimalSansAmpersand annotation lexicalXLower hexadecimal
 
 -- | A character that is denoted to have special meaning when escaped.
 data CharEscBase lexicalALower lexicalBLower lexicalFLower lexicalNLower lexicalRLower lexicalTLower lexicalVLower lexicalBackslash lexicalDoubleQuote lexicalSingleQuote lexicalAmpersand annotation fixpoint =
@@ -1682,6 +1697,20 @@ data CharEscBase lexicalALower lexicalBLower lexicalFLower lexicalNLower lexical
 	| EscapedDoubleQuote lexicalDoubleQuote
 	| EscapedSingleQuote lexicalSingleQuote
 	| EscapedAmpersand   lexicalAmpersand
+
+-- | A character that is denoted to have special meaning when escaped,
+-- excluding ‘&’.
+data CharEscSansAmpersandBase lexicalALower lexicalBLower lexicalFLower lexicalNLower lexicalRLower lexicalTLower lexicalVLower lexicalBackslash lexicalDoubleQuote lexicalSingleQuote annotation fixpoint =
+	  EscapedASansAmpersand           lexicalALower
+	| EscapedBSansAmpersand           lexicalBLower
+	| EscapedFSansAmpersand           lexicalFLower
+	| EscapedNSansAmpersand           lexicalNLower
+	| EscapedRSansAmpersand           lexicalRLower
+	| EscapedTSansAmpersand           lexicalTLower
+	| EscapedVSansAmpersand           lexicalVLower
+	| EscapedBackslashSansAmpersand   lexicalBackslash
+	| EscapedDoubleQuoteSansAmpersand lexicalDoubleQuote
+	| EscapedSingleQuoteSansAmpersand lexicalSingleQuote
 
 -- | An ASCII control character.
 data AsciiBase lexicalCaret cntrl lexicalNUL lexicalSOH lexicalSTX lexicalETX lexicalEOT lexicalENQ lexicalACK lexicalBEL lexicalBS lexicalHT lexicalLF lexicalVT lexicalFF lexicalCR lexicalSO lexicalSI lexicalDLE lexicalDC1 lexicalDC2 lexicalDC3 lexicalDC4 lexicalNAK lexicalSYN lexicalETB lexicalCAN lexicalEM lexicalSUB lexicalESC lexicalFS lexicalGS lexicalRS lexicalUS lexicalSpace lexicalDEL annotation fixpoint =

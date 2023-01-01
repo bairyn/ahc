@@ -235,10 +235,16 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	StringLiteralInnerUnit,
 	EscapeF(MkEscapeF, _unEscapeF),
 	Escape,
+	EscapeSansBackslashAndAmpersandF(MkEscapeSansBackslashAndAmpersandF, _unEscapeSansBackslashAndAmpersandF),
+	EscapeSansBackslashAndAmpersand,
 	EscapeInnerF(MkEscapeInnerF, _unEscapeInnerF),
 	EscapeInner,
+	EscapeInnerSansAmpersandF(MkEscapeInnerSansAmpersandF, _unEscapeInnerSansAmpersandF),
+	EscapeInnerSansAmpersand,
 	CharEscF(MkCharEscF, _unCharEscF),
 	CharEsc,
+	CharEscSansAmpersandF(MkCharEscSansAmpersandF, _unCharEscSansAmpersandF),
+	CharEscSansAmpersand,
 	AsciiF(MkAsciiF, _unAsciiF),
 	Ascii,
 	CntrlF(MkCntrlF, _unCntrlF),
@@ -1116,14 +1122,26 @@ type StringLiteralInnerUnit k z s l lexicalAnnotation annotation = Fixed.Fix (St
 newtype EscapeF k z s l lexicalAnnotation annotation fixpoint = MkEscapeF { _unEscapeF :: (EscapeBase (l (LexicalBackslashKeyBase k z s)) (EscapeInner k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'EscapeF'
 type Escape k z s l lexicalAnnotation annotation = Fixed.Fix (EscapeF k z s l lexicalAnnotation annotation)
+-- | 'EscapeSansBackslashAndAmpersandBase' with fewer unresolved variables, with default linking.
+newtype EscapeSansBackslashAndAmpersandF k z s l lexicalAnnotation annotation fixpoint = MkEscapeSansBackslashAndAmpersandF { _unEscapeSansBackslashAndAmpersandF :: (EscapeSansBackslashAndAmpersandBase (l (LexicalBackslashKeyBase k z s)) (EscapeInnerSansAmpersand k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'EscapeSansBackslashAndAmpersandF'
+type EscapeSansBackslashAndAmpersand k z s l lexicalAnnotation annotation = Fixed.Fix (EscapeSansBackslashAndAmpersandF k z s l lexicalAnnotation annotation)
 -- | 'EscapeInnerBase' with fewer unresolved variables, with default linking.
 newtype EscapeInnerF k z s l lexicalAnnotation annotation fixpoint = MkEscapeInnerF { _unEscapeInnerF :: (EscapeInnerBase (CharEsc k z s l lexicalAnnotation lexicalAnnotation) (Ascii k z s l lexicalAnnotation lexicalAnnotation) (Decimal k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalOLowerKeyBase k z s)) (Octal k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalXLowerKeyBase k z s)) (Hexadecimal k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'EscapeInnerF'
 type EscapeInner k z s l lexicalAnnotation annotation = Fixed.Fix (EscapeInnerF k z s l lexicalAnnotation annotation)
+-- | 'EscapeInnerSansAmpersandBase' with fewer unresolved variables, with default linking.
+newtype EscapeInnerSansAmpersandF k z s l lexicalAnnotation annotation fixpoint = MkEscapeInnerSansAmpersandF { _unEscapeInnerSansAmpersandF :: (EscapeInnerSansAmpersandBase (CharEscSansAmpersand k z s l lexicalAnnotation lexicalAnnotation) (Ascii k z s l lexicalAnnotation lexicalAnnotation) (Decimal k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalOLowerKeyBase k z s)) (Octal k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalXLowerKeyBase k z s)) (Hexadecimal k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'EscapeInnerSansAmpersandF'
+type EscapeInnerSansAmpersand k z s l lexicalAnnotation annotation = Fixed.Fix (EscapeInnerSansAmpersandF k z s l lexicalAnnotation annotation)
 -- | 'CharEscBase' with fewer unresolved variables, with default linking.
 newtype CharEscF k z s l lexicalAnnotation annotation fixpoint = MkCharEscF { _unCharEscF :: (CharEscBase (l (LexicalALowerKeyBase k z s)) (l (LexicalBLowerKeyBase k z s)) (l (LexicalFLowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalVLowerKeyBase k z s)) (l (LexicalBackslashKeyBase k z s)) (l (LexicalDoubleQuoteKeyBase k z s)) (l (LexicalSingleQuoteKeyBase k z s)) (l (LexicalAmpersandKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'CharEscF'
 type CharEsc k z s l lexicalAnnotation annotation = Fixed.Fix (CharEscF k z s l lexicalAnnotation annotation)
+-- | 'CharEscSansAmpersandBase' with fewer unresolved variables, with default linking.
+newtype CharEscSansAmpersandF k z s l lexicalAnnotation annotation fixpoint = MkCharEscSansAmpersandF { _unCharEscSansAmpersandF :: (CharEscSansAmpersandBase (l (LexicalALowerKeyBase k z s)) (l (LexicalBLowerKeyBase k z s)) (l (LexicalFLowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalVLowerKeyBase k z s)) (l (LexicalBackslashKeyBase k z s)) (l (LexicalDoubleQuoteKeyBase k z s)) (l (LexicalSingleQuoteKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'CharEscSansAmpersandF'
+type CharEscSansAmpersand k z s l lexicalAnnotation annotation = Fixed.Fix (CharEscSansAmpersandF k z s l lexicalAnnotation annotation)
 -- | 'AsciiBase' with fewer unresolved variables, with default linking.
 newtype AsciiF k z s l lexicalAnnotation annotation fixpoint = MkAsciiF { _unAsciiF :: (AsciiBase (l (LexicalCaretKeyBase k z s)) (Cntrl k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalNULKeyBase k z s)) (l (LexicalSOHKeyBase k z s)) (l (LexicalSTXKeyBase k z s)) (l (LexicalETXKeyBase k z s)) (l (LexicalEOTKeyBase k z s)) (l (LexicalENQKeyBase k z s)) (l (LexicalACKKeyBase k z s)) (l (LexicalBELKeyBase k z s)) (l (LexicalBSKeyBase k z s)) (l (LexicalHTKeyBase k z s)) (l (LexicalLFKeyBase k z s)) (l (LexicalVTKeyBase k z s)) (l (LexicalFFKeyBase k z s)) (l (LexicalCRKeyBase k z s)) (l (LexicalSOKeyBase k z s)) (l (LexicalSIKeyBase k z s)) (l (LexicalDLEKeyBase k z s)) (l (LexicalDC1KeyBase k z s)) (l (LexicalDC2KeyBase k z s)) (l (LexicalDC3KeyBase k z s)) (l (LexicalDC4KeyBase k z s)) (l (LexicalNAKKeyBase k z s)) (l (LexicalSYNKeyBase k z s)) (l (LexicalETBKeyBase k z s)) (l (LexicalCANKeyBase k z s)) (l (LexicalEMKeyBase k z s)) (l (LexicalSUBKeyBase k z s)) (l (LexicalESCKeyBase k z s)) (l (LexicalFSKeyBase k z s)) (l (LexicalGSKeyBase k z s)) (l (LexicalRSKeyBase k z s)) (l (LexicalUSKeyBase k z s)) (LexicalSpace k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDELKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'AsciiF'
