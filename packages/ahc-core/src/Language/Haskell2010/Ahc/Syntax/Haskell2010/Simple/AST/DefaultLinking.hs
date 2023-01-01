@@ -107,12 +107,16 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	BigAnySansNc,
 	AnyF(MkAnyF, _unAnyF),
 	Any,
+	AnySansSymbolF(MkAnySansSymbolF, _unAnySansSymbolF),
+	AnySansSymbol,
 	GraphicF(MkGraphicF, _unGraphicF),
 	Graphic,
 	GraphicSansSingleQuoteOrBackslashF(MkGraphicSansSingleQuoteOrBackslashF, _unGraphicSansSingleQuoteOrBackslashF),
 	GraphicSansSingleQuoteOrBackslash,
 	GraphicSansDoubleQuoteOrBackslashF(MkGraphicSansDoubleQuoteOrBackslashF, _unGraphicSansDoubleQuoteOrBackslashF),
 	GraphicSansDoubleQuoteOrBackslash,
+	GraphicSansSymbolF(MkGraphicSansSymbolF, _unGraphicSansSymbolF),
+	GraphicSansSymbol,
 	GraphicSansNcF(MkGraphicSansNcF, _unGraphicSansNcF),
 	GraphicSansNc,
 
@@ -881,6 +885,10 @@ type BigAnySansNc k z s l lexicalAnnotation annotation = Fixed.Fix (BigAnySansNc
 newtype AnyF k z s l lexicalAnnotation annotation fixpoint = MkAnyF { _unAnyF :: (AnyBase (Graphic k z s l lexicalAnnotation lexicalAnnotation) (Space k z s l lexicalAnnotation lexicalAnnotation) (Tab k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'AnyF'
 type Any k z s l lexicalAnnotation annotation = Fixed.Fix (AnyF k z s l lexicalAnnotation annotation)
+-- | 'AnySansSymbolBase' with fewer unresolved variables, with default linking.
+newtype AnySansSymbolF k z s l lexicalAnnotation annotation fixpoint = MkAnySansSymbolF { _unAnySansSymbolF :: (AnySansSymbolBase (GraphicSansSymbol k z s l lexicalAnnotation lexicalAnnotation) (Space k z s l lexicalAnnotation lexicalAnnotation) (Tab k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'AnySansSymbolF'
+type AnySansSymbol k z s l lexicalAnnotation annotation = Fixed.Fix (AnySansSymbolF k z s l lexicalAnnotation annotation)
 -- | 'GraphicBase' with fewer unresolved variables, with default linking.
 newtype GraphicF k z s l lexicalAnnotation annotation fixpoint = MkGraphicF { _unGraphicF :: (GraphicBase (Small k z s l lexicalAnnotation lexicalAnnotation) (Large k z s l lexicalAnnotation lexicalAnnotation) (Symbol k z s l lexicalAnnotation lexicalAnnotation) (Digit k z s l lexicalAnnotation lexicalAnnotation) (Special k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDoubleQuoteKeyBase k z s)) (l (LexicalSingleQuoteKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'GraphicF'
@@ -893,6 +901,11 @@ type GraphicSansSingleQuoteOrBackslash k z s l lexicalAnnotation annotation = Fi
 newtype GraphicSansDoubleQuoteOrBackslashF k z s l lexicalAnnotation annotation fixpoint = MkGraphicSansDoubleQuoteOrBackslashF { _unGraphicSansDoubleQuoteOrBackslashF :: (GraphicSansDoubleQuoteOrBackslashBase (Small k z s l lexicalAnnotation lexicalAnnotation) (Large k z s l lexicalAnnotation lexicalAnnotation) (SymbolSansBackslash k z s l lexicalAnnotation lexicalAnnotation) (Digit k z s l lexicalAnnotation lexicalAnnotation) (Special k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalSingleQuoteKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'GraphicSansDoubleQuoteOrBackslashF'
 type GraphicSansDoubleQuoteOrBackslash k z s l lexicalAnnotation annotation = Fixed.Fix (GraphicSansDoubleQuoteOrBackslashF k z s l lexicalAnnotation annotation)
+-- | 'GraphicSansSymbolBase' with fewer unresolved variables, with default linking.
+newtype GraphicSansSymbolF k z s l lexicalAnnotation annotation fixpoint = MkGraphicSansSymbolF { _unGraphicSansSymbolF :: (GraphicSansSymbolBase (Small k z s l lexicalAnnotation lexicalAnnotation) (Large k z s l lexicalAnnotation lexicalAnnotation) (Digit k z s l lexicalAnnotation lexicalAnnotation) (Special k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDoubleQuoteKeyBase k z s)) (l (LexicalSingleQuoteKeyBase k z s)) annotation fixpoint) }
+-- ^^^ TODO update?
+-- | Fixpoint applied to 'GraphicSansSymbolF'
+type GraphicSansSymbol k z s l lexicalAnnotation annotation = Fixed.Fix (GraphicSansSymbolF k z s l lexicalAnnotation annotation)
 -- | 'GraphicSansNcBase' with fewer unresolved variables, with default linking.
 newtype GraphicSansNcF k z s l lexicalAnnotation annotation fixpoint = MkGraphicSansNcF { _unGraphicSansNcF :: (GraphicSansNcBase (Small k z s l lexicalAnnotation lexicalAnnotation) (Large k z s l lexicalAnnotation lexicalAnnotation) (SymbolSansNc k z s l lexicalAnnotation lexicalAnnotation) (Digit k z s l lexicalAnnotation lexicalAnnotation) (SpecialSansNc k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDoubleQuoteKeyBase k z s)) (l (LexicalSingleQuoteKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'GraphicSansNcF'

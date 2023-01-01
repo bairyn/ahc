@@ -176,9 +176,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	BigAnyBase(GraphicBigAny, WhitecharBigAny),
 	BigAnySansNcBase(GraphicBigAnySansNc, WhitecharBigAnySansNc),
 	AnyBase(GraphicAny, SpaceAny, TabAny),
+	AnySansSymbolBase(GraphicAnySansSymbol, SpaceAnySansSymbol, TabAnySansSymbol),
 	GraphicBase(SmallGraphic, LargeGraphic, SymbolGraphic, DigitGraphic, SpecialGraphic, DoubleQuoteGraphic, SingleQuoteGraphic),
 	GraphicSansSingleQuoteOrBackslashBase(SmallGraphicSansSingleQuoteOrBackslash, LargeGraphicSansSingleQuoteOrBackslash, SymbolGraphicSansSingleQuoteOrBackslash, DigitGraphicSansSingleQuoteOrBackslash, SpecialGraphicSansSingleQuoteOrBackslash, DoubleQuoteGraphicSansSingleQuoteOrBackslash),
 	GraphicSansDoubleQuoteOrBackslashBase(SmallGraphicSansDoubleQuoteOrBackslash, LargeGraphicSansDoubleQuoteOrBackslash, SymbolGraphicSansDoubleQuoteOrBackslash, DigitGraphicSansDoubleQuoteOrBackslash, SpecialGraphicSansDoubleQuoteOrBackslash, SingleQuoteGraphicSansDoubleQuoteOrBackslash),
+	GraphicSansSymbolBase(SmallGraphicSansSymbol, LargeGraphicSansSymbol, DigitGraphicSansSymbol, SpecialGraphicSansSymbol, DoubleQuoteGraphicSansSymbol, SingleQuoteGraphicSansSymbol),
 	GraphicSansNcBase(SmallGraphicSansNc, LargeGraphicSansNc, SymbolGraphicSansNc, DigitGraphicSansNc, SpecialGraphicSansNc, DoubleQuoteGraphicSansNc, SingleQuoteGraphicSansNc),
 
 	SmallBase(AsciiSmall, UnicodeSmall, UnderscoreSmall),
@@ -1181,6 +1183,12 @@ data AnyBase graphic space tab annotation fixpoint =
 	| SpaceAny   annotation space
 	| TabAny     annotation tab
 
+-- | 'AnyBase' excluding symbols.
+data AnySansSymbolBase graphicSansSymbol space tab annotation fixpoint =
+	  GraphicAnySansSymbol annotation graphicSansSymbol
+	| SpaceAnySansSymbol   annotation space
+	| TabAnySansSymbol     annotation tab
+
 -- | A graphical character.
 --
 -- This is a printable character as opposed to a space character.
@@ -1214,6 +1222,18 @@ data GraphicSansDoubleQuoteOrBackslashBase small large symbolSansBackslash digit
 	| DigitGraphicSansDoubleQuoteOrBackslash       annotation digit
 	| SpecialGraphicSansDoubleQuoteOrBackslash     annotation special
 	| SingleQuoteGraphicSansDoubleQuoteOrBackslash annotation lexicalSingleQuote
+
+-- | 'GraphicBase' without symbols.
+--
+-- (Note that this excludes symbols, but only 'SymbolBase' symbols; in
+-- particular it does not exclude 'SpecialBase' (‘special’) symbols.)
+data GraphicSansSymbolBase small large digit special lexicalDoubleQuote lexicalSingleQuote annotation fixpoint =
+	  SmallGraphicSansSymbol       annotation small
+	| LargeGraphicSansSymbol       annotation large
+	| DigitGraphicSansSymbol       annotation digit
+	| SpecialGraphicSansSymbol     annotation special
+	| DoubleQuoteGraphicSansSymbol annotation lexicalDoubleQuote
+	| SingleQuoteGraphicSansSymbol annotation lexicalSingleQuote
 
 -- | A graphical character that cannot be part of any special ‘nc’
 -- (multiline-style) comment construct.
