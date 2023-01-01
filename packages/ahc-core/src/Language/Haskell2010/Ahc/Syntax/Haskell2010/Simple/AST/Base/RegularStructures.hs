@@ -332,6 +332,19 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	Lexical0xBase(PseudoLexical0x),
 	Lexical0XBase(PseudoLexical0X),
 
+	-- **** FFI pseudo-lexical structures.
+	{-
+	LexicalImportBase(PseudoLexicalImport),
+	-}
+	LexicalExportBase(PseudoLexicalExport),
+	LexicalCcallBase(PseudoLexicalCcall),
+	LexicalStdcallBase(PseudoLexicalStdcall),
+	LexicalCplusplusBase(PseudoLexicalCplusplus),
+	LexicalJvmBase(PseudoLexicalJvm),
+	LexicalDotnetBase(PseudoLexicalDotnet),
+	LexicalUnsafeBase(PseudoLexicalUnsafe),
+	LexicalSafeBase(PseudoLexicalSafe),
+
 	-- *** Lexical foundation.
 
 	-- $lexicalFoundation
@@ -2098,6 +2111,46 @@ data Lexical0xBase lexical0 lexicalXLower annotation fixpoint =
 -- | The ‘0X’ hexadecimal literal prefix.
 data Lexical0XBase lexical0 lexicalX annotation fixpoint =
 	PseudoLexical0X annotation lexical0 lexicalX
+
+-- FFI pseudo-lexical structures.
+
+{-
+-- | The ‘import’ FFI identifier.
+data LexicalImportBase lexicalILower lexicalMLower lexicalPLower lexicalOLower lexicalRLower lexicalTLower annotation fixpoint =
+	PseudoLexicalImport annotation lexicalILower lexicalMLower lexicalPLower lexicalOLower lexicalRLower lexicalTLower
+-}
+
+-- | The ‘export’ FFI identifier.
+data LexicalExportBase lexicalELower lexicalXLower lexicalPLower lexicalOLower lexicalRLower lexicalTLower annotation fixpoint =
+	PseudoLexicalExport annotation lexicalELower lexicalXLower lexicalPLower lexicalOLower lexicalRLower lexicalTLower
+
+-- | The ‘ccall’ FFI identifier.
+data LexicalCcallBase lexicalCLower lexicalALower lexicalLLower annotation fixpoint =
+	PseudoLexicalCcall annotation lexicalCLower lexicalCLower lexicalALower lexicalLLower lexicalLLower
+
+-- | The ‘stdcall’ FFI identifier.
+data LexicalStdcallBase lexicalSLower lexicalTLower lexicalDLower lexicalCLower lexicalALower lexicalLLower annotation fixpoint =
+	PseudoLexicalStdcall annotation lexicalSLower lexicalTLower lexicalDLower lexicalCLower lexicalALower lexicalLLower lexicalLLower
+
+-- | The ‘cplusplus’ FFI identifier.
+data LexicalCplusplusBase lexicalCLower lexicalPLower lexicalLLower lexicalULower lexicalSLower annotation fixpoint =
+	PseudoLexicalCplusplus annotation lexicalCLower lexicalPLower lexicalLLower lexicalULower lexicalSLower lexicalPLower lexicalLLower lexicalULower lexicalSLower
+
+-- | The ‘jvm’ FFI identifier.
+data LexicalJvmBase lexicalJLower lexicalVLower lexicalMLower annotation fixpoint =
+	PseudoLexicalJvm annotation lexicalJLower lexicalVLower lexicalMLower
+
+-- | The ‘dotnet’ FFI identifier.
+data LexicalDotnetBase lexicalDLower lexicalOLower lexicalTLower lexicalNLower lexicalELower annotation fixpoint =
+	PseudoLexicalDotnet annotation lexicalDLower lexicalOLower lexicalTLower lexicalNLower lexicalELower lexicalTLower
+
+-- | The ‘unsafe’ FFI identifier.
+data LexicalUnsafeBase lexicalULower lexicalNLower lexicalSLower lexicalALower lexicalFLower lexicalELower annotation fixpoint =
+	PseudoLexicalUnsafe annotation lexicalULower lexicalNLower lexicalSLower lexicalALower lexicalFLower lexicalELower
+
+-- | The ‘safe’ FFI identifier.
+data LexicalSafeBase lexicalSLower lexicalALower lexicalFLower lexicalELower annotation fixpoint =
+	PseudoLexicalSafe annotation lexicalSLower lexicalALower lexicalFLower lexicalELower
 
 -- Lexical foundation.
 

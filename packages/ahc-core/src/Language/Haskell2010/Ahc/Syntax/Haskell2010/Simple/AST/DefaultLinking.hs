@@ -378,6 +378,29 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	Lexical0XF(MkLexical0XF, _unLexical0XF),
 	Lexical0X,
 
+	-- ***** FFI pseudo-lexical structures.
+
+	{-
+	LexicalImportF(MkLexicalImportF, _unLexicalImportF),
+	LexicalImport,
+	-}
+	LexicalExportF(MkLexicalExportF, _unLexicalExportF),
+	LexicalExport,
+	LexicalCcallF(MkLexicalCcallF, _unLexicalCcallF),
+	LexicalCcall,
+	LexicalStdcallF(MkLexicalStdcallF, _unLexicalStdcallF),
+	LexicalStdcall,
+	LexicalCplusplusF(MkLexicalCplusplusF, _unLexicalCplusplusF),
+	LexicalCplusplus,
+	LexicalJvmF(MkLexicalJvmF, _unLexicalJvmF),
+	LexicalJvm,
+	LexicalDotnetF(MkLexicalDotnetF, _unLexicalDotnetF),
+	LexicalDotnet,
+	LexicalUnsafeF(MkLexicalUnsafeF, _unLexicalUnsafeF),
+	LexicalUnsafe,
+	LexicalSafeF(MkLexicalSafeF, _unLexicalSafeF),
+	LexicalSafe,
+
 	-- ** Grammatical structures.
 
 	-- *** § 5.1 Module Structure types.
@@ -1418,6 +1441,47 @@ type Lexical0x k z s l annotation = Fixed.Fix (Lexical0xF k z s l annotation)
 newtype Lexical0XF k z s l annotation fixpoint = MkLexical0XF { _unLexical0XF :: (Lexical0XBase (l (Lexical0KeyBase k z s)) (l (LexicalXKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'Lexical0XF'.
 type Lexical0X k z s l annotation = Fixed.Fix (Lexical0XF k z s l annotation)
+
+-- FFI pseudo-lexical structures.
+
+{-
+-- | 'LexicalImportBase' with fewer unresolved variables, with default linking.
+newtype LexicalImportF k z s l lexicalAnnotation annotation fixpoint = MkLexicalImportF { _unLexicalImportF :: (LexicalImportBase (l (LexicalILowerKeyBase k z s)) (l (LexicalMLowerKeyBase k z s)) (l (LexicalPLowerKeyBase k z s)) (l (LexicalOLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalImportF'
+type LexicalImport k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalImportF k z s l lexicalAnnotation annotation)
+-}
+-- | 'LexicalExportBase' with fewer unresolved variables, with default linking.
+newtype LexicalExportF k z s l lexicalAnnotation annotation fixpoint = MkLexicalExportF { _unLexicalExportF :: (LexicalExportBase (l (LexicalELowerKeyBase k z s)) (l (LexicalXLowerKeyBase k z s)) (l (LexicalPLowerKeyBase k z s)) (l (LexicalOLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalExportF'
+type LexicalExport k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalExportF k z s l lexicalAnnotation annotation)
+-- | 'LexicalCcallBase' with fewer unresolved variables, with default linking.
+newtype LexicalCcallF k z s l lexicalAnnotation annotation fixpoint = MkLexicalCcallF { _unLexicalCcallF :: (LexicalCcallBase (l (LexicalCLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalLLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalCcallF'
+type LexicalCcall k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalCcallF k z s l lexicalAnnotation annotation)
+-- | 'LexicalStdcallBase' with fewer unresolved variables, with default linking.
+newtype LexicalStdcallF k z s l lexicalAnnotation annotation fixpoint = MkLexicalStdcallF { _unLexicalStdcallF :: (LexicalStdcallBase (l (LexicalSLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalDLowerKeyBase k z s)) (l (LexicalCLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalLLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalStdcallF'
+type LexicalStdcall k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalStdcallF k z s l lexicalAnnotation annotation)
+-- | 'LexicalCplusplusBase' with fewer unresolved variables, with default linking.
+newtype LexicalCplusplusF k z s l lexicalAnnotation annotation fixpoint = MkLexicalCplusplusF { _unLexicalCplusplusF :: (LexicalCplusplusBase (l (LexicalCLowerKeyBase k z s)) (l (LexicalPLowerKeyBase k z s)) (l (LexicalLLowerKeyBase k z s)) (l (LexicalULowerKeyBase k z s)) (l (LexicalSLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalCplusplusF'
+type LexicalCplusplus k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalCplusplusF k z s l lexicalAnnotation annotation)
+-- | 'LexicalJvmBase' with fewer unresolved variables, with default linking.
+newtype LexicalJvmF k z s l lexicalAnnotation annotation fixpoint = MkLexicalJvmF { _unLexicalJvmF :: (LexicalJvmBase (l (LexicalJLowerKeyBase k z s)) (l (LexicalVLowerKeyBase k z s)) (l (LexicalMLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalJvmF'
+type LexicalJvm k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalJvmF k z s l lexicalAnnotation annotation)
+-- | 'LexicalDotnetBase' with fewer unresolved variables, with default linking.
+newtype LexicalDotnetF k z s l lexicalAnnotation annotation fixpoint = MkLexicalDotnetF { _unLexicalDotnetF :: (LexicalDotnetBase (l (LexicalDLowerKeyBase k z s)) (l (LexicalOLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalDotnetF'
+type LexicalDotnet k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalDotnetF k z s l lexicalAnnotation annotation)
+-- | 'LexicalUnsafeBase' with fewer unresolved variables, with default linking.
+newtype LexicalUnsafeF k z s l lexicalAnnotation annotation fixpoint = MkLexicalUnsafeF { _unLexicalUnsafeF :: (LexicalUnsafeBase (l (LexicalULowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalSLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalFLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalUnsafeF'
+type LexicalUnsafe k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalUnsafeF k z s l lexicalAnnotation annotation)
+-- | 'LexicalSafeBase' with fewer unresolved variables, with default linking.
+newtype LexicalSafeF k z s l lexicalAnnotation annotation fixpoint = MkLexicalSafeF { _unLexicalSafeF :: (LexicalSafeBase (l (LexicalSLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalFLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalSafeF'
+type LexicalSafe k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalSafeF k z s l lexicalAnnotation annotation)
 
 -- Grammatical structures.
 
