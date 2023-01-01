@@ -119,6 +119,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	QconopBase(QualifiableSymbolicConstructorBinaryOperator, QualifiableNonsymbolicConstructorBinaryOperator),
 	OpBase(NonConstructorBinaryOperator, ConstructorBinaryOperator),
 	QopBase(QualifiableNonConstructorBinaryOperator, QualifiableConstructorBinaryOperator),
+	QopSansMinusBase(QualifiableNonConstructorBinaryOperatorSansMinus, QualifiableConstructorBinaryOperatorSansMinus),
 	GconSymBase(ConsListConstructor, NonbuiltinQualifiableConstructorSymbolic),
 
 	-- ** § 3.11 List Comprehensions types.
@@ -716,35 +717,35 @@ data FexpBase maybe aexp annotation fixpoint =
 		-- 0-arity, not a regular ‘annotating’ expression as described above.
 
 -- | A base expression: variables, literals, or explicit groupings, etc.
-data AexpBase data2 maybe list qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansUnaryMinus qcon lexicalLeftBrace fbind lexicalRightBrace aexpSansQcon annotation fixpoint =
+data AexpBase data2 maybe list qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansMinus qcon lexicalLeftBrace fbind lexicalRightBrace aexpSansQcon annotation fixpoint =
 	  VariableExpression           annotation qvar
 	| ConstructorExpression        annotation gcon
 	| LiteralExpression            annotation literal
-	| ParenthesesExpression        annotation lexicalLeftParenthesis exp               lexicalRightParenthesis
-	| TupleExpression              annotation lexicalLeftParenthesis exp               lexicalComma                                           exp                     (list  (data2 lexicalComma exp )) lexicalRightParenthesis
-	| ListExpression               annotation lexicalLeftBracket     exp               (list (data2 lexicalComma exp))                        lexicalRightBracket
-	| ArithmeticSequenceExpression annotation lexicalLeftBracket     exp               (maybe exp)                                            lexicalDotDot           (maybe exp)                       lexicalRightBracket
-	| ListComprehensionExpression  annotation lexicalLeftBracket     exp               lexicalPipe                                            qual                    (list  (data2 lexicalComma qual)) lexicalRightBracket
-	| LeftSectionExpression        annotation lexicalLeftParenthesis infixExp          qop                                                    lexicalRightParenthesis
+	| ParenthesesExpression        annotation lexicalLeftParenthesis exp              lexicalRightParenthesis
+	| TupleExpression              annotation lexicalLeftParenthesis exp              lexicalComma                                            exp                               (list  (data2 lexicalComma exp )) lexicalRightParenthesis
+	| ListExpression               annotation lexicalLeftBracket     exp              (list (data2 lexicalComma exp))                         lexicalRightBracket
+	| ArithmeticSequenceExpression annotation lexicalLeftBracket     exp              (maybe exp)                                             lexicalDotDot                     (maybe exp)                       lexicalRightBracket
+	| ListComprehensionExpression  annotation lexicalLeftBracket     exp              lexicalPipe                                             qual                              (list  (data2 lexicalComma qual)) lexicalRightBracket
+	| LeftSectionExpression        annotation lexicalLeftParenthesis infixExp         qop                                                     lexicalRightParenthesis
 		-- ^ (The left section form of partial application, with a binary operation.)
-	| RightSectionExpression       annotation lexicalLeftParenthesis qopSansUnaryMinus infixExp                                               lexicalRightParenthesis
+	| RightSectionExpression       annotation lexicalLeftParenthesis qopSansMinus     infixExp                                                lexicalRightParenthesis
 		-- ^ (The right section form of partial application, with a binary operation.)
 	| ConstructRecordExpression    annotation qcon                   lexicalLeftBrace (maybe (data2 fbind (list (data2 lexicalComma fbind)))) lexicalRightBrace
 	| ModifyRecordExpression       annotation aexpSansQcon           lexicalLeftBrace fbind                                                   (list (data2 lexicalComma fbind)) lexicalRightBrace
 
 -- | A copy of 'AexpBase' without 'ConstructRecordExpression' and with a restricted 'ConstructorExpression'.
-data AexpSansQconBase data2 maybe list qvar gconSansQcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansUnaryMinus qcon lexicalLeftBrace fbind lexicalRightBrace annotation fixpoint =
+data AexpSansQconBase data2 maybe list qvar gconSansQcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansMinus qcon lexicalLeftBrace fbind lexicalRightBrace annotation fixpoint =
 	  VariableExpressionSansQcon           annotation qvar
 	| ConstructorExpressionSansQcon        annotation gconSansQcon
 	| LiteralExpressionSansQcon            annotation literal
-	| ParenthesesExpressionSansQcon        annotation lexicalLeftParenthesis exp               lexicalRightParenthesis
-	| TupleExpressionSansQcon              annotation lexicalLeftParenthesis exp               lexicalComma                                           exp                     (list  (data2 lexicalComma exp )) lexicalRightParenthesis
-	| ListExpressionSansQcon               annotation lexicalLeftBracket     exp               (list (data2 lexicalComma exp))                        lexicalRightBracket
-	| ArithmeticSequenceExpressionSansQcon annotation lexicalLeftBracket     exp               (maybe exp)                                            lexicalDotDot           (maybe exp)                       lexicalRightBracket
-	| ListComprehensionExpressionSansQcon  annotation lexicalLeftBracket     exp               lexicalPipe                                            qual                    (list  (data2 lexicalComma qual)) lexicalRightBracket
-	| LeftSectionExpressionSansQcon        annotation lexicalLeftParenthesis infixExp          qop                                                    lexicalRightParenthesis
+	| ParenthesesExpressionSansQcon        annotation lexicalLeftParenthesis exp              lexicalRightParenthesis
+	| TupleExpressionSansQcon              annotation lexicalLeftParenthesis exp              lexicalComma                                            exp                               (list  (data2 lexicalComma exp )) lexicalRightParenthesis
+	| ListExpressionSansQcon               annotation lexicalLeftBracket     exp              (list (data2 lexicalComma exp))                         lexicalRightBracket
+	| ArithmeticSequenceExpressionSansQcon annotation lexicalLeftBracket     exp              (maybe exp)                                             lexicalDotDot                     (maybe exp)                       lexicalRightBracket
+	| ListComprehensionExpressionSansQcon  annotation lexicalLeftBracket     exp              lexicalPipe                                             qual                              (list  (data2 lexicalComma qual)) lexicalRightBracket
+	| LeftSectionExpressionSansQcon        annotation lexicalLeftParenthesis infixExp         qop                                                     lexicalRightParenthesis
 		-- ^ (The left section form of partial application, with a binary operation.)
-	| RightSectionExpressionSansQcon       annotation lexicalLeftParenthesis qopSansUnaryMinus infixExp                                               lexicalRightParenthesis
+	| RightSectionExpressionSansQcon       annotation lexicalLeftParenthesis qopSansMinus     infixExp                                                lexicalRightParenthesis
 		-- ^ (The right section form of partial application, with a binary operation.)
 	| ModifyRecordExpressionSansQcon       annotation fixpoint               lexicalLeftBrace fbind                                                   (list (data2 lexicalComma fbind)) lexicalRightBrace
 
@@ -822,6 +823,11 @@ data OpBase varop conop annotation fixpoint =
 data QopBase qvarop qconop annotation fixpoint =
 	  QualifiableNonConstructorBinaryOperator annotation qvarop
 	| QualifiableConstructorBinaryOperator    annotation qconop
+
+-- | A qualifiable binary operation operator that is not ‘-’.
+data QopSansMinusBase qvaropSansMinus qconop annotation fixpoint =
+	  QualifiableNonConstructorBinaryOperatorSansMinus annotation qvaropSansMinus
+	| QualifiableConstructorBinaryOperatorSansMinus    annotation qconop
 
 -- | A qualifiable symbolic constructor name, extended with a selection of built-in names.
 data GconSymBase lexicalColon qcon annotation fixpoint =
