@@ -145,8 +145,8 @@ data VaridInnerSansAscSmallUnderscoreBase smallSansAscSmallUnderscore large digi
 -- | A lowercase character, except for those that are ASCII, and except underscores.
 --
 -- We'll build up ASCII characters more carefully in the restricted sets.
-data SmallSansAscSmallUnderscoreBase ascSmall uniSmallSansAscSmallUnderscore lexicalUnderscore annotation fixpoint =
-	UnicodeSmallSansAscSmallUnderscore annotation uniSmallSansAscSmallUnderscore
+data SmallSansAscSmallUnderscoreBase ascSmall uniSmallSansAsc lexicalUnderscore annotation fixpoint =
+	UnicodeSmallSansAscSmallUnderscore annotation uniSmallSansAsc
 
 -- | A unicode lowercase character, except those that are ASCII.
 --

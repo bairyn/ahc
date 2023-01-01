@@ -52,8 +52,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 
 	-- ** § 4.1.2 Syntax of Types types.
 	TypeBase(Type),
-	BTypeBase(TypeApplication),
-	ATypeBase(GeneralTypeConstructor, TypeVariableType, TupleType, ListType, GroupedType),
+	BtypeBase(TypeApplication),
+	AtypeBase(GeneralTypeConstructor, TypeVariableType, TupleType, ListType, GroupedType),
 	GtyconBase(QualifiableTypeConstructor, UnitTypeConstructor, EmptyListTypeConstructor, FunctionTypeConstructor, TupleTypeConstructor),
 
 	-- ** § 4.1.3 Syntax of Class Assertions and Contexts types.
@@ -78,7 +78,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	NewConstrBase(BasicNewtypeConstructor, RecordNewtypeConstructor),
 
 	-- ** § 4.3.1 Type Classes and Overloading types.
-	SContextBase(SimpleContextSingle, SimpleContextList),
+	ScontextBase(SimpleContextSingle, SimpleContextList),
 	SimpleClassBase(SimpleClassAssertion),
 
 	-- ** § 4.3.2 Instance Declarations types.
@@ -90,7 +90,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	-}
 
 	-- ** § 4.4.3 Function and Pattern Bindings types.
-	FunLhsBase(RegularFunctionClause, InfixFunctionClause, AppendingFunctionClause),
+	FunlhsBase(RegularFunctionClause, InfixFunctionClause, AppendingFunctionClause),
 
 	-- ** § 3 Expressions types.
 	ExpBase(TypedExpression, UntypedExpression),
@@ -105,10 +105,10 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	QvarBase(QualifiableVariableNonsymbolic, QualifiableVariableSymbolic),
 	ConBase(ConstructorNonsymbolic, ConstructorSymbolic),
 	QconBase(QualifiableConstructorNonsymbolic, QualifiableConstructorSymbolic),
-	VarOpBase(SymbolicNonconstructorBinaryOperator, NonsymbolicNonconstructorBinaryOperator),
-	QvarOpBase(QualifiableSymbolicNonconstructorBinaryOperator, QualifiableNonsymbolicNonconstructorBinaryOperator),
-	ConOpBase(SymbolicConstructorBinaryOperator, NonsymbolicConstructorBinaryOperator),
-	QconOpBase(QualifiableSymbolicConstructorBinaryOperator, QualifiableNonsymbolicConstructorBinaryOperator),
+	VaropBase(SymbolicNonconstructorBinaryOperator, NonsymbolicNonconstructorBinaryOperator),
+	QvaropBase(QualifiableSymbolicNonconstructorBinaryOperator, QualifiableNonsymbolicNonconstructorBinaryOperator),
+	ConopBase(SymbolicConstructorBinaryOperator, NonsymbolicConstructorBinaryOperator),
+	QconopBase(QualifiableSymbolicConstructorBinaryOperator, QualifiableNonsymbolicConstructorBinaryOperator),
 	OpBase(NonConstructorBinaryOperator, ConstructorBinaryOperator),
 	QopBase(QualifiableNonConstructorBinaryOperator, QualifiableConstructorBinaryOperator),
 	GconSymBase(ConsListConstructor, NonbuiltinQualifiableConstructorSymbolic),
@@ -421,8 +421,8 @@ data DeclsBase data2 maybe list lexicalLeftBrace decl lexicalSemicolon lexicalRi
 --
 -- It defines the type, value in a branch, or specification (e.g. fixity
 -- attribute) of an attribute or variable.
-data DeclBase either gendecl funlhs pat rhs annotation fixpoint =
-	  DeclarationMeta  annotation gendecl
+data DeclBase either genDecl funlhs pat rhs annotation fixpoint =
+	  DeclarationMeta  annotation genDecl
 	| DeclarationValue annotation (either funlhs pat) rhs
 
 -- | A block of class-declarations inside a class definition.
@@ -433,8 +433,8 @@ data CdeclsBase data2 maybe list lexicalLeftBrace cdecl lexicalSemicolon lexical
 --
 -- It defines the type, value in a branch, or specification (e.g. fixity
 -- attribute) of an attribute or variable in a class definition.
-data CdeclBase either gendecl funlhs pat rhs annotation fixpoint =
-	  ClassDeclarationMeta  annotation gendecl
+data CdeclBase either genDecl funlhs pat rhs annotation fixpoint =
+	  ClassDeclarationMeta  annotation genDecl
 	| ClassDeclarationValue annotation (either funlhs pat) rhs
 
 -- | A block of instance-declarations inside an instance body.
@@ -478,11 +478,11 @@ data TypeBase data2 maybe btype lexicalRightArrow annotation fixpoint =
 	Type annotation btype (maybe (data2 lexicalRightArrow fixpoint))
 
 -- | A type with possible type application.
-data BTypeBase maybe atype annotation fixpoint =
+data BtypeBase maybe atype annotation fixpoint =
 	TypeApplication annotation (maybe fixpoint) atype
 
 -- | An applicable type, one that can be part of type application.
-data ATypeBase data2 list gtycon tyvar lexicalLeftParenthesis type_ lexicalComma lexicalRightParenthesis lexicalLeftAngleBracket lexicalRightAngleBracket annotation fixpoint =
+data AtypeBase data2 list gtycon tyvar lexicalLeftParenthesis type_ lexicalComma lexicalRightParenthesis lexicalLeftAngleBracket lexicalRightAngleBracket annotation fixpoint =
 	  GeneralTypeConstructor annotation gtycon
 	| TypeVariableType       annotation tyvar
 	| TupleType              annotation lexicalLeftParenthesis  type_ lexicalComma             type_ (list (data2 lexicalComma type_)) lexicalRightParenthesis
@@ -576,7 +576,7 @@ data NewConstrBase con atype lexicalLeftBrace var lexicalDoubleColon type_ lexic
 --
 -- This is used rather than the full context structure by e.g. ‘class’
 -- declarations.
-data SContextBase data2 maybe list simpleClass lexicalLeftParenthesis lexicalComma lexicalRightParenthesis annotation fixpoint =
+data ScontextBase data2 maybe list simpleClass lexicalLeftParenthesis lexicalComma lexicalRightParenthesis annotation fixpoint =
 	  SimpleContextSingle annotation simpleClass
 		-- ^ Form with ommitted parentheses, requiring exactly 1 simple class.
 	| SimpleContextList   annotation lexicalLeftParenthesis (maybe (data2 simpleClass (list (data2 lexicalComma simpleClass)))) lexicalRightParenthesis
@@ -643,7 +643,7 @@ data FixityOpBase varop conop annotation fixpoint =
 -- (Note then that ‘where’ blocks belong to the clause (and all its guard
 -- groupings), rather than the last group of guards ‘guards’ but not the previous
 -- ‘| guard guard … guard’ belonging to the same clause.)
-data FunLhsBase list var apat pat varop lexicalLeftParenthesis lexicalRightParenthesis annotation fixpoint =
+data FunlhsBase list var apat pat varop lexicalLeftParenthesis lexicalRightParenthesis annotation fixpoint =
 	  RegularFunctionClause   annotation var                    apat  (list apat)
 	| InfixFunctionClause     annotation pat                    varop pat
 	| AppendingFunctionClause annotation lexicalLeftParenthesis apat  lexicalRightParenthesis (list apat)
@@ -690,7 +690,7 @@ data FexpBase maybe aexp annotation fixpoint =
 		-- 0-arity, not a regular ‘annotating’ expression as described above.
 
 -- | A base expression: variables, literals, or explicit groupings, etc.
-data AexpBase data2 maybe list qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansUnaryMinus qcon lexicalLeftBrace fbind lexicalRightBrace aexpSansQcon fbinds1 annotation fixpoint =
+data AexpBase data2 maybe list qvar gcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansUnaryMinus qcon lexicalLeftBrace fbind lexicalRightBrace aexpSansQcon annotation fixpoint =
 	  VariableExpression           annotation qvar
 	| ConstructorExpression        annotation gcon
 	| LiteralExpression            annotation literal
@@ -746,22 +746,22 @@ data QconBase qconid lexicalLeftParenthesis gconSym lexicalRightParenthesis anno
 		-- ^ (E.g. ‘(:+)’.)
 
 -- | An unqualified binary operation, lowercase-style, for non-constructor variables.
-data VarOpBase varSym lexicalBacktick varid annotation fixpoint =
+data VaropBase varSym lexicalBacktick varid annotation fixpoint =
 	  SymbolicNonconstructorBinaryOperator    annotation varSym
 	| NonsymbolicNonconstructorBinaryOperator annotation lexicalBacktick varid lexicalBacktick
 
 -- | A qualifiable binary operation, lowercase-style, for non-constructor variables.
-data QvarOpBase qvarSym lexicalBacktick qvarid annotation fixpoint =
+data QvaropBase qvarSym lexicalBacktick qvarid annotation fixpoint =
 	  QualifiableSymbolicNonconstructorBinaryOperator    annotation qvarSym
 	| QualifiableNonsymbolicNonconstructorBinaryOperator annotation lexicalBacktick qvarid lexicalBacktick
 
 -- | An unqualified binary operation, capitalized-style, for constructors and constructor variables.
-data ConOpBase conSym lexicalBacktick conid annotation fixpoint =
+data ConopBase conSym lexicalBacktick conid annotation fixpoint =
 	  SymbolicConstructorBinaryOperator    annotation conSym
 	| NonsymbolicConstructorBinaryOperator annotation lexicalBacktick conid lexicalBacktick
 
 -- | A qualifiable binary operation, capitalized-style, for constructors and constructor variables.
-data QconOpBase qconSym lexicalBacktick qconid annotation fixpoint =
+data QconopBase qconSym lexicalBacktick qconid annotation fixpoint =
 	  QualifiableSymbolicConstructorBinaryOperator    annotation qconSym
 	| QualifiableNonsymbolicConstructorBinaryOperator annotation lexicalBacktick qconid lexicalBacktick
 
