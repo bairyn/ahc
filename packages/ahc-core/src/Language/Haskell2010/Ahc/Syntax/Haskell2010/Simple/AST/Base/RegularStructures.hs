@@ -177,6 +177,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	BigAnySansNcBase(GraphicBigAnySansNc, WhitecharBigAnySansNc),
 	AnyBase(GraphicAny, SpaceAny, TabAny),
 	GraphicBase(SmallGraphic, LargeGraphic, SymbolGraphic, DigitGraphic, SpecialGraphic, DoubleQuoteGraphic, SingleQuoteGraphic),
+	GraphicSansSingleQuoteOrBackslashBase(SmallGraphicSansSingleQuoteOrBackslash, LargeGraphicSansSingleQuoteOrBackslash, SymbolGraphicSansSingleQuoteOrBackslash, DigitGraphicSansSingleQuoteOrBackslash, SpecialGraphicSansSingleQuoteOrBackslash, DoubleQuoteGraphicSansSingleQuoteOrBackslash),
+	GraphicSansDoubleQuoteOrBackslashBase(SmallGraphicSansDoubleQuoteOrBackslash, LargeGraphicSansDoubleQuoteOrBackslash, SymbolGraphicSansDoubleQuoteOrBackslash, DigitGraphicSansDoubleQuoteOrBackslash, SpecialGraphicSansDoubleQuoteOrBackslash, SingleQuoteGraphicSansDoubleQuoteOrBackslash),
 	GraphicSansNcBase(SmallGraphicSansNc, LargeGraphicSansNc, SymbolGraphicSansNc, DigitGraphicSansNc, SpecialGraphicSansNc, DoubleQuoteGraphicSansNc, SingleQuoteGraphicSansNc),
 
 	SmallBase(AsciiSmall, UnicodeSmall, UnderscoreSmall),
@@ -1185,6 +1187,28 @@ data GraphicBase small large symbol digit special lexicalDoubleQuote lexicalSing
 	| SpecialGraphic     annotation special
 	| DoubleQuoteGraphic annotation lexicalDoubleQuote
 	| SingleQuoteGraphic annotation lexicalSingleQuote
+
+-- | 'GraphicBase' without ‘'’ and ‘\’.
+--
+-- This is a printable character as opposed to a space character.
+data GraphicSansSingleQuoteOrBackslashBase small large symbolSansBackslash digit special lexicalDoubleQuote annotation fixpoint =
+	  SmallGraphicSansSingleQuoteOrBackslash       annotation small
+	| LargeGraphicSansSingleQuoteOrBackslash       annotation large
+	| SymbolGraphicSansSingleQuoteOrBackslash      annotation symbolSansBackslash
+	| DigitGraphicSansSingleQuoteOrBackslash       annotation digit
+	| SpecialGraphicSansSingleQuoteOrBackslash     annotation special
+	| DoubleQuoteGraphicSansSingleQuoteOrBackslash annotation lexicalDoubleQuote
+
+-- | 'GraphicBase' without ‘"’ and ‘\’.
+--
+-- This is a printable character as opposed to a space character.
+data GraphicSansDoubleQuoteOrBackslashBase small large symbolSansBackslash digit special lexicalSingleQuote annotation fixpoint =
+	  SmallGraphicSansDoubleQuoteOrBackslash       annotation small
+	| LargeGraphicSansDoubleQuoteOrBackslash       annotation large
+	| SymbolGraphicSansDoubleQuoteOrBackslash      annotation symbolSansBackslash
+	| DigitGraphicSansDoubleQuoteOrBackslash       annotation digit
+	| SpecialGraphicSansDoubleQuoteOrBackslash     annotation special
+	| SingleQuoteGraphicSansDoubleQuoteOrBackslash annotation lexicalSingleQuote
 
 -- | A graphical character that cannot be part of any special ‘nc’
 -- (multiline-style) comment construct.
