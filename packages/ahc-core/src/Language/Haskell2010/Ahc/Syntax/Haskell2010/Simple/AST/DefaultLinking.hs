@@ -527,6 +527,18 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	Guard,
 	-}
 
+	-- *** § 8.4 Foreign Declarations types.
+	FdeclF(MkFdeclF, _unFdeclF),
+	Fdecl,
+	CallConvF(MkCallConvF, _unCallConvF),
+	CallConv,
+	ImpentF(MkImpentF, _unImpentF),
+	Impent,
+	ExpentF(MkExpentF, _unExpentF),
+	Expent,
+	SafetyF(MkSafetyF, _unSafetyF),
+	Safety,
+
 	-- *** § 3 Expressions types.
 	ExpF(MkExpF, _unExpF),
 	Exp,
@@ -1719,6 +1731,29 @@ newtype GuardF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint =
 -- | Fixpoint applied to 'GuardF'
 type Guard k z s l lexicalAnnotation annotation = Fixed.Fix (GuardF k z s l lexicalAnnotation annotation)
 -}
+
+-- § 8.4 Foreign Declarations types.
+
+-- | 'FdeclBase' with fewer unresolved variables, with default linking.
+newtype FdeclF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFdeclF { _unFdeclF :: (FdeclBase Prelude.Maybe (LexicalImport k z s l lexicalAnnotation lexicalAnnotation) (CallConv k z s l lexicalAnnotation lexicalAnnotation) (Safety k z s l lexicalAnnotation lexicalAnnotation) (Impent k z s l lexicalAnnotation lexicalAnnotation) (Var k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (LexicalDoubleColon k z s l lexicalAnnotation lexicalAnnotation) (Ftype k z s l lexicalAnnotation lexicalAnnotation) (LexicalExport k z s l lexicalAnnotation lexicalAnnotation) (Expent k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'FdeclF'
+type Fdecl k z s l lexicalAnnotation annotation = Fixed.Fix (FdeclF k z s l lexicalAnnotation annotation)
+-- | 'CallConvBase' with fewer unresolved variables, with default linking.
+newtype CallConvF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkCallConvF { _unCallConvF :: (CallConvBase (LexicalCcall k z s l lexicalAnnotation lexicalAnnotation) (LexicalStdcall k z s l lexicalAnnotation lexicalAnnotation) (LexicalCplusplus k z s l lexicalAnnotation lexicalAnnotation) (LexicalJvm k z s l lexicalAnnotation lexicalAnnotation) (LexicalDotnet k z s l lexicalAnnotation lexicalAnnotation) (Varid k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'CallConvF'
+type CallConv k z s l lexicalAnnotation annotation = Fixed.Fix (CallConvF k z s l lexicalAnnotation annotation)
+-- | 'ImpentBase' with fewer unresolved variables, with default linking.
+newtype ImpentF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkImpentF { _unImpentF :: (ImpentBase Prelude.Maybe (String k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'ImpentF'
+type Impent k z s l lexicalAnnotation annotation = Fixed.Fix (ImpentF k z s l lexicalAnnotation annotation)
+-- | 'ExpentBase' with fewer unresolved variables, with default linking.
+newtype ExpentF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkExpentF { _unExpentF :: (ExpentBase Prelude.Maybe (String k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'ExpentF'
+type Expent k z s l lexicalAnnotation annotation = Fixed.Fix (ExpentF k z s l lexicalAnnotation annotation)
+-- | 'SafetyBase' with fewer unresolved variables, with default linking.
+newtype SafetyF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkSafetyF { _unSafetyF :: (SafetyBase (LexicalUnsafe k z s l lexicalAnnotation lexicalAnnotation) (LexicalSafe k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'SafetyF'
+type Safety k z s l lexicalAnnotation annotation = Fixed.Fix (SafetyF k z s l lexicalAnnotation annotation)
 
 -- § 3 Expressions types.
 

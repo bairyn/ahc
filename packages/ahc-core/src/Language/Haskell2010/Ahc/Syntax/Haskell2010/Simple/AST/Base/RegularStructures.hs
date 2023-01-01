@@ -98,6 +98,13 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	GuardBase(PatternDeclGuard, LocalDeclarationDeclGuard, BooleanDeclGuard),
 	-}
 
+	-- ** § 8.4 Foreign Declarations types.
+	FdeclBase(ForeignImport, ForeignExport),
+	CallConvBase(CcallCallConv, StdcallCallConv, CplusplusCallConv, JvmCallConv, DotnetCallConv, SystemSpecificCallConv),
+	ImpentBase(ImpentFFI),
+	ExpentBase(ExpentFFI),
+	SafetyBase(UnsafeFFI, SafeFFI),
+
 	-- ** § 3 Expressions types.
 	ExpBase(TypedExpression, UntypedExpression),
 	InfixExpBase(RightInfixExpression, UnaryPrefixExpression, LeftExpression),
@@ -705,6 +712,40 @@ data GuardBase pat lexicalLeftArrow infixExp lexicalLet decls annotation fixpoin
 	| LocalDeclarationDeclGuard annotation lexicalLet decls
 	| BooleanDeclGuard          annotation infixExp
 -}
+
+-- § 8.4 Foreign Declarations types.
+
+-- | A ‘foreign import’ or ‘foreign export’ declaration.
+data FdeclBase maybe lexicalImport callConv safety impent var lexicalDoubleColon ftype lexicalExport expent annotation fixpoint =
+	  ForeignImport annotation lexicalImport callConv (maybe safety) impent var                lexicalDoubleColon ftype
+	| ForeignExport annotation lexicalExport callConv expent         var    lexicalDoubleColon ftype
+
+-- | The calling convention identifier of a ‘foreign import’ or ‘foreign
+-- export’ declaration.
+data CallConvBase lexicalCcall lexicalStdcall lexicalCplusplus lexicalJvm lexicalDotnet varid annotation fixpoint =
+	  CcallCallConv          annotation lexicalCcall
+	| StdcallCallConv        annotation lexicalStdcall
+	| CplusplusCallConv      annotation lexicalCplusplus
+	| JvmCallConv            annotation lexicalJvm
+	| DotnetCallConv         annotation lexicalDotnet
+	| SystemSpecificCallConv annotation varid
+
+-- | The entity identifier representing what a ‘foreign import’ declaration
+-- imports.
+data ImpentBase maybe string annotation fixpoint =
+	ImpentFFI annotation (maybe string)
+
+-- | The identifier representing the entity a ‘foreign export’ declaration
+-- exports.
+data ExpentBase maybe string annotation fixpoint =
+	ExpentFFI annotation (maybe string)
+
+-- | The ‘safety’ specifier of a ‘foreign import’ declaration, whether we
+-- provide an assumed guarantee that evaluation will not trigger a call back
+-- into same Haskell context, by operating in the unsafe safety level mode.
+data SafetyBase lexicalUnsafe lexicalSafe annotation fixpoint =
+	  UnsafeFFI annotation lexicalSafe
+	| SafeFFI   annotation lexicalSafe
 
 -- § 3 Expression types.
 
