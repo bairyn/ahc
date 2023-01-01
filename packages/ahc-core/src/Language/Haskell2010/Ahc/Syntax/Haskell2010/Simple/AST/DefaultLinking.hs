@@ -1250,19 +1250,19 @@ type Gap k z s l lexicalAnnotation annotation = Fixed.Fix (GapF k z s l lexicalA
 -- § 8.3 (FFI) Lexical Structure types.
 
 -- | 'ChnameBase' with fewer unresolved variables, with default linking.
-newtype ChnameF k z s l lexicalAnnotation annotation fixpoint = MkChnameF { _unChnameF :: (ChnameBase [] (Chchar k z s l lexicalAnnotation lexicalAnnotation fixpoint) (l (LexicalDotKeyBase k z s)) (l (LexicalHLowerKeyBase k z s)) annotation fixpoint) }
+newtype ChnameF k z s l lexicalAnnotation annotation fixpoint = MkChnameF { _unChnameF :: (ChnameBase [] (Chchar k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDotKeyBase k z s)) (l (LexicalHLowerKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'ChnameF'
 type Chname k z s l lexicalAnnotation annotation = Fixed.Fix (ChnameF k z s l lexicalAnnotation annotation)
 -- | 'CidBase' with fewer unresolved variables, with default linking.
-newtype CidF k z s l lexicalAnnotation annotation fixpoint = MkCidF { _unCidF :: (CidBase [] Prelude.Either (Letter k z s l lexicalAnnotation lexicalAnnotation fixpoint) (AscDigit k z s l lexicalAnnotation lexicalAnnotation fixpoint) annotation fixpoint) }
+newtype CidF k z s l lexicalAnnotation annotation fixpoint = MkCidF { _unCidF :: (CidBase [] Prelude.Either (Letter k z s l lexicalAnnotation lexicalAnnotation) (AscDigit k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'CidF'
 type Cid k z s l lexicalAnnotation annotation = Fixed.Fix (CidF k z s l lexicalAnnotation annotation)
 -- | 'ChcharBase' with fewer unresolved variables, with default linking.
-newtype ChcharF k z s l lexicalAnnotation annotation fixpoint = MkChcharF { _unChcharF :: (ChcharBase Prelude.Either (Letter k z s l lexicalAnnotation lexicalAnnotation fixpoint) (AscSymbolSansAmpersand k z s l lexicalAnnotation lexicalAnnotation fixpoint) annotation fixpoint) }
+newtype ChcharF k z s l lexicalAnnotation annotation fixpoint = MkChcharF { _unChcharF :: (ChcharBase Prelude.Either (Letter k z s l lexicalAnnotation lexicalAnnotation) (AscSymbolSansAmpersand k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'ChcharF'
 type Chchar k z s l lexicalAnnotation annotation = Fixed.Fix (ChcharF k z s l lexicalAnnotation annotation)
 -- | 'LetterBase' with fewer unresolved variables, with default linking.
-newtype LetterF k z s l lexicalAnnotation annotation fixpoint = MkLetterF { _unLetterF :: (LetterBase (AscSmall k z s l lexicalAnnotation lexicalAnnotation fixpoint) (AscLarge k z s l lexicalAnnotation lexicalAnnotation fixpoint) (l (LexicalUnderscoreKeyBase k z s)) annotation fixpoint) }
+newtype LetterF k z s l lexicalAnnotation annotation fixpoint = MkLetterF { _unLetterF :: (LetterBase (AscSmall k z s l lexicalAnnotation lexicalAnnotation) (AscLarge k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalUnderscoreKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'LetterF'
 type Letter k z s l lexicalAnnotation annotation = Fixed.Fix (LetterF k z s l lexicalAnnotation annotation)
 -- | 'AscSymbolSansAmpersandBase' with fewer unresolved variables, with default linking.
