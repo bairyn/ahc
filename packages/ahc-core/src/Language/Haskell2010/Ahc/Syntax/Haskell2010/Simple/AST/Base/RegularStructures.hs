@@ -91,6 +91,12 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 
 	-- ** § 4.4.3 Function and Pattern Bindings types.
 	FunlhsBase(RegularFunctionClause, InfixFunctionClause, AppendingFunctionClause),
+	RhsBase(UnguardedRhs, GuardedRhs),
+	GdrhsBase(RhsGuardClause),
+	{-
+	GuardsBase(GuardClause),
+	GuardBase(PatternDeclGuard, LocalDeclarationDeclGuard, BooleanDeclGuard),
+	-}
 
 	-- ** § 3 Expressions types.
 	ExpBase(TypedExpression, UntypedExpression),
@@ -643,6 +649,27 @@ data FunlhsBase list var apat pat varop lexicalLeftParenthesis lexicalRightParen
 	  RegularFunctionClause   annotation var                    apat  (list apat)
 	| InfixFunctionClause     annotation pat                    varop pat
 	| AppendingFunctionClause annotation lexicalLeftParenthesis apat  lexicalRightParenthesis (list apat)
+
+-- | A declaration rhs: a possibly guarded equals assignment.
+data RhsBase data2 maybe lexicalEquals exp lexicalWhere decls gdrhs annotation fixpoint =
+	  UnguardedRhs annotation lexicalEquals exp                                (maybe (data2 lexicalWhere decls))
+	| GuardedRhs   annotation gdrhs         (maybe (data2 lexicalWhere decls))
+
+-- | A guard clause for a rhs: a ‘|’ clause with 1 or more guards.
+data GdrhsBase maybe guards lexicalEquals exp annotation fixpoint =
+	RhsGuardClause annotation guards lexicalEquals exp (maybe fixpoint)
+
+{-
+-- | A ‘|’ branch at the declaration level with 1 or more guards.
+data GuardsBase data2 list lexicalPipe guard lexicalComma annotation fixpoint =
+	GuardClause annotation lexicalPipe guard (list (data2 lexicalComma guard))
+
+-- | An individual guard in a guard clause branch at the declaration level.
+data GuardBase pat lexicalLeftArrow infixExp lexicalLet decls annotation fixpoint =
+	  PatternDeclGuard          annotation pat        lexicalLeftArrow infixExp
+	| LocalDeclarationDeclGuard annotation lexicalLet decls
+	| BooleanDeclGuard          annotation infixExp
+-}
 
 -- § 3 Expression types.
 

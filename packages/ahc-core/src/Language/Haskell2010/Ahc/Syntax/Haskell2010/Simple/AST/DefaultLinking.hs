@@ -461,6 +461,16 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	-- *** § 4.4.3 Function and Pattern Bindings types.
 	FunlhsF(MkFunlhsF, _unFunlhsF),
 	Funlhs,
+	RhsF(MkRhsF, _unRhsF),
+	Rhs,
+	GdrhsF(MkGdrhsF, _unGdrhsF),
+	Gdrhs,
+	{-
+	GuardsF(MkGuardsF, _unGuardsF),
+	Guards,
+	GuardF(MkGuardF, _unGuardF),
+	Guard,
+	-}
 
 	-- *** § 3 Expressions types.
 	ExpF(MkExpF, _unExpF),
@@ -1521,6 +1531,24 @@ type FixityOp k z s l lexicalAnnotation annotation = Fixed.Fix (FixityOpF k z s 
 newtype FunlhsF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFunlhsF { _unFunlhsF :: (FunlhsBase [] (Var k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Apat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Varop k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalLeftParenthesisKeyBase k z s)) (l (LexicalRightParenthesisKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'FunlhsF'
 type Funlhs k z s l lexicalAnnotation annotation = Fixed.Fix (FunlhsF k z s l lexicalAnnotation annotation)
+-- | 'RhsBase' with fewer unresolved variables, with default linking.
+newtype RhsF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkRhsF { _unRhsF :: (RhsBase (,) Prelude.Maybe (l (LexicalEqualsKeyBase k z s)) (Exp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (LexicalWhere k z s l lexicalAnnotation lexicalAnnotation) (Decls k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Gdrhs k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'RhsF'
+type Rhs k z s l lexicalAnnotation annotation = Fixed.Fix (RhsF k z s l lexicalAnnotation annotation)
+-- | 'GdrhsBase' with fewer unresolved variables, with default linking.
+newtype GdrhsF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkGdrhsF { _unGdrhsF :: (GdrhsBase Prelude.Maybe (Guards k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalEqualsKeyBase k z s)) (Exp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'GdrhsF'
+type Gdrhs k z s l lexicalAnnotation annotation = Fixed.Fix (GdrhsF k z s l lexicalAnnotation annotation)
+{-
+-- | 'GuardsBase' with fewer unresolved variables, with default linking.
+newtype GuardsF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkGuardsF { _unGuardsF :: (GuardsBase (,) [] (l (LexicalPipeKeyBase k z s)) (Guard k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalCommaKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'GuardsF'
+type Guards k z s l lexicalAnnotation annotation = Fixed.Fix (GuardsF k z s l lexicalAnnotation annotation)
+-- | 'GuardBase' with fewer unresolved variables, with default linking.
+newtype GuardF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkGuardF { _unGuardF :: (GuardBase (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (LexicalLeftArrow k z s l lexicalAnnotation lexicalAnnotation) (InfixExp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (LexicalLet k z s l lexicalAnnotation lexicalAnnotation) (Decls k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'GuardF'
+type Guard k z s l lexicalAnnotation annotation = Fixed.Fix (GuardF k z s l lexicalAnnotation annotation)
+-}
 
 -- § 3 Expressions types.
 
