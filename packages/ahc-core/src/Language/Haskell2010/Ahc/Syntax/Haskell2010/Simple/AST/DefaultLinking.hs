@@ -514,6 +514,10 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	GconSymF(MkGconSymF, _unGconSymF),
 	GconSym,
 
+	-- *** § 3.11 List Comprehensions types.
+	QualF(MkQualF, _unQualF),
+	Qual,
+
 	-- *** § 3.13 Case Expressions types.
 	AltsF(MkAltsF, _unAltsF),
 	Alts,
@@ -1631,6 +1635,13 @@ type Qop k z s l lexicalAnnotation annotation = Fixed.Fix (QopF k z s l lexicalA
 newtype GconSymF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkGconSymF { _unGconSymF :: (GconSymBase (l (LexicalColonKeyBase k z s)) (Qcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'GconSymF'
 type GconSym k z s l lexicalAnnotation annotation = Fixed.Fix (GconSymF k z s l lexicalAnnotation annotation)
+
+-- § 3.11 List Comprehensions types.
+
+-- | 'QualBase' with fewer unresolved variables, with default linking.
+newtype QualF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkQualF { _unQualF :: (QualBase (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (LexicalLeftArrow k z s l lexicalAnnotation lexicalAnnotation) (Exp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (LexicalLet k z s l lexicalAnnotation lexicalAnnotation) (Decls k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'QualF'
+type Qual k z s l lexicalAnnotation annotation = Fixed.Fix (QualF k z s l lexicalAnnotation annotation)
 
 -- § 3.13 Case Expressions types.
 

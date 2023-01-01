@@ -121,6 +121,9 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	QopBase(QualifiableNonConstructorBinaryOperator, QualifiableConstructorBinaryOperator),
 	GconSymBase(ConsListConstructor, NonbuiltinQualifiableConstructorSymbolic),
 
+	-- ** § 3.11 List Comprehensions types.
+	QualBase(GeneratorQual, LocalDeclarationQual, BooleanGuardQual),
+
 	-- ** § 3.13 Case Expressions types.
 	AltsBase(CaseBranches),
 	AltBase(ExpBranch, GuardedExpBranch, NullExpBranch),
@@ -824,6 +827,15 @@ data QopBase qvarop qconop annotation fixpoint =
 data GconSymBase lexicalColon qcon annotation fixpoint =
 	  ConsListConstructor                      annotation lexicalColon
 	| NonbuiltinQualifiableConstructorSymbolic annotation qcon
+
+-- § 3.11 List Comprehensions types.
+
+-- | A list comprehension qualifier: the individual bindings and components
+-- after the ‘|’.
+data QualBase pat lexicalLeftArrow exp lexicalLet decls annotation fixpoint =
+	  GeneratorQual        annotation pat        lexicalLeftArrow exp
+	| LocalDeclarationQual annotation lexicalLet decls
+	| BooleanGuardQual     annotation exp
 
 -- § 3.13 Case Expressions types.
 
