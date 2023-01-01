@@ -420,8 +420,8 @@ data ExportsBase data2 maybe list lexicalLeftParenthesis export lexicalComma lex
 -- (modid: module identifier.)
 data ExportBase data2 data3 maybe either list qvar qtycon lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis cname lexicalComma qtycls var lexicalModule modid annotation fixpoint =
 	  ExportVariable      annotation qvar
-	| ExportTypeVariable  annotation qtycon        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 cname (list (lexicalComma cname)))) lexicalRightParenthesis)))
-	| ExportClassVariable annotation qtycls        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 var   (list (lexicalComma var  )))) lexicalRightParenthesis)))
+	| ExportTypeVariable  annotation qtycon        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 cname (list (data2 lexicalComma cname)))) lexicalRightParenthesis)))
+	| ExportClassVariable annotation qtycls        (maybe (either (data3 lexicalLeftParenthesis lexicalDotDot lexicalRightParenthesis) (data3 lexicalLeftParenthesis (maybe (data2 var   (list (data2 lexicalComma var  )))) lexicalRightParenthesis)))
 	| ExportModule        annotation lexicalModule modid
 
 -- | Export (or import, etc.) a ‘data’ or ‘newtype’'s fields (‘var’s) and constructors (‘con’s).
