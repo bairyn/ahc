@@ -43,10 +43,10 @@
 -- semicolons for more convenient automatic text manipulation.
 module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST (
 	module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base,
-	module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.StandardLinking,
+	module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking,
 ) where
 
 import Prelude ()
 
 import Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base
-import Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.StandardLinking
+import Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking
