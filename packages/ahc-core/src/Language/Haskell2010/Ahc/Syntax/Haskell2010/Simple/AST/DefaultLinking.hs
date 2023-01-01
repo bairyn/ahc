@@ -503,6 +503,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	Varop,
 	QvaropF(MkQvaropF, _unQvaropF),
 	Qvarop,
+	QvaropSansMinusF(MkQvaropSansMinusF, _unQvaropSansMinusF),
+	QvaropSansMinus,
 	ConopF(MkConopF, _unConopF),
 	Conop,
 	QconopF(MkQconopF, _unQconopF),
@@ -1617,6 +1619,10 @@ type Varop k z s l lexicalAnnotation annotation = Fixed.Fix (VaropF k z s l lexi
 newtype QvaropF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkQvaropF { _unQvaropF :: (QvaropBase (QvarSym k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalBacktickKeyBase k z s)) (Qvarid k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'QvaropF'
 type Qvarop k z s l lexicalAnnotation annotation = Fixed.Fix (QvaropF k z s l lexicalAnnotation annotation)
+-- | 'QvaropSansMinusBase' with fewer unresolved variables, with default linking.
+newtype QvaropSansMinusF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkQvaropSansMinusF { _unQvaropSansMinusF :: (QvaropSansMinusBase (QvarSymSansMinus k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalBacktickKeyBase k z s)) (Qvarid k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'QvaropSansMinusF'
+type QvaropSansMinus k z s l lexicalAnnotation annotation = Fixed.Fix (QvaropSansMinusF k z s l lexicalAnnotation annotation)
 -- | 'ConopBase' with fewer unresolved variables, with default linking.
 newtype ConopF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkConopF { _unConopF :: (ConopBase (ConSym k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalBacktickKeyBase k z s)) (Conid k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'ConopF'

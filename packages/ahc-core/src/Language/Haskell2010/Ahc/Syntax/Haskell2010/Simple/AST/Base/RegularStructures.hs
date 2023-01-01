@@ -115,6 +115,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	QconBase(QualifiableConstructorNonsymbolic, QualifiableConstructorSymbolic),
 	VaropBase(SymbolicNonconstructorBinaryOperator, NonsymbolicNonconstructorBinaryOperator),
 	QvaropBase(QualifiableSymbolicNonconstructorBinaryOperator, QualifiableNonsymbolicNonconstructorBinaryOperator),
+	QvaropSansMinusBase(QualifiableSymbolicNonconstructorBinaryOperatorSansMinus, QualifiableNonsymbolicNonconstructorBinaryOperator),
 	ConopBase(SymbolicConstructorBinaryOperator, NonsymbolicConstructorBinaryOperator),
 	QconopBase(QualifiableSymbolicConstructorBinaryOperator, QualifiableNonsymbolicConstructorBinaryOperator),
 	OpBase(NonConstructorBinaryOperator, ConstructorBinaryOperator),
@@ -803,6 +804,11 @@ data VaropBase varSym lexicalBacktick varid annotation fixpoint =
 data QvaropBase qvarSym lexicalBacktick qvarid annotation fixpoint =
 	  QualifiableSymbolicNonconstructorBinaryOperator    annotation qvarSym
 	| QualifiableNonsymbolicNonconstructorBinaryOperator annotation lexicalBacktick qvarid lexicalBacktick
+
+-- | 'QvaropBase' without ‘-’.
+data QvaropSansMinusBase qvarSymSansMinus lexicalBacktick qvarid annotation fixpoint =
+	  QualifiableSymbolicNonconstructorBinaryOperatorSansMinus    annotation qvarSymSansMinus
+	| QualifiableNonsymbolicNonconstructorBinaryOperatorSansMinus annotation lexicalBacktick qvarid lexicalBacktick
 
 -- | An unqualified binary operation, capitalized-style, for constructors and constructor variables.
 data ConopBase conSym lexicalBacktick conid annotation fixpoint =
