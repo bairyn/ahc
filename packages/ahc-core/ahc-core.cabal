@@ -101,7 +101,7 @@ common extended-components
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStructures
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.LexicalFoundation
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStructures
-		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking
+		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.StandardLinking
 
 library
 	import: all-components
@@ -116,7 +116,7 @@ library
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStructures
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.LexicalFoundation
 		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStructures
-		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking
+		Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.StandardLinking
 
 -- An implementation designed for portability and minimalistic requirements.
 --

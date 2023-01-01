@@ -1,7 +1,7 @@
 -- vim: set filetype=haskell noet
 
 {-
- - DefaultLinking.hs
+ - StandardLinking.hs
  -
  - Haskell2010 Simple syntax AST: default intra-module linking.
  -
@@ -39,7 +39,7 @@
 --
 -- (If needed, ‘type’ aliases can be wrapped with another layer with ‘newtype’
 -- to enable partial type application.)
-module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
+module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.StandardLinking (
 	-- Export everything, explicitly.
 
 	-- * Structures with default linking.
