@@ -189,9 +189,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	AscLargeBase(AsciiLargeA, AsciiLargeB, AsciiLargeC, AsciiLargeD, AsciiLargeE, AsciiLargeF, AsciiLargeG, AsciiLargeH, AsciiLargeI, AsciiLargeJ, AsciiLargeK, AsciiLargeL, AsciiLargeM, AsciiLargeN, AsciiLargeO, AsciiLargeP, AsciiLargeQ, AsciiLargeR, AsciiLargeS, AsciiLargeT, AsciiLargeU, AsciiLargeV, AsciiLargeW, AsciiLargeX, AsciiLargeY, AsciiLargeZ),
 	UniLargeBase(UnicodeLargeUniLarge),
 	SymbolBase(AsciiNonspecialSymbol, UnicodeNonspecialNonscorequoteSymbol),
+	SymbolSansBackslashBase(AsciiNonspecialSymbolSansBackslash, UnicodeNonspecialNonscorequoteSymbolSansBackslash),
 	SymbolSansNcBase(AsciiNonspecialSymbolSansNc, UnicodeNonspecialNonscorequoteSymbolSansNc),
 
 	AscSymbolBase(ExclamationAsciiSymbol, HashAsciiSymbol, DollarAsciiSymbol, PercentAsciiSymbol, AmpersandAsciiSymbol, AsteriskAsciiSymbol, PlusAsciiSymbol, DotAsciiSymbol, SlashAsciiSymbol, LeftAngleBracketAsciiSymbol, EqualsAsciiSymbol, RightAngleBracketAsciiSymbol, QuestionMarkAsciiSymbol, AtAsciiSymbol, BackslashAsciiSymbol, CaretAsciiSymbol, PipeAsciiSymbol, HyphenAsciiSymbol, TildeAsciiSymbol, ColonAsciiSymbol),
+	AscSymbolSansBackslashBase(ExclamationAsciiSymbolSansBackslash, HashAsciiSymbolSansBackslash, DollarAsciiSymbolSansBackslash, PercentAsciiSymbolSansBackslash, AmpersandAsciiSymbolSansBackslash, AsteriskAsciiSymbolSansBackslash, PlusAsciiSymbolSansBackslash, DotAsciiSymbolSansBackslash, SlashAsciiSymbolSansBackslash, LeftAngleBracketAsciiSymbolSansBackslash, EqualsAsciiSymbolSansBackslash, RightAngleBracketAsciiSymbolSansBackslash, QuestionMarkAsciiSymbolSansBackslash, AtAsciiSymbolSansBackslash, CaretAsciiSymbolSansBackslash, PipeAsciiSymbolSansBackslash, HyphenAsciiSymbolSansBackslash, TildeAsciiSymbolSansBackslash, ColonAsciiSymbolSansBackslash),
 	AscSymbolSansNcBase(ExclamationAsciiSymbolSansNc, HashAsciiSymbolSansNc, DollarAsciiSymbolSansNc, PercentAsciiSymbolSansNc, AmpersandAsciiSymbolSansNc, AsteriskAsciiSymbolSansNc, PlusAsciiSymbolSansNc, DotAsciiSymbolSansNc, SlashAsciiSymbolSansNc, LeftAngleBracketAsciiSymbolSansNc, EqualsAsciiSymbolSansNc, RightAngleBracketAsciiSymbolSansNc, QuestionMarkAsciiSymbolSansNc, AtAsciiSymbolSansNc, BackslashAsciiSymbolSansNc, CaretAsciiSymbolSansNc, PipeAsciiSymbolSansNc, TildeAsciiSymbolSansNc, ColonAsciiSymbolSansNc),
 	UniSymbolBase(UnicodeSymbol),
 	UniSymbolSansSpecialishBase(UnicodeSymbolSansSpecialish),
@@ -1310,6 +1312,11 @@ data SymbolBase ascSymbol uniSymbolSansSpecialish annotation fixpoint =
 	  AsciiNonspecialSymbol                annotation ascSymbol
 	| UnicodeNonspecialNonscorequoteSymbol annotation uniSymbolSansSpecialish
 
+-- | 'SymbolBase', excluding ‘\’.
+data SymbolSansBackslashBase ascSymbolSansBackslash uniSymbolSansSpecialish annotation fixpoint =
+	  AsciiNonspecialSymbolSansBackslash                annotation ascSymbolSansBackslash
+	| UnicodeNonspecialNonscorequoteSymbolSansBackslash annotation uniSymbolSansSpecialish
+
 -- | Symbol characters, excluding special symbols and any character that can be
 -- part of an ‘nc’ (multi-line style comment) construct.
 --
@@ -1341,6 +1348,28 @@ data AscSymbolBase lexicalExclamation lexicalHash lexicalDollar lexicalPercent l
 	| HyphenAsciiSymbol            annotation lexicalHyphen
 	| TildeAsciiSymbol             annotation lexicalTilde
 	| ColonAsciiSymbol             annotation lexicalColon
+
+-- | 'AscSymbolBase' excluding ‘\’.
+data AscSymbolSansBackslashBase lexicalExclamation lexicalHash lexicalDollar lexicalPercent lexicalAmpersand lexicalAsterisk lexicalPlus lexicalDot lexicalSlash lexicalLeftAngleBracket lexicalEquals lexicalRightAngleBracket lexicalQuestionMark lexicalAt lexicalCaret lexicalPipe lexicalHyphen lexicalTilde lexicalColon annotation fixpoint =
+	  ExclamationAsciiSymbolSansBackslash       annotation lexicalExclamation
+	| HashAsciiSymbolSansBackslash              annotation lexicalHash
+	| DollarAsciiSymbolSansBackslash            annotation lexicalDollar
+	| PercentAsciiSymbolSansBackslash           annotation lexicalPercent
+	| AmpersandAsciiSymbolSansBackslash         annotation lexicalAmpersand
+	| AsteriskAsciiSymbolSansBackslash          annotation lexicalAsterisk
+	| PlusAsciiSymbolSansBackslash              annotation lexicalPlus
+	| DotAsciiSymbolSansBackslash               annotation lexicalDot
+	| SlashAsciiSymbolSansBackslash             annotation lexicalSlash
+	| LeftAngleBracketAsciiSymbolSansBackslash  annotation lexicalLeftAngleBracket
+	| EqualsAsciiSymbolSansBackslash            annotation lexicalEquals
+	| RightAngleBracketAsciiSymbolSansBackslash annotation lexicalRightAngleBracket
+	| QuestionMarkAsciiSymbolSansBackslash      annotation lexicalQuestionMark
+	| AtAsciiSymbolSansBackslash                annotation lexicalAt
+	| CaretAsciiSymbolSansBackslash             annotation lexicalCaret
+	| PipeAsciiSymbolSansBackslash              annotation lexicalPipe
+	| HyphenAsciiSymbolSansBackslash            annotation lexicalHyphen
+	| TildeAsciiSymbolSansBackslash             annotation lexicalTilde
+	| ColonAsciiSymbolSansBackslash             annotation lexicalColon
 
 -- | An ASCII symbol except special characters, underscore, and quote
 -- characters; except ‘nc’ (multiline-style comment) chars.

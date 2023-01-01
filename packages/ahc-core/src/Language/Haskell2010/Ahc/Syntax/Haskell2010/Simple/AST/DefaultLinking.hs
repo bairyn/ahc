@@ -131,11 +131,15 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	UniLarge,
 	SymbolF(MkSymbolF, _unSymbolF),
 	Symbol,
+	SymbolSansBackslashF(MkSymbolSansBackslashF, _unSymbolSansBackslashF),
+	SymbolSansBackslash,
 	SymbolSansNcF(MkSymbolSansNcF, _unSymbolSansNcF),
 	SymbolSansNc,
 
 	AscSymbolF(MkAscSymbolF, _unAscSymbolF),
 	AscSymbol,
+	AscSymbolSansBackslashF(MkAscSymbolSansBackslashF, _unAscSymbolSansBackslashF),
+	AscSymbolSansBackslash,
 	AscSymbolSansNcF(MkAscSymbolSansNcF, _unAscSymbolSansNcF),
 	AscSymbolSansNc,
 	UniSymbolF(MkUniSymbolF, _unUniSymbolF),
@@ -921,6 +925,10 @@ type UniLarge k z s l lexicalAnnotation annotation = Fixed.Fix (UniLargeF k z s 
 newtype SymbolF k z s l lexicalAnnotation annotation fixpoint = MkSymbolF { _unSymbolF :: (SymbolBase (AscSymbol k z s l lexicalAnnotation lexicalAnnotation) (UniSymbolSansSpecialish k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'SymbolF'
 type Symbol k z s l lexicalAnnotation annotation = Fixed.Fix (SymbolF k z s l lexicalAnnotation annotation)
+-- | 'SymbolSansBackslashBase' with fewer unresolved variables, with default linking.
+newtype SymbolSansBackslashF k z s l lexicalAnnotation annotation fixpoint = MkSymbolSansBackslashF { _unSymbolSansBackslashF :: (SymbolSansBackslashBase (AscSymbolSansBackslash k z s l lexicalAnnotation lexicalAnnotation) (UniSymbolSansSpecialish k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'SymbolSansBackslashF'
+type SymbolSansBackslash k z s l lexicalAnnotation annotation = Fixed.Fix (SymbolSansBackslashF k z s l lexicalAnnotation annotation)
 -- | 'SymbolSansNcBase' with fewer unresolved variables, with default linking.
 newtype SymbolSansNcF k z s l lexicalAnnotation annotation fixpoint = MkSymbolSansNcF { _unSymbolSansNcF :: (SymbolSansNcBase (AscSymbolSansNc k z s l lexicalAnnotation lexicalAnnotation) (UniSymbolSansSpecialishSansNc k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'SymbolSansNcF'
@@ -929,6 +937,10 @@ type SymbolSansNc k z s l lexicalAnnotation annotation = Fixed.Fix (SymbolSansNc
 newtype AscSymbolF k z s l lexicalAnnotation annotation fixpoint = MkAscSymbolF { _unAscSymbolF :: (AscSymbolBase (l (LexicalExclamationKeyBase k z s)) (l (LexicalHashKeyBase k z s)) (l (LexicalDollarKeyBase k z s)) (l (LexicalPercentKeyBase k z s)) (l (LexicalAmpersandKeyBase k z s)) (l (LexicalAsteriskKeyBase k z s)) (l (LexicalPlusKeyBase k z s)) (l (LexicalDotKeyBase k z s)) (l (LexicalSlashKeyBase k z s)) (l (LexicalLeftAngleBracketKeyBase k z s)) (l (LexicalEqualsKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) (l (LexicalQuestionMarkKeyBase k z s)) (l (LexicalAtKeyBase k z s)) (l (LexicalBackslashKeyBase k z s)) (l (LexicalCaretKeyBase k z s)) (l (LexicalPipeKeyBase k z s)) (l (LexicalHyphenKeyBase k z s)) (l (LexicalTildeKeyBase k z s)) (l (LexicalColonKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'AscSymbolF'
 type AscSymbol k z s l lexicalAnnotation annotation = Fixed.Fix (AscSymbolF k z s l lexicalAnnotation annotation)
+-- | 'AscSymbolSansBackslashBase' with fewer unresolved variables, with default linking.
+newtype AscSymbolSansBackslashF k z s l lexicalAnnotation annotation fixpoint = MkAscSymbolSansBackslashF { _unAscSymbolSansBackslashF :: (AscSymbolSansBackslashBase (l (LexicalExclamationKeyBase k z s)) (l (LexicalHashKeyBase k z s)) (l (LexicalDollarKeyBase k z s)) (l (LexicalPercentKeyBase k z s)) (l (LexicalAmpersandKeyBase k z s)) (l (LexicalAsteriskKeyBase k z s)) (l (LexicalPlusKeyBase k z s)) (l (LexicalDotKeyBase k z s)) (l (LexicalSlashKeyBase k z s)) (l (LexicalLeftAngleBracketKeyBase k z s)) (l (LexicalEqualsKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) (l (LexicalQuestionMarkKeyBase k z s)) (l (LexicalAtKeyBase k z s)) (l (LexicalCaretKeyBase k z s)) (l (LexicalPipeKeyBase k z s)) (l (LexicalHyphenKeyBase k z s)) (l (LexicalTildeKeyBase k z s)) (l (LexicalColonKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'AscSymbolSansBackslashF'
+type AscSymbolSansBackslash k z s l lexicalAnnotation annotation = Fixed.Fix (AscSymbolSansBackslashF k z s l lexicalAnnotation annotation)
 -- | 'AscSymbolSansNcBase' with fewer unresolved variables, with default linking.
 newtype AscSymbolSansNcF k z s l lexicalAnnotation annotation fixpoint = MkAscSymbolSansNcF { _unAscSymbolSansNcF :: (AscSymbolSansNcBase (l (LexicalExclamationKeyBase k z s)) (l (LexicalHashKeyBase k z s)) (l (LexicalDollarKeyBase k z s)) (l (LexicalPercentKeyBase k z s)) (l (LexicalAmpersandKeyBase k z s)) (l (LexicalAsteriskKeyBase k z s)) (l (LexicalPlusKeyBase k z s)) (l (LexicalDotKeyBase k z s)) (l (LexicalSlashKeyBase k z s)) (l (LexicalLeftAngleBracketKeyBase k z s)) (l (LexicalEqualsKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) (l (LexicalQuestionMarkKeyBase k z s)) (l (LexicalAtKeyBase k z s)) (l (LexicalBackslashKeyBase k z s)) (l (LexicalCaretKeyBase k z s)) (l (LexicalPipeKeyBase k z s)) (l (LexicalTildeKeyBase k z s)) (l (LexicalColonKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'AscSymbolSansNcF'
