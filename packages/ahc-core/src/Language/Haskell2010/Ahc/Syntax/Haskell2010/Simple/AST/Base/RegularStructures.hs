@@ -105,6 +105,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	ExpentBase(ExpentFFI),
 	SafetyBase(UnsafeFFI, SafeFFI),
 
+	-- ** § 8.4.2 Foreign Types types.
+	FtypeBase(OutputFtype, FunctionFtype),
+	FrtypeBase(BaseOutputFrtype, VoidOutputFrtype),
+	FatypeBase(FatypeFFI),
+
 	-- ** § 3 Expressions types.
 	ExpBase(TypedExpression, UntypedExpression),
 	InfixExpBase(RightInfixExpression, UnaryPrefixExpression, LeftExpression),
@@ -746,6 +751,25 @@ data ExpentBase maybe string annotation fixpoint =
 data SafetyBase lexicalUnsafe lexicalSafe annotation fixpoint =
 	  UnsafeFFI annotation lexicalSafe
 	| SafeFFI   annotation lexicalSafe
+
+-- § 8.4.2 Foreign Types types.
+
+-- | A type that imported or exported entities can have in the FFI.
+--
+-- As an ‘ftype’, it can be either an output type or a function type from an
+-- input type to an ‘ftype’.
+data FtypeBase frtype fatype lexicalRightArrow annotation fixpoint =
+	  OutputFtype   annotation frtype
+	| FunctionFtype annotation fatype lexicalRightArrow fixpoint
+
+-- | A possible output type in the FFI.
+data FrtypeBase fatype lexicalLeftParenthesis lexicalRightParenthesis annotation fixpoint =
+	  BaseOutputFrtype annotation fatype
+	| VoidOutputFrtype annotation lexicalLeftParenthesis lexicalRightParenthesis
+
+-- | A type applicable in the FFI.
+data FatypeBase list qtycon atype annotation fixpoint =
+	FatypeFFI annotation qtycon (list atype)
 
 -- § 3 Expression types.
 

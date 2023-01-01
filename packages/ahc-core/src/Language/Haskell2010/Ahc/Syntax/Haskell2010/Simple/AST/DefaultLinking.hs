@@ -539,6 +539,14 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	SafetyF(MkSafetyF, _unSafetyF),
 	Safety,
 
+	-- ** § 8.4.2 Foreign Types types.
+	FtypeF(MkFtypeF, _unFtypeF),
+	Ftype,
+	FrtypeF(MkFrtypeF, _unFrtypeF),
+	Frtype,
+	FatypeF(MkFatypeF, _unFatypeF),
+	Fatype,
+
 	-- *** § 3 Expressions types.
 	ExpF(MkExpF, _unExpF),
 	Exp,
@@ -1754,6 +1762,21 @@ type Expent k z s l lexicalAnnotation annotation = Fixed.Fix (ExpentF k z s l le
 newtype SafetyF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkSafetyF { _unSafetyF :: (SafetyBase (LexicalUnsafe k z s l lexicalAnnotation lexicalAnnotation) (LexicalSafe k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'SafetyF'
 type Safety k z s l lexicalAnnotation annotation = Fixed.Fix (SafetyF k z s l lexicalAnnotation annotation)
+
+-- § 8.4.2 Foreign Types types.
+
+-- | 'FtypeBase' with fewer unresolved variables, with default linking.
+newtype FtypeF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFtypeF { _unFtypeF :: (FtypeBase (Frtype k z s l lexicalAnnotation lexicalAnnotation) (Fatype k z s l lexicalAnnotation lexicalAnnotation) (LexicalRightArrow k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'FtypeF'
+type Ftype k z s l lexicalAnnotation annotation = Fixed.Fix (FtypeF k z s l lexicalAnnotation annotation)
+-- | 'FrtypeBase' with fewer unresolved variables, with default linking.
+newtype FrtypeF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFrtypeF { _unFrtypeF :: (FrtypeBase (Fatype k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalLeftParenthesisKeyBase k z s)) (l (LexicalRightParenthesisKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'FrtypeF'
+type Frtype k z s l lexicalAnnotation annotation = Fixed.Fix (FrtypeF k z s l lexicalAnnotation annotation)
+-- | 'FatypeBase' with fewer unresolved variables, with default linking.
+newtype FatypeF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFatypeF { _unFatypeF :: (FatypeBase [] (Qtycon k z s l lexicalAnnotation lexicalAnnotation) (Atype k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'FatypeF'
+type Fatype k z s l lexicalAnnotation annotation = Fixed.Fix (FatypeF k z s l lexicalAnnotation annotation)
 
 -- § 3 Expressions types.
 
