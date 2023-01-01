@@ -3,7 +3,7 @@
 {-
  - StandardLinking.hs
  -
- - Haskell2010 Simple syntax AST: default intra-module linking.
+ - Haskell2010 Simple syntax AST: standard intra-module linking.
  -
  - Instantiates AST structures with intra-module references, providing a
  - default implementation.
