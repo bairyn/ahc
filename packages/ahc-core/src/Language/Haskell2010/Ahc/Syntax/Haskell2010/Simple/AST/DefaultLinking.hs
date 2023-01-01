@@ -260,6 +260,18 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	GapF(MkGapF, _unGapF),
 	Gap,
 
+	-- *** § 8.3 (FFI) Lexical Structure types.
+	ChnameF(MkChnameF, _unChnameF),
+	Chname,
+	CidF(MkCidF, _unCidF),
+	Cid,
+	ChcharF(MkChcharF, _unChcharF),
+	Chchar,
+	LetterF(MkLetterF, _unLetterF),
+	Letter,
+	AscSymbolSansAmpersandF(MkAscSymbolSansAmpersandF, _unAscSymbolSansAmpersandF),
+	AscSymbolSansAmpersand,
+
 	-- *** Base lexical structures.
 
 	-- **** Pseudo-foundational lexical structures.
@@ -1179,6 +1191,29 @@ type Cntrl k z s l lexicalAnnotation annotation = Fixed.Fix (CntrlF k z s l lexi
 newtype GapF k z s l lexicalAnnotation annotation fixpoint = MkGapF { _unGapF :: (GapBase [] (l (LexicalBackslashKeyBase k z s)) (Whitechar k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'GapF'
 type Gap k z s l lexicalAnnotation annotation = Fixed.Fix (GapF k z s l lexicalAnnotation annotation)
+
+-- § 8.3 (FFI) Lexical Structure types.
+
+-- | 'ChnameBase' with fewer unresolved variables, with default linking.
+newtype ChnameF k z s l lexicalAnnotation annotation fixpoint = MkChnameF { _unChnameF :: (ChnameBase [] (Chchar k z s l lexicalAnnotation lexicalAnnotation fixpoint) (l (LexicalDotKeyBase k z s)) (l (LexicalHLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'ChnameF'
+type Chname k z s l lexicalAnnotation annotation = Fixed.Fix (ChnameF k z s l lexicalAnnotation annotation)
+-- | 'CidBase' with fewer unresolved variables, with default linking.
+newtype CidF k z s l lexicalAnnotation annotation fixpoint = MkCidF { _unCidF :: (CidBase [] Prelude.Either (Letter k z s l lexicalAnnotation lexicalAnnotation fixpoint) (AscDigit k z s l lexicalAnnotation lexicalAnnotation fixpoint) annotation fixpoint) }
+-- | Fixpoint applied to 'CidF'
+type Cid k z s l lexicalAnnotation annotation = Fixed.Fix (CidF k z s l lexicalAnnotation annotation)
+-- | 'ChcharBase' with fewer unresolved variables, with default linking.
+newtype ChcharF k z s l lexicalAnnotation annotation fixpoint = MkChcharF { _unChcharF :: (ChcharBase Prelude.Either (Letter k z s l lexicalAnnotation lexicalAnnotation fixpoint) (AscSymbolSansAmpersand k z s l lexicalAnnotation lexicalAnnotation fixpoint) annotation fixpoint) }
+-- | Fixpoint applied to 'ChcharF'
+type Chchar k z s l lexicalAnnotation annotation = Fixed.Fix (ChcharF k z s l lexicalAnnotation annotation)
+-- | 'LetterBase' with fewer unresolved variables, with default linking.
+newtype LetterF k z s l lexicalAnnotation annotation fixpoint = MkLetterF { _unLetterF :: (LetterBase (AscSmall k z s l lexicalAnnotation lexicalAnnotation fixpoint) (AscLarge k z s l lexicalAnnotation lexicalAnnotation fixpoint) (l (LexicalUnderscoreKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LetterF'
+type Letter k z s l lexicalAnnotation annotation = Fixed.Fix (LetterF k z s l lexicalAnnotation annotation)
+-- | 'AscSymbolSansAmpersandBase' with fewer unresolved variables, with default linking.
+newtype AscSymbolSansAmpersandF k z s l lexicalAnnotation annotation fixpoint = MkAscSymbolSansAmpersandF { _unAscSymbolSansAmpersandF :: (AscSymbolSansAmpersandBase (l (LexicalExclamationKeyBase k z s)) (l (LexicalHashKeyBase k z s)) (l (LexicalDollarKeyBase k z s)) (l (LexicalPercentKeyBase k z s)) (l (LexicalAsteriskKeyBase k z s)) (l (LexicalPlusKeyBase k z s)) (l (LexicalDotKeyBase k z s)) (l (LexicalSlashKeyBase k z s)) (l (LexicalLeftAngleBracketKeyBase k z s)) (l (LexicalEqualsKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) (l (LexicalQuestionMarkKeyBase k z s)) (l (LexicalAtKeyBase k z s)) (l (LexicalBackslashKeyBase k z s)) (l (LexicalCaretKeyBase k z s)) (l (LexicalPipeKeyBase k z s)) (l (LexicalHyphenKeyBase k z s)) (l (LexicalTildeKeyBase k z s)) (l (LexicalColonKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'AscSymbolSansAmpersandF'
+type AscSymbolSansAmpersand k z s l lexicalAnnotation annotation = Fixed.Fix (AscSymbolSansAmpersandF k z s l lexicalAnnotation annotation)
 
 -- Base lexical structures.
 

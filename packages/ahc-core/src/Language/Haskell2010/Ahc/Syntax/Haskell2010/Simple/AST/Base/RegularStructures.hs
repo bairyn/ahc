@@ -262,6 +262,13 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	CntrlBase(AsciiControlAscLarge, AsciiControlAt, AsciiControlLeftBracket, AsciiControlBackslash, AsciiControlRightBracket, AsciiControlCaret, AsciiControlUnderscore),
 	GapBase(WhitespaceGap),
 
+	-- ** § 8.3 (FFI) Lexical Structure types.
+	ChnameBase(ChnameFFI),
+	CidBase(CidFFI),
+	ChcharBase(ChcharFFI),
+	LetterBase(SmallLetterFFI, LargeLetterFFI, UnderscoreLetterFFI),
+	AscSymbolSansAmpersandBase(ExclamationAsciiSymbolSansAmpersand, HashAsciiSymbolSansAmpersand, DollarAsciiSymbolSansAmpersand, PercentAsciiSymbolSansAmpersand, AsteriskAsciiSymbolSansAmpersand, PlusAsciiSymbolSansAmpersand, DotAsciiSymbolSansAmpersand, SlashAsciiSymbolSansAmpersand, LeftAngleBracketAsciiSymbolSansAmpersand, EqualsAsciiSymbolSansAmpersand, RightAngleBracketAsciiSymbolSansAmpersand, QuestionMarkAsciiSymbolSansAmpersand, AtAsciiSymbolSansAmpersand, BackslashAsciiSymbolSansAmpersand, CaretAsciiSymbolSansAmpersand, PipeAsciiSymbolSansAmpersand, HyphenAsciiSymbolSansAmpersand, TildeAsciiSymbolSansAmpersand, ColonAsciiSymbolSansAmpersand),
+
 	-- ** Base lexical structures.
 
 	-- $baseLexicalStructures
@@ -1815,6 +1822,52 @@ data CntrlBase ascLarge lexicalAt lexicalLeftBracket lexicalBackslash lexicalRig
 -- terminating backslash character.
 data GapBase list lexicalBackslash whitechar annotation fixpoint =
 	WhitespaceGap annotation lexicalBackslash whitechar (list whitechar) lexicalBackslash
+
+-- § 8.3 (FFI) Lexical Structure types.
+
+-- | Haskell2010 FFI-conformant C header filename.
+data ChnameBase list chchar lexicalDot lexicalHLower annotation fixpoint =
+	ChnameFFI annotation (list chchar) lexicalDot lexicalHLower
+
+-- | C identifier.
+--
+-- According to the spec, this coincides with C identifiers.
+data CidBase list either letter ascDigit annotation fixpoint =
+	CidFFI annotation letter (list (either letter ascDigit))
+
+-- | A character of those that make up a C header path.
+data ChcharBase either letter ascSymbolSansAmpersand annotation fixpoint =
+	ChcharFFI annotation (either letter ascSymbolSansAmpersand )
+
+-- | A letter or underscore, a valid starting character for a C identifier.
+data LetterBase ascSmall ascLarge lexicalUnderscore annotation fixpoint =
+	  SmallLetterFFI      annotation ascSmall
+	| LargeLetterFFI      annotation ascLarge
+	| UnderscoreLetterFFI annotation lexicalUnderscore
+
+-- | 'AscSymbolBase' excluding ‘&’.
+--
+-- This is for 'ChcharBase'.
+data AscSymbolSansAmpersandBase lexicalExclamation lexicalHash lexicalDollar lexicalPercent lexicalAsterisk lexicalPlus lexicalDot lexicalSlash lexicalLeftAngleBracket lexicalEquals lexicalRightAngleBracket lexicalQuestionMark lexicalAt lexicalBackslash lexicalCaret lexicalPipe lexicalHyphen lexicalTilde lexicalColon annotation fixpoint =
+	  ExclamationAsciiSymbolSansAmpersand       annotation lexicalExclamation
+	| HashAsciiSymbolSansAmpersand              annotation lexicalHash
+	| DollarAsciiSymbolSansAmpersand            annotation lexicalDollar
+	| PercentAsciiSymbolSansAmpersand           annotation lexicalPercent
+	| AsteriskAsciiSymbolSansAmpersand          annotation lexicalAsterisk
+	| PlusAsciiSymbolSansAmpersand              annotation lexicalPlus
+	| DotAsciiSymbolSansAmpersand               annotation lexicalDot
+	| SlashAsciiSymbolSansAmpersand             annotation lexicalSlash
+	| LeftAngleBracketAsciiSymbolSansAmpersand  annotation lexicalLeftAngleBracket
+	| EqualsAsciiSymbolSansAmpersand            annotation lexicalEquals
+	| RightAngleBracketAsciiSymbolSansAmpersand annotation lexicalRightAngleBracket
+	| QuestionMarkAsciiSymbolSansAmpersand      annotation lexicalQuestionMark
+	| AtAsciiSymbolSansAmpersand                annotation lexicalAt
+	| BackslashAsciiSymbolSansAmpersand         annotation lexicalBackslash
+	| CaretAsciiSymbolSansAmpersand             annotation lexicalCaret
+	| PipeAsciiSymbolSansAmpersand              annotation lexicalPipe
+	| HyphenAsciiSymbolSansAmpersand            annotation lexicalHyphen
+	| TildeAsciiSymbolSansAmpersand             annotation lexicalTilde
+	| ColonAsciiSymbolSansAmpersand             annotation lexicalColon
 
 -- Base lexical structures.
 
