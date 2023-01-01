@@ -200,6 +200,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	Qtycls,
 	QvarSymF(MkQvarSymF, _unQvarSymF),
 	QvarSym,
+	QvarSymSansMinusF(MkQvarSymSansMinusF, _unQvarSymSansMinusF),
+	QvarSymSansMinus,
 	QconSymF(MkQconSymF, _unQconSymF),
 	QconSym,
 
@@ -1042,6 +1044,10 @@ type Qtycls k z s l lexicalAnnotation annotation = Fixed.Fix (QtyclsF k z s l le
 newtype QvarSymF k z s l lexicalAnnotation annotation fixpoint = MkQvarSymF { _unQvarSymF :: (QvarSymBase (,) Prelude.Maybe (Modid k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDotKeyBase k z s)) (VarSym k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'QvarSymF'
 type QvarSym k z s l lexicalAnnotation annotation = Fixed.Fix (QvarSymF k z s l lexicalAnnotation annotation)
+-- | 'QvarSymSansMinusBase' with fewer unresolved variables, with default linking.
+newtype QvarSymSansMinusF k z s l lexicalAnnotation annotation fixpoint = MkQvarSymSansMinusF { _unQvarSymSansMinusF :: (QvarSymSansMinusBase (,) Prelude.Maybe (Modid k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDotKeyBase k z s)) (VarSymSansMinus k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'QvarSymSansMinusF'
+type QvarSymSansMinus k z s l lexicalAnnotation annotation = Fixed.Fix (QvarSymSansMinusF k z s l lexicalAnnotation annotation)
 -- | 'QconSymBase' with fewer unresolved variables, with default linking.
 newtype QconSymF k z s l lexicalAnnotation annotation fixpoint = MkQconSymF { _unQconSymF :: (QconSymBase (,) Prelude.Maybe (Modid k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDotKeyBase k z s)) (ConSym k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'QconSymF'

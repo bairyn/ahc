@@ -115,7 +115,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	QconBase(QualifiableConstructorNonsymbolic, QualifiableConstructorSymbolic),
 	VaropBase(SymbolicNonconstructorBinaryOperator, NonsymbolicNonconstructorBinaryOperator),
 	QvaropBase(QualifiableSymbolicNonconstructorBinaryOperator, QualifiableNonsymbolicNonconstructorBinaryOperator),
-	QvaropSansMinusBase(QualifiableSymbolicNonconstructorBinaryOperatorSansMinus, QualifiableNonsymbolicNonconstructorBinaryOperator),
+	QvaropSansMinusBase(QualifiableSymbolicNonconstructorBinaryOperatorSansMinus, QualifiableNonsymbolicNonconstructorBinaryOperatorSansMinus),
 	ConopBase(SymbolicConstructorBinaryOperator, NonsymbolicConstructorBinaryOperator),
 	QconopBase(QualifiableSymbolicConstructorBinaryOperator, QualifiableNonsymbolicConstructorBinaryOperator),
 	OpBase(NonConstructorBinaryOperator, ConstructorBinaryOperator),
@@ -228,6 +228,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	QtyconBase(QualifiableTycon),
 	QtyclsBase(QualifiableTycls),
 	QvarSymBase(QualifiableVarSym),
+	QvarSymSansMinusBase(QualifiableVarSymSansMinus),
 	QconSymBase(QualifiableConSym),
 
 	-- | (Note: the exclusion structures appear in 'Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStructures'.)
@@ -1567,6 +1568,10 @@ data QtyclsBase data2 maybe modid lexicalDot tycls annotation fixpoint =
 -- | A qualifiable lowercase-style, non-symbolic variable name.
 data QvarSymBase data2 maybe modid lexicalDot varSym annotation fixpoint =
 	QualifiableVarSym annotation (maybe (data2 modid lexicalDot)) varSym
+
+-- | A qualifiable lowercase-style, non-symbolic variable name, excluding ‘-’.
+data QvarSymSansMinusBase data2 maybe modid lexicalDot varSymSansMinus annotation fixpoint =
+	QualifiableVarSymSansMinus annotation (maybe (data2 modid lexicalDot)) varSymSansMinus
 
 -- | A qualifiable lowercase-style, non-symbolic variable name.
 data QconSymBase data2 maybe modid lexicalDot conSym annotation fixpoint =
