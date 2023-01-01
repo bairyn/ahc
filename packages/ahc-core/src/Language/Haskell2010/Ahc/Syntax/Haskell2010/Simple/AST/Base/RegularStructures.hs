@@ -98,9 +98,11 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	LexpBase(LambdaExpression, LetExpression, ConditionalExpression, CaseExpression, DoExpression, BaseExpression),
 	FexpBase(ApplicationExpression),
 	AexpBase(VariableExpression, ConstructorExpression, LiteralExpression, ParenthesesExpression, TupleExpression, ListExpression, ArithmeticSequenceExpression, ListComprehensionExpression, LeftSectionExpression, RightSectionExpression, ConstructRecordExpression, ModifyRecordExpression),
+	AexpSansQconBase(VariableExpressionSansQcon, ConstructorExpressionSansQcon, LiteralExpressionSansQcon, ParenthesesExpressionSansQcon, TupleExpressionSansQcon, ListExpressionSansQcon, ArithmeticSequenceExpressionSansQcon, ListComprehensionExpressionSansQcon, LeftSectionExpressionSansQcon, RightSectionExpressionSansQcon, ModifyRecordExpressionSansQcon),
 
 	-- ** § 3.2 Variables, Constructors, Operators, and Literals types.
 	GconBase(UnitConstructor, EmptyListConstructor, TupleConstructor, QualifiableConstructor),
+	GconSansQconBase(UnitConstructorSansQcon, EmptyListConstructorSansQcon, TupleConstructorSansQcon),
 	VarBase(VariableNonsymbolic, VariableSymbolic),
 	QvarBase(QualifiableVariableNonsymbolic, QualifiableVariableSymbolic),
 	ConBase(ConstructorNonsymbolic, ConstructorSymbolic),
@@ -706,6 +708,22 @@ data AexpBase data2 maybe list qvar gcon literal lexicalLeftParenthesis exp lexi
 	| ConstructRecordExpression    annotation qcon                   lexicalLeftBrace (maybe (data2 fbind (list (data2 lexicalComma fbind)))) lexicalRightBrace
 	| ModifyRecordExpression       annotation aexpSansQcon           lexicalLeftBrace fbind                                                   (list (data2 lexicalComma fbind)) lexicalRightBrace
 
+-- | A copy of 'AexpBase' without 'ConstructRecordExpression' and with a restricted 'ConstructorExpression'.
+data AexpSansQconBase data2 maybe list qvar gconSansQcon literal lexicalLeftParenthesis exp lexicalRightParenthesis lexicalComma lexicalLeftBracket lexicalRightBracket lexicalDotDot lexicalPipe qual infixExp qop qopSansUnaryMinus qcon lexicalLeftBrace fbind lexicalRightBrace annotation fixpoint =
+	  VariableExpressionSansQcon           annotation qvar
+	| ConstructorExpressionSansQcon        annotation gconSansQcon
+	| LiteralExpressionSansQcon            annotation literal
+	| ParenthesesExpressionSansQcon        annotation lexicalLeftParenthesis exp               lexicalRightParenthesis
+	| TupleExpressionSansQcon              annotation lexicalLeftParenthesis exp               lexicalComma                                           exp                     (list  (data2 lexicalComma exp )) lexicalRightParenthesis
+	| ListExpressionSansQcon               annotation lexicalLeftBracket     exp               (list (data2 lexicalComma exp))                        lexicalRightBracket
+	| ArithmeticSequenceExpressionSansQcon annotation lexicalLeftBracket     exp               (maybe exp)                                            lexicalDotDot           (maybe exp)                       lexicalRightBracket
+	| ListComprehensionExpressionSansQcon  annotation lexicalLeftBracket     exp               lexicalPipe                                            qual                    (list  (data2 lexicalComma qual)) lexicalRightBracket
+	| LeftSectionExpressionSansQcon        annotation lexicalLeftParenthesis infixExp          qop                                                    lexicalRightParenthesis
+		-- ^ (The left section form of partial application, with a binary operation.)
+	| RightSectionExpressionSansQcon       annotation lexicalLeftParenthesis qopSansUnaryMinus infixExp                                               lexicalRightParenthesis
+		-- ^ (The right section form of partial application, with a binary operation.)
+	| ModifyRecordExpressionSansQcon       annotation fixpoint               lexicalLeftBrace fbind                                                   (list (data2 lexicalComma fbind)) lexicalRightBrace
+
 -- § 3.2 Variables, Constructors, Operators, and Literals types.
 
 -- | A value constructor, extended with a selection of built-in constructors.
@@ -714,6 +732,12 @@ data GconBase list lexicalLeftParenthesis lexicalRightParenthesis lexicalLeftBra
 	| EmptyListConstructor   annotation lexicalLeftBracket     lexicalRightBracket
 	| TupleConstructor       annotation lexicalLeftParenthesis lexicalComma            (list lexicalComma) lexicalRightParenthesis
 	| QualifiableConstructor annotation qcon
+
+-- | A copy of 'GconBase' without 'QualifiableConstructor'.
+data GconSansQconBase list lexicalLeftParenthesis lexicalRightParenthesis lexicalLeftBracket lexicalRightBracket lexicalComma annotation fixpoint =
+	  UnitConstructorSansQcon        annotation lexicalLeftParenthesis lexicalRightParenthesis
+	| EmptyListConstructorSansQcon   annotation lexicalLeftBracket     lexicalRightBracket
+	| TupleConstructorSansQcon       annotation lexicalLeftParenthesis lexicalComma            (list lexicalComma) lexicalRightParenthesis
 
 -- | An unqualified variable, represented as a non-symbolic identifier name or a symbolic variable name.
 data VarBase varid lexicalLeftParenthesis varSym lexicalRightParenthesis annotation fixpoint =

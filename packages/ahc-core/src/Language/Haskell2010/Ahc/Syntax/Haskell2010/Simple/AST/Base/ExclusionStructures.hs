@@ -69,6 +69,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStru
 	VaridNeBase(EOPVaridNe, InnerSansAscVaridNe, ALowerVaridNe, BLowerVaridNe, CLowerVaridNe, DLowerVaridNe, ELowerVaridNe, FLowerVaridNe, GLowerVaridNe, HLowerVaridNe, ILowerVaridNe, JLowerVaridNe, KLowerVaridNe, LLowerVaridNe, MLowerVaridNe, NLowerVaridNe, OLowerVaridNe, PLowerVaridNe, QLowerVaridNe, RLowerVaridNe, SLowerVaridNe, TLowerVaridNe, ULowerVaridNe, VLowerVaridNe, WLowerVaridNe, XLowerVaridNe, YLowerVaridNe, ZLowerVaridNe),
 	VaridThBase(EOPVaridTh, InnerSansAscVaridTh, ALowerVaridTh, BLowerVaridTh, CLowerVaridTh, DLowerVaridTh, ELowerVaridTh, FLowerVaridTh, GLowerVaridTh, HLowerVaridTh, ILowerVaridTh, JLowerVaridTh, KLowerVaridTh, LLowerVaridTh, MLowerVaridTh, NLowerVaridTh, OLowerVaridTh, PLowerVaridTh, QLowerVaridTh, RLowerVaridTh, SLowerVaridTh, TLowerVaridTh, ULowerVaridTh, VLowerVaridTh, WLowerVaridTh, XLowerVaridTh, YLowerVaridTh, ZLowerVaridTh),
 	VaridTyBase(EOPVaridTy, InnerSansAscVaridTy, ALowerVaridTy, BLowerVaridTy, CLowerVaridTy, DLowerVaridTy, ELowerVaridTy, FLowerVaridTy, GLowerVaridTy, HLowerVaridTy, ILowerVaridTy, JLowerVaridTy, KLowerVaridTy, LLowerVaridTy, MLowerVaridTy, NLowerVaridTy, OLowerVaridTy, PLowerVaridTy, QLowerVaridTy, RLowerVaridTy, SLowerVaridTy, TLowerVaridTy, ULowerVaridTy, VLowerVaridTy, WLowerVaridTy, XLowerVaridTy, YLowerVaridTy, ZLowerVaridTy),
+	VaridWhBase(EOPVaridWh, InnerSansAscVaridWh, ALowerVaridWh, BLowerVaridWh, CLowerVaridWh, DLowerVaridWh, ELowerVaridWh, FLowerVaridWh, GLowerVaridWh, HLowerVaridWh, ILowerVaridWh, JLowerVaridWh, KLowerVaridWh, LLowerVaridWh, MLowerVaridWh, NLowerVaridWh, OLowerVaridWh, PLowerVaridWh, QLowerVaridWh, RLowerVaridWh, SLowerVaridWh, TLowerVaridWh, ULowerVaridWh, VLowerVaridWh, WLowerVaridWh, XLowerVaridWh, YLowerVaridWh, ZLowerVaridWh),
 	VaridCasBase(EOPVaridCas, InnerSansAscVaridCas, ALowerVaridCas, BLowerVaridCas, CLowerVaridCas, DLowerVaridCas, ELowerVaridCas, FLowerVaridCas, GLowerVaridCas, HLowerVaridCas, ILowerVaridCas, JLowerVaridCas, KLowerVaridCas, LLowerVaridCas, MLowerVaridCas, NLowerVaridCas, OLowerVaridCas, PLowerVaridCas, QLowerVaridCas, RLowerVaridCas, SLowerVaridCas, TLowerVaridCas, ULowerVaridCas, VLowerVaridCas, WLowerVaridCas, XLowerVaridCas, YLowerVaridCas, ZLowerVaridCas),
 	VaridClaBase(EOPVaridCla, InnerSansAscVaridCla, ALowerVaridCla, BLowerVaridCla, CLowerVaridCla, DLowerVaridCla, ELowerVaridCla, FLowerVaridCla, GLowerVaridCla, HLowerVaridCla, ILowerVaridCla, JLowerVaridCla, KLowerVaridCla, LLowerVaridCla, MLowerVaridCla, NLowerVaridCla, OLowerVaridCla, PLowerVaridCla, QLowerVaridCla, RLowerVaridCla, SLowerVaridCla, TLowerVaridCla, ULowerVaridCla, VLowerVaridCla, WLowerVaridCla, XLowerVaridCla, YLowerVaridCla, ZLowerVaridCla),
 	VaridDatBase(EOPVaridDat, InnerSansAscVaridDat, ALowerVaridDat, BLowerVaridDat, CLowerVaridDat, DLowerVaridDat, ELowerVaridDat, FLowerVaridDat, GLowerVaridDat, HLowerVaridDat, ILowerVaridDat, JLowerVaridDat, KLowerVaridDat, LLowerVaridDat, MLowerVaridDat, NLowerVaridDat, OLowerVaridDat, PLowerVaridDat, QLowerVaridDat, RLowerVaridDat, SLowerVaridDat, TLowerVaridDat, ULowerVaridDat, VLowerVaridDat, WLowerVaridDat, XLowerVaridDat, YLowerVaridDat, ZLowerVaridDat),
@@ -1738,6 +1739,67 @@ data VaridTyBase list lexicalEndOfParse varidInnerSansAscSmallUnderscore varidIn
 		-- ^ ‘tyy’ starts no excluded identifier.
 	| ZLowerVaridTy       annotation lexicalZLower                    (list varidInner)
 		-- ^ ‘tyz’ starts no excluded identifier.
+
+-- | A non-symbolic variable (lowercase-style) identifier name, excluding
+-- reserved names, after an ‘wh’ was parsed from the beginning.
+data VaridWhBase list lexicalEndOfParse varidInnerSansAscSmallUnderscore varidInner lexicalALower lexicalBLower lexicalCLower lexicalDLower lexicalELower varidWhe lexicalFLower lexicalGLower lexicalHLower lexicalILower lexicalJLower lexicalKLower lexicalLLower lexicalMLower lexicalNLower lexicalOLower lexicalPLower lexicalQLower lexicalRLower lexicalSLower lexicalTLower lexicalULower lexicalVLower lexicalWLower lexicalXLower lexicalYLower lexicalZLower annotation fixpoint =
+	  EOPVaridWh          annotation lexicalEndOfParse
+		-- ^ We're provided with a certification that no more characters will
+		-- follow in whatever we're parsing, and ‘wh’ is not excluded.
+	| InnerSansAscVaridWh annotation varidInnerSansAscSmallUnderscore (list varidInner)
+		-- ^ Characters we know aren't excluded are valid characters.
+	| ALowerVaridWh       annotation lexicalALower                    (list varidInner)
+		-- ^ ‘wha’ starts no excluded identifier.
+	| BLowerVaridWh       annotation lexicalBLower                    (list varidInner)
+		-- ^ ‘whb’ starts no excluded identifier.
+	| CLowerVaridWh       annotation lexicalCLower                    (list varidInner)
+		-- ^ ‘whc’ starts no excluded identifier.
+	| DLowerVaridWh       annotation lexicalDLower                    (list varidInner)
+		-- ^ ‘whd’ starts no excluded identifier.
+	| ELowerVaridWh       annotation lexicalELower                    varidWhe
+		-- ^ ‘whe’ starts 1 excluded identifier.
+	| FLowerVaridWh       annotation lexicalFLower                    (list varidInner)
+		-- ^ ‘whf’ starts no excluded identifier.
+	| GLowerVaridWh       annotation lexicalGLower                    (list varidInner)
+		-- ^ ‘whg’ starts no excluded identifier.
+	| HLowerVaridWh       annotation lexicalHLower                    (list varidInner)
+		-- ^ ‘whh’ starts no excluded identifier.
+	| ILowerVaridWh       annotation lexicalILower                    (list varidInner)
+		-- ^ ‘whi’ starts no excluded identifier.
+	| JLowerVaridWh       annotation lexicalJLower                    (list varidInner)
+		-- ^ ‘whj’ starts no excluded identifier.
+	| KLowerVaridWh       annotation lexicalKLower                    (list varidInner)
+		-- ^ ‘whk’ starts no excluded identifier.
+	| LLowerVaridWh       annotation lexicalLLower                    (list varidInner)
+		-- ^ ‘whl’ starts no excluded identifier.
+	| MLowerVaridWh       annotation lexicalMLower                    (list varidInner)
+		-- ^ ‘whm’ starts no excluded identifier.
+	| NLowerVaridWh       annotation lexicalNLower                    (list varidInner)
+		-- ^ ‘whn’ starts no excluded identifier.
+	| OLowerVaridWh       annotation lexicalOLower                    (list varidInner)
+		-- ^ ‘who’ starts no excluded identifier.
+	| PLowerVaridWh       annotation lexicalPLower                    (list varidInner)
+		-- ^ ‘whp’ starts no excluded identifier.
+	| QLowerVaridWh       annotation lexicalQLower                    (list varidInner)
+		-- ^ ‘whq’ starts no excluded identifier.
+	| RLowerVaridWh       annotation lexicalRLower                    (list varidInner)
+		-- ^ ‘whr’ starts no excluded identifier.
+	| SLowerVaridWh       annotation lexicalSLower                    (list varidInner)
+		-- ^ ‘whs’ starts no excluded identifier.
+	| TLowerVaridWh       annotation lexicalTLower                    (list varidInner)
+		-- ^ ‘wht’ starts no excluded identifier.
+	| ULowerVaridWh       annotation lexicalULower                    (list varidInner)
+		-- ^ ‘whu’ starts no excluded identifier.
+	| VLowerVaridWh       annotation lexicalVLower                    (list varidInner)
+		-- ^ ‘whv’ starts no excluded identifier.
+	| WLowerVaridWh       annotation lexicalWLower                    (list varidInner)
+		-- ^ ‘whw’ starts no excluded identifier.
+	| XLowerVaridWh       annotation lexicalXLower                    (list varidInner)
+		-- ^ ‘whx’ starts no excluded identifier.
+	| YLowerVaridWh       annotation lexicalYLower                    (list varidInner)
+		-- ^ ‘why’ starts no excluded identifier.
+	| ZLowerVaridWh       annotation lexicalZLower                    (list varidInner)
+		-- ^ ‘whz’ starts no excluded identifier.
 
 -- | A non-symbolic variable (lowercase-style) identifier name, excluding
 -- reserved names, after an ‘cas’ was parsed from the beginning.

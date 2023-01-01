@@ -473,10 +473,14 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	Fexp,
 	AexpF(MkAexpF, _unAexpF),
 	Aexp,
+	AexpSansQconF(MkAexpSansQconF, _unAexpSansQconF),
+	AexpSansQcon,
 
 	-- *** § 3.2 Variables, Constructors, Operators, and Literals types.
 	GconF(MkGconF, _unGconF),
 	Gcon,
+	GconSansQconF(MkGconSansQconF, _unGconSansQconF),
+	GconSansQcon,
 	VarF(MkVarF, _unVarF),
 	Var,
 	QvarF(MkQvarF, _unQvarF),
@@ -606,6 +610,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	VaridTh,
 	VaridTyF(MkVaridTyF, _unVaridTyF),
 	VaridTy,
+	VaridWhF(MkVaridWhF, _unVaridWhF),
+	VaridWh,
 	VaridCasF(MkVaridCasF, _unVaridCasF),
 	VaridCas,
 	VaridClaF(MkVaridClaF, _unVaridClaF),
@@ -1550,6 +1556,10 @@ type Fexp k z s l lexicalAnnotation annotation = Fixed.Fix (FexpF k z s l lexica
 newtype AexpF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkAexpF { _unAexpF :: (AexpBase (,) Prelude.Maybe [] (Qvar k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Gcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Literal k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalLeftParenthesisKeyBase k z s)) (Exp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalRightParenthesisKeyBase k z s)) (l (LexicalCommaKeyBase k z s)) (l (LexicalLeftBracketKeyBase k z s)) (l (LexicalRightBracketKeyBase k z s)) (LexicalDotDot k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalPipeKeyBase k z s)) (Qual k z s l lexicalAnnotation lexicalAnnotation) (InfixExp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Qop k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (QopSansUnaryMinus k z s l lexicalAnnotation lexicalAnnotation) (Qcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalLeftBraceKeyBase k z s)) (Fbind k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalRightBraceKeyBase k z s)) (AexpSansQcon k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'AexpF'
 type Aexp k z s l lexicalAnnotation annotation = Fixed.Fix (AexpF k z s l lexicalAnnotation annotation)
+-- | 'AexpSansQconBase' with fewer unresolved variables, with default linking.
+newtype AexpSansQconF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkAexpSansQconF { _unAexpSansQconF :: (AexpSansQconBase (,) Prelude.Maybe [] (Qvar k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (GconSansQcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Literal k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalLeftParenthesisKeyBase k z s)) (Exp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalRightParenthesisKeyBase k z s)) (l (LexicalCommaKeyBase k z s)) (l (LexicalLeftBracketKeyBase k z s)) (l (LexicalRightBracketKeyBase k z s)) (LexicalDotDot k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalPipeKeyBase k z s)) (Qual k z s l lexicalAnnotation lexicalAnnotation) (InfixExp k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Qop k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (QopSansUnaryMinus k z s l lexicalAnnotation lexicalAnnotation) (Qcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalLeftBraceKeyBase k z s)) (Fbind k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalRightBraceKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'AexpSansQconF'
+type AexpSansQcon k z s l lexicalAnnotation annotation = Fixed.Fix (AexpSansQconF k z s l lexicalAnnotation annotation)
 
 -- § 3.2 Variables, Constructors, Operators, and Literals types.
 
@@ -1557,6 +1567,10 @@ type Aexp k z s l lexicalAnnotation annotation = Fixed.Fix (AexpF k z s l lexica
 newtype GconF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkGconF { _unGconF :: (GconBase [] (l (LexicalLeftParenthesisKeyBase k z s)) (l (LexicalRightParenthesisKeyBase k z s)) (l (LexicalLeftBracketKeyBase k z s)) (l (LexicalRightBracketKeyBase k z s)) (l (LexicalCommaKeyBase k z s)) (Qcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'GconF'
 type Gcon k z s l lexicalAnnotation annotation = Fixed.Fix (GconF k z s l lexicalAnnotation annotation)
+-- | 'GconSansQconBase' with fewer unresolved variables, with default linking.
+newtype GconSansQconF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkGconSansQconF { _unGconSansQconF :: (GconSansQconBase [] (l (LexicalLeftParenthesisKeyBase k z s)) (l (LexicalRightParenthesisKeyBase k z s)) (l (LexicalLeftBracketKeyBase k z s)) (l (LexicalRightBracketKeyBase k z s)) (l (LexicalCommaKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'GconSansQconF'
+type GconSansQcon k z s l lexicalAnnotation annotation = Fixed.Fix (GconSansQconF k z s l lexicalAnnotation annotation)
 -- | 'VarBase' with fewer unresolved variables, with default linking.
 newtype VarF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkVarF { _unVarF :: (VarBase (Varid k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalLeftParenthesisKeyBase k z s)) (VarSym k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalRightParenthesisKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'VarF'
@@ -1804,6 +1818,10 @@ type VaridTh k z s l lexicalAnnotation annotation = Fixed.Fix (VaridThF k z s l 
 newtype VaridTyF k z s l lexicalAnnotation annotation fixpoint = MkVaridTyF { _unVaridTyF :: (VaridTyBase [] (l (LexicalEndOfParseKeyBase k z s)) (VaridInnerSansAscSmallUnderscore k z s l lexicalAnnotation lexicalAnnotation) (VaridInner k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalALowerKeyBase k z s)) (l (LexicalBLowerKeyBase k z s)) (l (LexicalCLowerKeyBase k z s)) (l (LexicalDLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) (l (LexicalFLowerKeyBase k z s)) (l (LexicalGLowerKeyBase k z s)) (l (LexicalHLowerKeyBase k z s)) (l (LexicalILowerKeyBase k z s)) (l (LexicalJLowerKeyBase k z s)) (l (LexicalKLowerKeyBase k z s)) (l (LexicalLLowerKeyBase k z s)) (l (LexicalMLowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalOLowerKeyBase k z s)) (l (LexicalPLowerKeyBase k z s)) (l (LexicalQLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalSLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalULowerKeyBase k z s)) (l (LexicalVLowerKeyBase k z s)) (l (LexicalWLowerKeyBase k z s)) (l (LexicalXLowerKeyBase k z s)) (l (LexicalYLowerKeyBase k z s)) (VaridTyp k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalZLowerKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'VaridTyF'
 type VaridTy k z s l lexicalAnnotation annotation = Fixed.Fix (VaridTyF k z s l lexicalAnnotation annotation)
+-- | 'VaridWhBase' with fewer unresolved variables, with default linking.
+newtype VaridWhF k z s l lexicalAnnotation annotation fixpoint = MkVaridWhF { _unVaridWhF :: (VaridWhBase [] (l (LexicalEndOfParseKeyBase k z s)) (VaridInnerSansAscSmallUnderscore k z s l lexicalAnnotation lexicalAnnotation) (VaridInner k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalALowerKeyBase k z s)) (l (LexicalBLowerKeyBase k z s)) (l (LexicalCLowerKeyBase k z s)) (l (LexicalDLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) (VaridWhe k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalFLowerKeyBase k z s)) (l (LexicalGLowerKeyBase k z s)) (l (LexicalHLowerKeyBase k z s)) (l (LexicalILowerKeyBase k z s)) (l (LexicalJLowerKeyBase k z s)) (l (LexicalKLowerKeyBase k z s)) (l (LexicalLLowerKeyBase k z s)) (l (LexicalMLowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalOLowerKeyBase k z s)) (l (LexicalPLowerKeyBase k z s)) (l (LexicalQLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalSLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalULowerKeyBase k z s)) (l (LexicalVLowerKeyBase k z s)) (l (LexicalWLowerKeyBase k z s)) (l (LexicalXLowerKeyBase k z s)) (l (LexicalYLowerKeyBase k z s)) (l (LexicalZLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'VaridWhF'
+type VaridWh k z s l lexicalAnnotation annotation = Fixed.Fix (VaridWhF k z s l lexicalAnnotation annotation)
 -- | 'VaridCasBase' with fewer unresolved variables, with default linking.
 newtype VaridCasF k z s l lexicalAnnotation annotation fixpoint = MkVaridCasF { _unVaridCasF :: (VaridCasBase [] (l (LexicalEndOfParseKeyBase k z s)) (VaridInnerSansAscSmallUnderscore k z s l lexicalAnnotation lexicalAnnotation) (VaridInner k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalALowerKeyBase k z s)) (l (LexicalBLowerKeyBase k z s)) (l (LexicalCLowerKeyBase k z s)) (l (LexicalDLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) (l (LexicalFLowerKeyBase k z s)) (l (LexicalGLowerKeyBase k z s)) (l (LexicalHLowerKeyBase k z s)) (l (LexicalILowerKeyBase k z s)) (l (LexicalJLowerKeyBase k z s)) (l (LexicalKLowerKeyBase k z s)) (l (LexicalLLowerKeyBase k z s)) (l (LexicalMLowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalOLowerKeyBase k z s)) (l (LexicalPLowerKeyBase k z s)) (l (LexicalQLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalSLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalULowerKeyBase k z s)) (l (LexicalVLowerKeyBase k z s)) (l (LexicalWLowerKeyBase k z s)) (l (LexicalXLowerKeyBase k z s)) (l (LexicalYLowerKeyBase k z s)) (l (LexicalZLowerKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'VaridCasF'
