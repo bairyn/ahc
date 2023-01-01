@@ -110,6 +110,10 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	FrtypeBase(BaseOutputFrtype, VoidOutputFrtype),
 	FatypeBase(FatypeFFI),
 
+	-- ** § 8.5.1 Standard C Calls types.
+	ImpentCcallBase(StaticCcallFFI, DynamicCcallFFI, WrapperCcallFFI),
+	ExpentCcallBase(ExpentCcallFFI),
+
 	-- ** § 3 Expressions types.
 	ExpBase(TypedExpression, UntypedExpression),
 	InfixExpBase(RightInfixExpression, UnaryPrefixExpression, LeftExpression),
@@ -356,6 +360,9 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	LexicalDotnetBase(PseudoLexicalDotnet),
 	LexicalUnsafeBase(PseudoLexicalUnsafe),
 	LexicalSafeBase(PseudoLexicalSafe),
+	LexicalStaticBase(PseudoLexicalStatic),
+	LexicalDynamicBase(PseudoLexicalDynamic),
+	LexicalWrapperBase(PseudoLexicalWrapper),
 
 	-- *** Lexical foundation.
 
@@ -770,6 +777,20 @@ data FrtypeBase fatype lexicalLeftParenthesis lexicalRightParenthesis annotation
 -- | A type applicable in the FFI.
 data FatypeBase list qtycon atype annotation fixpoint =
 	FatypeFFI annotation qtycon (list atype)
+
+-- § 8.5.1 Standard C Calls types.
+
+-- | An impent grammatical structure that can be applied to ‘foreign import’
+-- declarations with the ‘ccall’ calling convention.
+data ImpentCcallBase maybe lexicalDoubleQuote lexicalStatic chname lexicalAmpersand cid lexicalDynamic lexicalWrapper annotation fixpoint =
+	  StaticCcallFFI  annotation lexicalDoubleQuote (maybe lexicalStatic) (maybe chname) (maybe lexicalAmpersand) (maybe cid) lexicalDoubleQuote
+	| DynamicCcallFFI annotation lexicalDoubleQuote lexicalDynamic lexicalDoubleQuote
+	| WrapperCcallFFI annotation lexicalDoubleQuote lexicalWrapper lexicalDoubleQuote
+
+-- | An expent grammatical structure that can be applied to ‘foreign export’
+-- declarations with the ‘ccall’ calling convention.
+data ExpentCcallBase maybe lexicalDoubleQuote cid annotation fixpoint =
+	ExpentCcallFFI annotation lexicalDoubleQuote (maybe cid) lexicalDoubleQuote
 
 -- § 3 Expression types.
 
@@ -2216,6 +2237,18 @@ data LexicalUnsafeBase lexicalULower lexicalNLower lexicalSLower lexicalALower l
 -- | The ‘safe’ FFI identifier.
 data LexicalSafeBase lexicalSLower lexicalALower lexicalFLower lexicalELower annotation fixpoint =
 	PseudoLexicalSafe annotation lexicalSLower lexicalALower lexicalFLower lexicalELower
+
+-- | The ‘static’ FFI identifier.
+data LexicalStaticBase lexicalSLower lexicalTLower lexicalALower lexicalILower lexicalCLower annotation fixpoint =
+	PseudoLexicalStatic annotation lexicalSLower lexicalTLower lexicalALower lexicalTLower lexicalILower lexicalCLower
+
+-- | The ‘dynamic’ FFI identifier.
+data LexicalDynamicBase lexicalDLower lexicalYLower lexicalNLower lexicalALower lexicalMLower lexicalILower lexicalCLower annotation fixpoint =
+	PseudoLexicalDynamic annotation lexicalDLower lexicalYLower lexicalNLower lexicalALower lexicalMLower lexicalILower lexicalCLower
+
+-- | The ‘wrapper’ FFI identifier.
+data LexicalWrapperBase lexicalWLower lexicalRLower lexicalALower lexicalPLower lexicalELower annotation fixpoint =
+	PseudoLexicalWrapper annotation lexicalWLower lexicalRLower lexicalALower lexicalPLower lexicalPLower lexicalELower lexicalRLower
 
 -- Lexical foundation.
 

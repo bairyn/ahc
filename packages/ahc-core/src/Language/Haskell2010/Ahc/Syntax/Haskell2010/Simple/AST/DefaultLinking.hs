@@ -400,6 +400,12 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	LexicalUnsafe,
 	LexicalSafeF(MkLexicalSafeF, _unLexicalSafeF),
 	LexicalSafe,
+	LexicalStaticF(MkLexicalStaticF, _unLexicalStaticF),
+	LexicalStatic,
+	LexicalDynamicF(MkLexicalDynamicF, _unLexicalDynamicF),
+	LexicalDynamic,
+	LexicalWrapperF(MkLexicalWrapperF, _unLexicalWrapperF),
+	LexicalWrapper,
 
 	-- ** Grammatical structures.
 
@@ -546,6 +552,12 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	Frtype,
 	FatypeF(MkFatypeF, _unFatypeF),
 	Fatype,
+
+	-- ** § 8.5.1 Standard C Calls types.
+	ImpentCcallF(MkImpentCcallF, _unImpentCcallF),
+	ImpentCcall,
+	ExpentCcallF(MkExpentCcallF, _unExpentCcallF),
+	ExpentCcall,
 
 	-- *** § 3 Expressions types.
 	ExpF(MkExpF, _unExpF),
@@ -1502,6 +1514,18 @@ type LexicalUnsafe k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalUnsa
 newtype LexicalSafeF k z s l lexicalAnnotation annotation fixpoint = MkLexicalSafeF { _unLexicalSafeF :: (LexicalSafeBase (l (LexicalSLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalFLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'LexicalSafeF'
 type LexicalSafe k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalSafeF k z s l lexicalAnnotation annotation)
+-- | 'LexicalStaticBase' with fewer unresolved variables, with default linking.
+newtype LexicalStaticF k z s l lexicalAnnotation annotation fixpoint = MkLexicalStaticF { _unLexicalStaticF :: (LexicalStaticBase (l (LexicalSLowerKeyBase k z s)) (l (LexicalTLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalILowerKeyBase k z s)) (l (LexicalCLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalStaticF'
+type LexicalStatic k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalStaticF k z s l lexicalAnnotation annotation)
+-- | 'LexicalDynamicBase' with fewer unresolved variables, with default linking.
+newtype LexicalDynamicF k z s l lexicalAnnotation annotation fixpoint = MkLexicalDynamicF { _unLexicalDynamicF :: (LexicalDynamicBase (l (LexicalDLowerKeyBase k z s)) (l (LexicalYLowerKeyBase k z s)) (l (LexicalNLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalMLowerKeyBase k z s)) (l (LexicalILowerKeyBase k z s)) (l (LexicalCLowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalDynamicF'
+type LexicalDynamic k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalDynamicF k z s l lexicalAnnotation annotation)
+-- | 'LexicalWrapperBase' with fewer unresolved variables, with default linking.
+newtype LexicalWrapperF k z s l lexicalAnnotation annotation fixpoint = MkLexicalWrapperF { _unLexicalWrapperF :: (LexicalWrapperBase (l (LexicalWLowerKeyBase k z s)) (l (LexicalRLowerKeyBase k z s)) (l (LexicalALowerKeyBase k z s)) (l (LexicalPLowerKeyBase k z s)) (l (LexicalELowerKeyBase k z s)) annotation fixpoint) }
+-- | Fixpoint applied to 'LexicalWrapperF'
+type LexicalWrapper k z s l lexicalAnnotation annotation = Fixed.Fix (LexicalWrapperF k z s l lexicalAnnotation annotation)
 
 -- Grammatical structures.
 
@@ -1777,6 +1801,17 @@ type Frtype k z s l lexicalAnnotation annotation = Fixed.Fix (FrtypeF k z s l le
 newtype FatypeF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFatypeF { _unFatypeF :: (FatypeBase [] (Qtycon k z s l lexicalAnnotation lexicalAnnotation) (Atype k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'FatypeF'
 type Fatype k z s l lexicalAnnotation annotation = Fixed.Fix (FatypeF k z s l lexicalAnnotation annotation)
+
+-- § 8.5.1 Standard C Calls types.
+
+-- | 'ImpentCcallBase' with fewer unresolved variables, with default linking.
+newtype ImpentCcallF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkImpentCcallF { _unImpentCcallF :: (ImpentCcallBase Prelude.Maybe (l (LexicalDoubleQuoteKeyBase k z s)) (LexicalStatic k z s l lexicalAnnotation lexicalAnnotation) (Chname k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalAmpersandKeyBase k z s)) (Cid k z s l lexicalAnnotation lexicalAnnotation) (LexicalDynamic k z s l lexicalAnnotation lexicalAnnotation) (LexicalWrapper k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'ImpentCcallF'
+type ImpentCcall k z s l lexicalAnnotation annotation = Fixed.Fix (ImpentCcallF k z s l lexicalAnnotation annotation)
+-- | 'ExpentCcallBase' with fewer unresolved variables, with default linking.
+newtype ExpentCcallF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkExpentCcallF { _unExpentCcallF :: (ExpentCcallBase Prelude.Maybe (l (LexicalDoubleQuoteKeyBase k z s)) (Cid k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'ExpentCcallF'
+type ExpentCcall k z s l lexicalAnnotation annotation = Fixed.Fix (ExpentCcallF k z s l lexicalAnnotation annotation)
 
 -- § 3 Expressions types.
 
