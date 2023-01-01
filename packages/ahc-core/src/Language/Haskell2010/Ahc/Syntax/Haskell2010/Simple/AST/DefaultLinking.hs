@@ -533,18 +533,6 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	Lpat,
 	ApatF(MkApatF, _unApatF),
 	Apat,
-	FpatsF(MkFpatsF, _unFpatsF),
-	Fpats,
-	FpatsRestF(MkFpatsRestF, _unFpatsRestF),
-	FpatsRest,
-	Pats2F(MkPats2F, _unPats2F),
-	Pats2,
-	Pats2RestF(MkPats2RestF, _unPats2RestF),
-	Pats2Rest,
-	Pats1F(MkPats1F, _unPats1F),
-	Pats1,
-	Pats1RestF(MkPats1RestF, _unPats1RestF),
-	Pats1Rest,
 	FpatF(MkFpatF, _unFpatF),
 	Fpat,
 
@@ -1671,30 +1659,6 @@ type Lpat k z s l lexicalAnnotation annotation = Fixed.Fix (LpatF k z s l lexica
 newtype ApatF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkApatF { _unApatF :: (ApatBase (,) Prelude.Maybe [] (Var k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalAtKeyBase k z s)) (Gcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Qcon k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalLeftBraceKeyBase k z s)) (Fpat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalCommaKeyBase k z s)) (l (LexicalRightBraceKeyBase k z s)) (Literal k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalUnderscoreKeyBase k z s)) (l (LexicalLeftParenthesisKeyBase k z s)) (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalRightParenthesisKeyBase k z s)) (l (LexicalLeftBracketKeyBase k z s)) (l (LexicalRightBracketKeyBase k z s)) (l (LexicalTildeKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'ApatF'
 type Apat k z s l lexicalAnnotation annotation = Fixed.Fix (ApatF k z s l lexicalAnnotation annotation)
--- | 'FpatsBase' with fewer unresolved variables, with default linking.
-newtype FpatsF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFpatsF { _unFpatsF :: (FpatsBase (l (LexicalLeftBraceKeyBase k z s)) (l (LexicalRightBraceKeyBase k z s)) (Fpat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (FpatsRest k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
--- | Fixpoint applied to 'FpatsF'
-type Fpats k z s l lexicalAnnotation annotation = Fixed.Fix (FpatsF k z s l lexicalAnnotation annotation)
--- | 'FpatsRestBase' with fewer unresolved variables, with default linking.
-newtype FpatsRestF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFpatsRestF { _unFpatsRestF :: (FpatsRestBase (l (LexicalRightBraceKeyBase k z s)) (l (LexicalCommaKeyBase k z s)) (Fpat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
--- | Fixpoint applied to 'FpatsRestF'
-type FpatsRest k z s l lexicalAnnotation annotation = Fixed.Fix (FpatsRestF k z s l lexicalAnnotation annotation)
--- | 'Pats2Base' with fewer unresolved variables, with default linking.
-newtype Pats2F k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkPats2F { _unPats2F :: (Pats2Base (l (LexicalLeftParenthesisKeyBase k z s)) (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalCommaKeyBase k z s)) (Pats2Rest k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
--- | Fixpoint applied to 'Pats2F'
-type Pats2 k z s l lexicalAnnotation annotation = Fixed.Fix (Pats2F k z s l lexicalAnnotation annotation)
--- | 'Pats2RestBase' with fewer unresolved variables, with default linking.
-newtype Pats2RestF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkPats2RestF { _unPats2RestF :: (Pats2RestBase (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalRightParenthesisKeyBase k z s)) (l (LexicalCommaKeyBase k z s)) annotation fixpoint) }
--- | Fixpoint applied to 'Pats2RestF'
-type Pats2Rest k z s l lexicalAnnotation annotation = Fixed.Fix (Pats2RestF k z s l lexicalAnnotation annotation)
--- | 'Pats1Base' with fewer unresolved variables, with default linking.
-newtype Pats1F k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkPats1F { _unPats1F :: (Pats1Base (l (LexicalLeftBracketKeyBase k z s)) (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (Pats1Rest k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
--- | Fixpoint applied to 'Pats1F'
-type Pats1 k z s l lexicalAnnotation annotation = Fixed.Fix (Pats1F k z s l lexicalAnnotation annotation)
--- | 'Pats1RestBase' with fewer unresolved variables, with default linking.
-newtype Pats1RestF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkPats1RestF { _unPats1RestF :: (Pats1RestBase (l (LexicalRightBracketKeyBase k z s)) (l (LexicalCommaKeyBase k z s)) (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
--- | Fixpoint applied to 'Pats1RestF'
-type Pats1Rest k z s l lexicalAnnotation annotation = Fixed.Fix (Pats1RestF k z s l lexicalAnnotation annotation)
 -- | 'FpatBase' with fewer unresolved variables, with default linking.
 newtype FpatF k z s l lexicalAnnotation grammarAnnotation annotation fixpoint = MkFpatF { _unFpatF :: (FpatBase (Qvar k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) (l (LexicalEqualsKeyBase k z s)) (Pat k z s l lexicalAnnotation grammarAnnotation grammarAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'FpatF'

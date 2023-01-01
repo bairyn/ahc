@@ -133,12 +133,6 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.RegularStruct
 	PatBase(ConstructorBinaryOperationPattern, LeftPattern),
 	LpatBase(BasePattern, MinusNumberPattern, ExposedConstructorPattern),
 	ApatBase(AsPattern, ConstructorPattern, RecordPattern, LiteralPattern, WildcardPattern, GroupedPattern, TuplePattern, ListPattern, IrrefutablePattern),
-	FpatsBase(FpatsEmpty, FpatsFromFirst),
-	FpatsRestBase(FpatsLast, FpatsNotLast),
-	Pats2Base(Pats2FromFirst),
-	Pats2RestBase(Pats2Last, Pats2NotLast),
-	Pats1Base(Pats1FromFirst),
-	Pats1RestBase(Pats1End, Pats1Push),
 	FpatBase(FieldPattern),
 
 	-- ** § 2.2 Lexical Program Structure types.
@@ -885,34 +879,6 @@ data ApatBase data2 maybe list var lexicalAt gcon qcon lexicalLeftBrace fpat lex
 	| ListPattern        annotation lexicalLeftBracket     pat                                (list (data2 lexicalComma pat))                       lexicalRightBracket
 	| IrrefutablePattern annotation lexicalTilde           fixpoint
 		-- ^ Lazy pattern matching, with ‘~’.
-
--- | Zero or more field patterns.
-data FpatsBase lexicalLeftBrace lexicalRightBrace fpat fpatsRest annotation fixpoint =
-	  FpatsEmpty     annotation lexicalLeftBrace lexicalRightBrace
-	| FpatsFromFirst annotation lexicalLeftBrace fpat              fpatsRest
-
--- | The rest of zero or more field patterns.
-data FpatsRestBase lexicalRightBrace lexicalComma fpat annotation fixpoint =
-	  FpatsLast    annotation lexicalRightBrace
-	| FpatsNotLast annotation lexicalComma      fpat fixpoint
-
--- | The 2 or more patterns constituting a tuple pattern, with parentheses.
-data Pats2Base lexicalLeftParenthesis pat lexicalComma pats2Rest annotation fixpoint =
-	Pats2FromFirst annotation lexicalLeftParenthesis pat lexicalComma pats2Rest
-
--- | The rest of 2 or more patterns constituting a tuple pattern.
-data Pats2RestBase pat lexicalRightParenthesis lexicalComma annotation fixpoint =
-	  Pats2Last    annotation pat lexicalRightParenthesis
-	| Pats2NotLast annotation pat lexicalComma            fixpoint
-
--- | The 1 or more patterns constituting a list pattern, with brackets.
-data Pats1Base lexicalLeftBracket pat pats1Rest annotation fixpoint =
-	Pats1FromFirst annotation lexicalLeftBracket pat pats1Rest
-
--- | The rest of 1 or more patterns constituting a list pattern.
-data Pats1RestBase lexicalRightBracket lexicalComma pat annotation fixpoint =
-	  Pats1End  annotation lexicalRightBracket
-	| Pats1Push annotation lexicalComma        pat fixpoint
 
 -- | A field pattern.
 --
