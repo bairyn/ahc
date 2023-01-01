@@ -540,7 +540,7 @@ data ConstrsBase data2 list constr lexicalPipe annotation fixpoint =
 	Constructors annotation constr (list (data2 lexicalPipe constr))
 
 -- | A data constructor, for a ‘data’ ADT type declaration / definition.
-data ConstrBase data2 list either maybe con evalAtype btype conop lexicalLeftBrace fieldDecl lexicalComma lexicalRightBrace annotation fixpoints =
+data ConstrBase data2 list either maybe con evalAtype btype conop lexicalLeftBrace fieldDecl lexicalComma lexicalRightBrace annotation fixpoint =
 	  BasicConstructor          annotation con                      (list evalAtype)
 	| BinaryOperatorConstructor annotation (either btype evalAtype) conop            (either btype evalAtype)
 	| RecordConstructor         annotation con                      lexicalLeftBrace (maybe (data2 fieldDecl (list (data2 lexicalComma fieldDecl)))) lexicalRightBrace
@@ -558,7 +558,7 @@ data DerivingBase data3 data2 either maybe list lexicalDeriving dclass lexicalLe
 	DerivingClause annotation lexicalDeriving (either dclass (data3 lexicalLeftParenthesis (maybe (data2 dclass (list (data2 lexicalComma dclass)))) lexicalRightParenthesis))
 
 -- | A class name inside a ‘deriving’ declaration.
-data DclassBase qtycls annotation fixpoints =
+data DclassBase qtycls annotation fixpoint =
 	DerivingClass annotation qtycls
 
 -- § 4.2.3 Datatype Renamings types.
@@ -670,7 +670,7 @@ data InfixExpBase lexp qop lexicalMinus annotation fixpoint =
 		-- ^ An expression that is not a binary operation application on top.
 
 -- | A left-expression, one not directly a unary or binary operation application.
-data LexpBase maybe list lexicalAsciiLambda apat lexicalRightArrow exp lexicalLet decls lexicalIn lexicalIf lexicalSemicolon lexicalThen lexicalElse lexicalCase lexicalOf lexicalLeftBrace alts lexicalRightBrace stmts annotation fexp fixpoint =
+data LexpBase maybe list lexicalAsciiLambda apat lexicalRightArrow exp lexicalLet decls lexicalIn lexicalIf lexicalSemicolon lexicalThen lexicalElse lexicalCase lexicalOf lexicalLeftBrace alts lexicalRightBrace stmts fexp annotation fixpoint =
 	  LambdaExpression      annotation lexicalAsciiLambda    apat  (list apat)              lexicalRightArrow exp
 	| LetExpression         annotation lexicalLet            decls lexicalIn                exp
 	| ConditionalExpression annotation lexicalIf             exp   (maybe lexicalSemicolon) lexicalThen       exp  (maybe lexicalSemicolon) lexicalElse exp
