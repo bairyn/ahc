@@ -844,7 +844,7 @@ newtype BigAnySeqValidNcomChar1_0F k z s l lexicalAnnotation annotation fixpoint
 -- | Fixpoint applied to 'BigAnySeqValidNcomChar1_0F'
 type BigAnySeqValidNcomChar1_0 k z s l lexicalAnnotation annotation = Fixed.Fix (BigAnySeqValidNcomChar1_0F k z s l lexicalAnnotation annotation)
 -- | 'BigAnySeqValidNcomChar1_1Base' with fewer unresolved variables, with default linking.
-newtype BigAnySeqValidNcomChar1_1F k z s l lexicalAnnotation annotation fixpoint = MkBigAnySeqValidNcomChar1_1F { _unBigAnySeqValidNcomChar1_1F :: (BigAnySeqValidNcomChar1_1Base (BigAnySansNc k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalLeftBraceKeyBase k z s)) (BigAnySeqValidNconChar1_0Base k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalHyphenKeyBase k z s)) (l (LexicalEndOfParseKeyBase k z s)) annotation fixpoint) }
+newtype BigAnySeqValidNcomChar1_1F k z s l lexicalAnnotation annotation fixpoint = MkBigAnySeqValidNcomChar1_1F { _unBigAnySeqValidNcomChar1_1F :: (BigAnySeqValidNcomChar1_1Base (BigAnySansNc k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalLeftBraceKeyBase k z s)) (BigAnySeqValidNcomChar1_0 k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalHyphenKeyBase k z s)) (l (LexicalEndOfParseKeyBase k z s)) annotation fixpoint) }
 -- | Fixpoint applied to 'BigAnySeqValidNcomChar1_1F'
 type BigAnySeqValidNcomChar1_1 k z s l lexicalAnnotation annotation = Fixed.Fix (BigAnySeqValidNcomChar1_1F k z s l lexicalAnnotation annotation)
 -- | 'BigAnyBase' with fewer unresolved variables, with default linking.

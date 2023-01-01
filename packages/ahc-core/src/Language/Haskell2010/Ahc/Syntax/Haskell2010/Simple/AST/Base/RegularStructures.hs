@@ -1128,10 +1128,10 @@ data BigAnySeqValidNcomChar1_0Base bigAnySansNc lexicalLeftBrace lexicalRightBra
 -- sequences.
 --
 -- More simply, we parsed ‘-’, so make sure there's not a ‘}’.
-data BigAnySeqValidNcomChar1_1Base bigAnySansNc lexicalLeftBrace bigAnySeqValidNconmChar1_0Base lexicalHyphen lexicalEndOfParse annotation fixpoint =
+data BigAnySeqValidNcomChar1_1Base bigAnySansNc lexicalLeftBrace bigAnySeqValidNcomChar1_0Base lexicalHyphen lexicalEndOfParse annotation fixpoint =
 	  NotNcomChar1_1   annotation bigAnySansNc
 		-- ^ The next character is not an ‘nc’ character, so it can't be ‘}’.
-	| LeftBraceChar1_1 annotation lexicalLeftBrace bigAnySeqValidNconmChar1_0Base
+	| LeftBraceChar1_1 annotation lexicalLeftBrace bigAnySeqValidNcomChar1_0Base
 		-- ^ It's not ‘-’, but it's ‘nc’ so we might not be able to reset to
 		-- ‘BigAnySeqBase’.
 	| HyphenChar1_1    annotation lexicalHyphen fixpoint
