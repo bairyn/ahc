@@ -117,6 +117,7 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.Base.ExclusionStru
 	AscSymbolSansHyphenBase(ExclamationAsciiSymbolSansHyphen, HashAsciiSymbolSansHyphen, DollarAsciiSymbolSansHyphen, PercentAsciiSymbolSansHyphen, AmpersandAsciiSymbolSansHyphen, AsteriskAsciiSymbolSansHyphen, PlusAsciiSymbolSansHyphen, DotAsciiSymbolSansHyphen, SlashAsciiSymbolSansHyphen, LeftAngleBracketAsciiSymbolSansHyphen, EqualsAsciiSymbolSansHyphen, RightAngleBracketAsciiSymbolSansHyphen, QuestionMarkAsciiSymbolSansHyphen, AtAsciiSymbolSansHyphen, BackslashAsciiSymbolSansHyphen, CaretAsciiSymbolSansHyphen, PipeAsciiSymbolSansHyphen, TildeAsciiSymbolSansHyphen, ColonAsciiSymbolSansHyphen),
 	UniSymbolSansSpecialishHyphenBase(UnicodeSymbolSansSpecialishHyphen),
 	VarSymBase(UniVarSym, ExclamationVarSym, HashVarSym, DollarVarSym, PercentVarSym, AmpersandVarSym, AsteriskVarSym, PlusVarSym, DotVarSym, SlashVarSym, LeftAngleBracketVarSym, RightAngleBracketVarSym, QuestionMarkVarSym, CaretVarSym, HyphenVarSym, DotExclamationVarSym, DotHashVarSym, DotDollarVarSym, DotPercentVarSym, DotAmpersandVarSym, DotAsteriskVarSym, DotPlusVarSym, DotSlashVarSym, DotLeftAngleBracketVarSym, DotEqualsVarSym, DotRightAngleBracketVarSym, DotQuestionMarkVarSym, DotAtVarSym, DotBackslashVarSym, DotCaretVarSym, DotPipeVarSym, DotHyphenVarSym, DotTildeVarSym, DotColonVarSym, LeftAngleBracketExclamationVarSym, LeftAngleBracketHashVarSym, LeftAngleBracketDollarVarSym, LeftAngleBracketPercentVarSym, LeftAngleBracketAmpersandVarSym, LeftAngleBracketAsteriskVarSym, LeftAngleBracketPlusVarSym, LeftAngleBracketDotVarSym, LeftAngleBracketSlashVarSym, LeftAngleBracketLeftAngleBracketVarSym, LeftAngleBracketEqualsVarSym, LeftAngleBracketRightAngleBracketVarSym, LeftAngleBracketQuestionMarkVarSym, LeftAngleBracketAtVarSym, LeftAngleBracketBackslashVarSym, LeftAngleBracketCaretVarSym, LeftAngleBracketPipeVarSym, LeftAngleBracketTildeVarSym, LeftAngleBracketColonVarSym, EqualsExclamationVarSym, EqualsHashVarSym, EqualsDollarVarSym, EqualsPercentVarSym, EqualsAmpersandVarSym, EqualsAsteriskVarSym, EqualsPlusVarSym, EqualsDotVarSym, EqualsSlashVarSym, EqualsLeftAngleBracketVarSym, EqualsEqualsVarSym, EqualsQuestionMarkVarSym, EqualsAtVarSym, EqualsBackslashVarSym, EqualsCaretVarSym, EqualsPipeVarSym, EqualsHyphenVarSym, EqualsTildeMarkVarSym, EqualsColonMarkVarSym, AtVarSym, BackslashVarSym, PipeVarSym, HyphenExclamationVarSym, HyphenHashVarSym, HyphenDollarVarSym, HyphenPercentVarSym, HyphenAmpersandVarSym, HyphenAsteriskVarSym, HyphenPlusVarSym, HyphenDotVarSym, HyphenSlashVarSym, HyphenLeftAngleBracketVarSym, HyphenEqualsVarSym, HyphenQuestionMarkVarSym, HyphenAtVarSym, HyphenBackslashVarSym, HyphenCaretVarSym, HyphenPipeVarSym, HyphenTildeVarSym, HyphenColonVarSym, TildeVarSym, ColonExclamationVarSym, ColonHashVarSym, ColonDollarVarSym, ColonPercentVarSym, ColonAmpersandVarSym, ColonAsteriskVarSym, ColonPlusVarSym, ColonDotVarSym, ColonSlashVarSym, ColonLeftAngleBracketVarSym, ColonEqualsVarSym, ColonRightAngleBracketVarSym, ColonQuestionMarkVarSym, ColonAtVarSym, ColonBackslashVarSym, ColonCaretVarSym, ColonPipeVarSym, ColonHyphenVarSym, ColonTildeVarSym, DotDotVarSym, LeftAngleBracketHyphenVarSym, EqualsRightAngleBracketVarSym, HyphenRightAngleBracketVarSym, HyphenHyphenVarSym),
+	VarSymSansMinusBase(UniVarSymSansMinus, ExclamationVarSymSansMinus, HashVarSymSansMinus, DollarVarSymSansMinus, PercentVarSymSansMinus, AmpersandVarSymSansMinus, AsteriskVarSymSansMinus, PlusVarSymSansMinus, DotVarSymSansMinus, SlashVarSymSansMinus, LeftAngleBracketVarSymSansMinus, RightAngleBracketVarSymSansMinus, QuestionMarkVarSymSansMinus, CaretVarSymSansMinus, DotExclamationVarSymSansMinus, DotHashVarSymSansMinus, DotDollarVarSymSansMinus, DotPercentVarSymSansMinus, DotAmpersandVarSymSansMinus, DotAsteriskVarSymSansMinus, DotPlusVarSymSansMinus, DotSlashVarSymSansMinus, DotLeftAngleBracketVarSymSansMinus, DotEqualsVarSymSansMinus, DotRightAngleBracketVarSymSansMinus, DotQuestionMarkVarSymSansMinus, DotAtVarSymSansMinus, DotBackslashVarSymSansMinus, DotCaretVarSymSansMinus, DotPipeVarSymSansMinus, DotHyphenVarSymSansMinus, DotTildeVarSymSansMinus, DotColonVarSymSansMinus, LeftAngleBracketExclamationVarSymSansMinus, LeftAngleBracketHashVarSymSansMinus, LeftAngleBracketDollarVarSymSansMinus, LeftAngleBracketPercentVarSymSansMinus, LeftAngleBracketAmpersandVarSymSansMinus, LeftAngleBracketAsteriskVarSymSansMinus, LeftAngleBracketPlusVarSymSansMinus, LeftAngleBracketDotVarSymSansMinus, LeftAngleBracketSlashVarSymSansMinus, LeftAngleBracketLeftAngleBracketVarSymSansMinus, LeftAngleBracketEqualsVarSymSansMinus, LeftAngleBracketRightAngleBracketVarSymSansMinus, LeftAngleBracketQuestionMarkVarSymSansMinus, LeftAngleBracketAtVarSymSansMinus, LeftAngleBracketBackslashVarSymSansMinus, LeftAngleBracketCaretVarSymSansMinus, LeftAngleBracketPipeVarSymSansMinus, LeftAngleBracketTildeVarSymSansMinus, LeftAngleBracketColonVarSymSansMinus, EqualsExclamationVarSymSansMinus, EqualsHashVarSymSansMinus, EqualsDollarVarSymSansMinus, EqualsPercentVarSymSansMinus, EqualsAmpersandVarSymSansMinus, EqualsAsteriskVarSymSansMinus, EqualsPlusVarSymSansMinus, EqualsDotVarSymSansMinus, EqualsSlashVarSymSansMinus, EqualsLeftAngleBracketVarSymSansMinus, EqualsEqualsVarSymSansMinus, EqualsQuestionMarkVarSymSansMinus, EqualsAtVarSymSansMinus, EqualsBackslashVarSymSansMinus, EqualsCaretVarSymSansMinus, EqualsPipeVarSymSansMinus, EqualsHyphenVarSymSansMinus, EqualsTildeMarkVarSymSansMinus, EqualsColonMarkVarSymSansMinus, AtVarSymSansMinus, BackslashVarSymSansMinus, PipeVarSymSansMinus, HyphenExclamationVarSymSansMinus, HyphenHashVarSymSansMinus, HyphenDollarVarSymSansMinus, HyphenPercentVarSymSansMinus, HyphenAmpersandVarSymSansMinus, HyphenAsteriskVarSymSansMinus, HyphenPlusVarSymSansMinus, HyphenDotVarSymSansMinus, HyphenSlashVarSymSansMinus, HyphenLeftAngleBracketVarSymSansMinus, HyphenEqualsVarSymSansMinus, HyphenQuestionMarkVarSymSansMinus, HyphenAtVarSymSansMinus, HyphenBackslashVarSymSansMinus, HyphenCaretVarSymSansMinus, HyphenPipeVarSymSansMinus, HyphenTildeVarSymSansMinus, HyphenColonVarSymSansMinus, TildeVarSymSansMinus, ColonExclamationVarSymSansMinus, ColonHashVarSymSansMinus, ColonDollarVarSymSansMinus, ColonPercentVarSymSansMinus, ColonAmpersandVarSymSansMinus, ColonAsteriskVarSymSansMinus, ColonPlusVarSymSansMinus, ColonDotVarSymSansMinus, ColonSlashVarSymSansMinus, ColonLeftAngleBracketVarSymSansMinus, ColonEqualsVarSymSansMinus, ColonRightAngleBracketVarSymSansMinus, ColonQuestionMarkVarSymSansMinus, ColonAtVarSymSansMinus, ColonBackslashVarSymSansMinus, ColonCaretVarSymSansMinus, ColonPipeVarSymSansMinus, ColonHyphenVarSymSansMinus, ColonTildeVarSymSansMinus, DotDotVarSymSansMinus, LeftAngleBracketHyphenVarSymSansMinus, EqualsRightAngleBracketVarSymSansMinus, HyphenRightAngleBracketVarSymSansMinus, HyphenHyphenVarSymSansMinus),
 
 	SymbolSansColonBase(AsciiNonspecialSymbolSansColon, UnicodeNonspecialNonscorequoteSymbolSansColon),
 	AscSymbolSansColonBase(ExclamationAsciiSymbolSansColon, HashAsciiSymbolSansColon, DollarAsciiSymbolSansColon, PercentAsciiSymbolSansColon, AmpersandAsciiSymbolSansColon, AsteriskAsciiSymbolSansColon, PlusAsciiSymbolSansColon, DotAsciiSymbolSansColon, SlashAsciiSymbolSansColon, LeftAngleBracketAsciiSymbolSansColon, EqualsAsciiSymbolSansColon, RightAngleBracketAsciiSymbolSansColon, QuestionMarkAsciiSymbolSansColon, AtAsciiSymbolSansColon, BackslashAsciiSymbolSansColon, CaretAsciiSymbolSansColon, PipeAsciiSymbolSansColon, HyphenAsciiSymbolSansColon, TildeAsciiSymbolSansColon),
@@ -4571,6 +4572,287 @@ data VarSymBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexical
 	-- ^ ‘->’?* is valid.
 
 	| HyphenHyphenVarSym                      annotation lexicalHyphen            lexicalHyphen             (list lexicalHyphen) symbolSansHyphen (list symbol)
+	-- ^ ‘/---*[^-].*/’ is valid; there just needs to be at least one non-dash character.
+
+-- | 'VarSymBase' without ‘-’.
+--
+-- This is for 'AexpBase'.
+data VarSymSansMinusBase list symbolSansAsc symbol lexicalExclamation lexicalHash lexicalDollar lexicalPercent lexicalAmpersand lexicalAsterisk lexicalPlus lexicalDot lexicalSlash lexicalLeftAngleBracket lexicalRightAngleBracket lexicalQuestionMark lexicalCaret lexicalHyphen lexicalEquals lexicalAt lexicalBackslash lexicalPipe lexicalTilde lexicalColon symbolSansHyphen annotation fixpoint =
+	  UniVarSymSansMinus                               annotation symbolSansAsc            (list symbol)
+	-- ^ A single-symbol non-ASCII name is valid (we know it isn't ‘:’ or ‘-’),
+	-- as is anything that starts with it.
+
+	| ExclamationVarSymSansMinus                       annotation lexicalExclamation       (list symbol)
+	-- ^ ‘!’* is valid.
+	| HashVarSymSansMinus                              annotation lexicalHash              (list symbol)
+	-- ^ ‘#’* is valid.
+	| DollarVarSymSansMinus                            annotation lexicalDollar            (list symbol)
+	-- ^ ‘$’* is valid.
+	| PercentVarSymSansMinus                           annotation lexicalPercent           (list symbol)
+	-- ^ ‘%’* is valid.
+	| AmpersandVarSymSansMinus                         annotation lexicalAmpersand         (list symbol)
+	-- ^ ‘&’* is valid.
+	| AsteriskVarSymSansMinus                          annotation lexicalAsterisk          (list symbol)
+	-- ^ ‘*’* is valid.
+	| PlusVarSymSansMinus                              annotation lexicalPlus              (list symbol)
+	-- ^ ‘+’* is valid.
+	| DotVarSymSansMinus                               annotation lexicalDot
+	-- ^ ‘.’ is valid.
+	| SlashVarSymSansMinus                             annotation lexicalSlash             (list symbol)
+	-- ^ ‘/’* is valid.
+	| LeftAngleBracketVarSymSansMinus                  annotation lexicalLeftAngleBracket
+	-- ^ ‘<’ is valid.
+	--EqualVarSymSansMinus
+	--   ‘=’ is not valid.
+	| RightAngleBracketVarSymSansMinus                 annotation lexicalRightAngleBracket (list symbol)
+	-- ^ ‘>’* is valid.
+	| QuestionMarkVarSymSansMinus                      annotation lexicalQuestionMark      (list symbol)
+	-- ^ ‘?’* is valid.
+	--AtVarSymSansMinus
+	--   ‘@’ is not valid.
+	--BackslashVarSymSansMinus
+	--   ‘\’ is not valid.
+	| CaretVarSymSansMinus                             annotation lexicalCaret             (list symbol)
+	-- ^ ‘^’* is valid.
+	--PipeVarSymSansMinus
+	--   ‘|’ is not valid.
+	--HyphenVarSymSansMinus
+	--   ‘-’ is not valid.
+	--TildeVarSymSansMinus
+	--   ‘~’ is not valid.
+	--ColonVarSymSansMinus
+	--   ‘:’ is not valid.
+
+	| DotExclamationVarSymSansMinus                    annotation lexicalDot               lexicalExclamation        (list symbol)
+	-- ^ ‘.!’* is valid.
+	| DotHashVarSymSansMinus                           annotation lexicalDot               lexicalHash               (list symbol)
+	-- ^ ‘.#’* is valid.
+	| DotDollarVarSymSansMinus                         annotation lexicalDot               lexicalDollar             (list symbol)
+	-- ^ ‘.$’* is valid.
+	| DotPercentVarSymSansMinus                        annotation lexicalDot               lexicalPercent            (list symbol)
+	-- ^ ‘.%’* is valid.
+	| DotAmpersandVarSymSansMinus                      annotation lexicalDot               lexicalAmpersand          (list symbol)
+	-- ^ ‘.&’* is valid.
+	| DotAsteriskVarSymSansMinus                       annotation lexicalDot               lexicalAsterisk           (list symbol)
+	-- ^ ‘.*’* is valid.
+	| DotPlusVarSymSansMinus                           annotation lexicalDot               lexicalPlus               (list symbol)
+	-- ^ ‘.+’* is valid.
+	--DotDotVarSymSansMinus
+	--   ‘..’ is not valid.
+	| DotSlashVarSymSansMinus                          annotation lexicalDot               lexicalSlash              (list symbol)
+	-- ^ ‘./’* is valid.
+	| DotLeftAngleBracketVarSymSansMinus               annotation lexicalDot               lexicalLeftAngleBracket   (list symbol)
+	-- ^ ‘.<’* is valid.
+	| DotEqualsVarSymSansMinus                         annotation lexicalDot               lexicalEquals             (list symbol)
+	-- ^ ‘.=’* is valid.
+	| DotRightAngleBracketVarSymSansMinus              annotation lexicalDot               lexicalRightAngleBracket  (list symbol)
+	-- ^ ‘.>’* is valid.
+	| DotQuestionMarkVarSymSansMinus                   annotation lexicalDot               lexicalQuestionMark       (list symbol)
+	-- ^ ‘.?’* is valid.
+	| DotAtVarSymSansMinus                             annotation lexicalDot               lexicalAt                 (list symbol)
+	-- ^ ‘.@’* is valid.
+	| DotBackslashVarSymSansMinus                      annotation lexicalDot               lexicalBackslash          (list symbol)
+	-- ^ ‘.\’* is valid.
+	| DotCaretVarSymSansMinus                          annotation lexicalDot               lexicalCaret              (list symbol)
+	-- ^ ‘.^’* is valid.
+	| DotPipeVarSymSansMinus                           annotation lexicalDot               lexicalPipe               (list symbol)
+	-- ^ ‘.|’* is valid.
+	| DotHyphenVarSymSansMinus                         annotation lexicalDot               lexicalHyphen             (list symbol)
+	-- ^ ‘.-’* is valid.
+	| DotTildeVarSymSansMinus                          annotation lexicalDot               lexicalTilde              (list symbol)
+	-- ^ ‘.~’* is valid.
+	| DotColonVarSymSansMinus                          annotation lexicalDot               lexicalColon              (list symbol)
+	-- ^ ‘.:’* is valid.
+
+	| LeftAngleBracketExclamationVarSymSansMinus       annotation lexicalLeftAngleBracket  lexicalExclamation        (list symbol)
+	-- ^ ‘<!’* is valid.
+	| LeftAngleBracketHashVarSymSansMinus              annotation lexicalLeftAngleBracket  lexicalHash               (list symbol)
+	-- ^ ‘<#’* is valid.
+	| LeftAngleBracketDollarVarSymSansMinus            annotation lexicalLeftAngleBracket  lexicalDollar             (list symbol)
+	-- ^ ‘<$’* is valid.
+	| LeftAngleBracketPercentVarSymSansMinus           annotation lexicalLeftAngleBracket  lexicalPercent            (list symbol)
+	-- ^ ‘<%’* is valid.
+	| LeftAngleBracketAmpersandVarSymSansMinus         annotation lexicalLeftAngleBracket  lexicalAmpersand          (list symbol)
+	-- ^ ‘<&’* is valid.
+	| LeftAngleBracketAsteriskVarSymSansMinus          annotation lexicalLeftAngleBracket  lexicalAsterisk           (list symbol)
+	-- ^ ‘<*’* is valid.
+	| LeftAngleBracketPlusVarSymSansMinus              annotation lexicalLeftAngleBracket  lexicalPlus               (list symbol)
+	-- ^ ‘<+’* is valid.
+	| LeftAngleBracketDotVarSymSansMinus               annotation lexicalLeftAngleBracket  lexicalDot                (list symbol)
+	-- ^ ‘<.’* is valid.
+	| LeftAngleBracketSlashVarSymSansMinus             annotation lexicalLeftAngleBracket  lexicalSlash              (list symbol)
+	-- ^ ‘</’* is valid.
+	| LeftAngleBracketLeftAngleBracketVarSymSansMinus  annotation lexicalLeftAngleBracket  lexicalLeftAngleBracket   (list symbol)
+	-- ^ ‘<<’* is valid.
+	| LeftAngleBracketEqualsVarSymSansMinus            annotation lexicalLeftAngleBracket  lexicalEquals             (list symbol)
+	-- ^ ‘<=’* is valid.
+	| LeftAngleBracketRightAngleBracketVarSymSansMinus annotation lexicalLeftAngleBracket  lexicalRightAngleBracket  (list symbol)
+	-- ^ ‘<>’* is valid.
+	| LeftAngleBracketQuestionMarkVarSymSansMinus      annotation lexicalLeftAngleBracket  lexicalQuestionMark       (list symbol)
+	-- ^ ‘<?’* is valid.
+	| LeftAngleBracketAtVarSymSansMinus                annotation lexicalLeftAngleBracket  lexicalAt                 (list symbol)
+	-- ^ ‘<@’* is valid.
+	| LeftAngleBracketBackslashVarSymSansMinus         annotation lexicalLeftAngleBracket  lexicalBackslash          (list symbol)
+	-- ^ ‘<\’* is valid.
+	| LeftAngleBracketCaretVarSymSansMinus             annotation lexicalLeftAngleBracket  lexicalCaret              (list symbol)
+	-- ^ ‘<^’* is valid.
+	| LeftAngleBracketPipeVarSymSansMinus              annotation lexicalLeftAngleBracket  lexicalPipe               (list symbol)
+	-- ^ ‘<|’* is valid.
+	--LeftAngleBracketHyphenVarSymSansMinus
+	--   ‘<-’ is not valid.
+	| LeftAngleBracketTildeVarSymSansMinus             annotation lexicalLeftAngleBracket  lexicalTilde              (list symbol)
+	-- ^ ‘<~’* is valid.
+	| LeftAngleBracketColonVarSymSansMinus             annotation lexicalLeftAngleBracket  lexicalColon              (list symbol)
+	-- ^ ‘<:’* is valid.
+
+	| EqualsExclamationVarSymSansMinus                 annotation lexicalEquals            lexicalExclamation        (list symbol)
+	-- ^ ‘=!’* is valid.
+	| EqualsHashVarSymSansMinus                        annotation lexicalEquals            lexicalHash               (list symbol)
+	-- ^ ‘=#’* is valid.
+	| EqualsDollarVarSymSansMinus                      annotation lexicalEquals            lexicalDollar             (list symbol)
+	-- ^ ‘=$’* is valid.
+	| EqualsPercentVarSymSansMinus                     annotation lexicalEquals            lexicalPercent            (list symbol)
+	-- ^ ‘=%’* is valid.
+	| EqualsAmpersandVarSymSansMinus                   annotation lexicalEquals            lexicalAmpersand          (list symbol)
+	-- ^ ‘=&’* is valid.
+	| EqualsAsteriskVarSymSansMinus                    annotation lexicalEquals            lexicalAsterisk           (list symbol)
+	-- ^ ‘=*’* is valid.
+	| EqualsPlusVarSymSansMinus                        annotation lexicalEquals            lexicalPlus               (list symbol)
+	-- ^ ‘=+’* is valid.
+	| EqualsDotVarSymSansMinus                         annotation lexicalEquals            lexicalDot                (list symbol)
+	-- ^ ‘=.’* is valid.
+	| EqualsSlashVarSymSansMinus                       annotation lexicalEquals            lexicalSlash              (list symbol)
+	-- ^ ‘=/’* is valid.
+	| EqualsLeftAngleBracketVarSymSansMinus            annotation lexicalEquals            lexicalLeftAngleBracket   (list symbol)
+	-- ^ ‘=<’* is valid.
+	| EqualsEqualsVarSymSansMinus                      annotation lexicalEquals            lexicalEquals             (list symbol)
+	-- ^ ‘==’* is valid.
+	--EqualsRightAngleBracketVarSymSansMinus
+	--   ‘=>’ is not valid.
+	| EqualsQuestionMarkVarSymSansMinus                annotation lexicalEquals            lexicalQuestionMark       (list symbol)
+	-- ^ ‘=?’* is valid.
+	| EqualsAtVarSymSansMinus                          annotation lexicalEquals            lexicalAt                 (list symbol)
+	-- ^ ‘=@’* is valid.
+	| EqualsBackslashVarSymSansMinus                   annotation lexicalEquals            lexicalBackslash          (list symbol)
+	-- ^ ‘=\’* is valid.
+	| EqualsCaretVarSymSansMinus                       annotation lexicalEquals            lexicalCaret              (list symbol)
+	-- ^ ‘=^’* is valid.
+	| EqualsPipeVarSymSansMinus                        annotation lexicalEquals            lexicalPipe               (list symbol)
+	-- ^ ‘=|’* is valid.
+	| EqualsHyphenVarSymSansMinus                      annotation lexicalEquals            lexicalHyphen             (list symbol)
+	-- ^ ‘=-’* is valid.
+	| EqualsTildeMarkVarSymSansMinus                   annotation lexicalEquals            lexicalTilde              (list symbol)
+	-- ^ ‘=~’* is valid.
+	| EqualsColonMarkVarSymSansMinus                   annotation lexicalEquals            lexicalColon              (list symbol)
+	-- ^ ‘=:’* is valid.
+
+	| AtVarSymSansMinus                                annotation lexicalAt                symbol                    (list symbol)
+	-- ^ ‘@’?* is valid.
+
+	| BackslashVarSymSansMinus                         annotation lexicalBackslash         symbol                    (list symbol)
+	-- ^ ‘\’?* is valid.
+
+	| PipeVarSymSansMinus                              annotation lexicalPipe              symbol                    (list symbol)
+	-- ^ ‘|’?* is valid.
+
+	| HyphenExclamationVarSymSansMinus                 annotation lexicalHyphen            lexicalExclamation        (list symbol)
+	-- ^ ‘-!’* is valid.
+	| HyphenHashVarSymSansMinus                        annotation lexicalHyphen            lexicalHash               (list symbol)
+	-- ^ ‘-#’* is valid.
+	| HyphenDollarVarSymSansMinus                      annotation lexicalHyphen            lexicalDollar             (list symbol)
+	-- ^ ‘-$’* is valid.
+	| HyphenPercentVarSymSansMinus                     annotation lexicalHyphen            lexicalPercent            (list symbol)
+	-- ^ ‘-%’* is valid.
+	| HyphenAmpersandVarSymSansMinus                   annotation lexicalHyphen            lexicalAmpersand          (list symbol)
+	-- ^ ‘-&’* is valid.
+	| HyphenAsteriskVarSymSansMinus                    annotation lexicalHyphen            lexicalAsterisk           (list symbol)
+	-- ^ ‘-*’* is valid.
+	| HyphenPlusVarSymSansMinus                        annotation lexicalHyphen            lexicalPlus               (list symbol)
+	-- ^ ‘-+’* is valid.
+	| HyphenDotVarSymSansMinus                         annotation lexicalHyphen            lexicalDot                (list symbol)
+	-- ^ ‘-.’* is valid.
+	| HyphenSlashVarSymSansMinus                       annotation lexicalHyphen            lexicalSlash              (list symbol)
+	-- ^ ‘-/’* is valid.
+	| HyphenLeftAngleBracketVarSymSansMinus            annotation lexicalHyphen            lexicalLeftAngleBracket   (list symbol)
+	-- ^ ‘-<’* is valid.
+	| HyphenEqualsVarSymSansMinus                      annotation lexicalHyphen            lexicalEquals             (list symbol)
+	-- ^ ‘-=’* is valid.
+	--HyphenRightAngleBracketVarSymSansMinus
+	--   ‘->’ is not valid.
+	| HyphenQuestionMarkVarSymSansMinus                annotation lexicalHyphen            lexicalQuestionMark       (list symbol)
+	-- ^ ‘-?’* is valid.
+	| HyphenAtVarSymSansMinus                          annotation lexicalHyphen            lexicalAt                 (list symbol)
+	-- ^ ‘-@’* is valid.
+	| HyphenBackslashVarSymSansMinus                   annotation lexicalHyphen            lexicalBackslash          (list symbol)
+	-- ^ ‘-\’* is valid.
+	| HyphenCaretVarSymSansMinus                       annotation lexicalHyphen            lexicalCaret              (list symbol)
+	-- ^ ‘-^’* is valid.
+	| HyphenPipeVarSymSansMinus                        annotation lexicalHyphen            lexicalPipe               (list symbol)
+	-- ^ ‘-|’* is valid.
+	--HyphenHyphenVarSymSansMinus
+	--   ‘--’ is not valid.
+	| HyphenTildeVarSymSansMinus                       annotation lexicalHyphen            lexicalTilde              (list symbol)
+	-- ^ ‘-~’* is valid.
+	| HyphenColonVarSymSansMinus                       annotation lexicalHyphen            lexicalColon              (list symbol)
+	-- ^ ‘-:’* is valid.
+
+	| TildeVarSymSansMinus                             annotation lexicalTilde             symbol                    (list symbol)
+	-- ^ ‘~’?* is valid.
+
+	| ColonExclamationVarSymSansMinus                  annotation lexicalColon             lexicalExclamation        (list symbol)
+	-- ^ ‘:!’* is valid.
+	| ColonHashVarSymSansMinus                         annotation lexicalColon             lexicalHash               (list symbol)
+	-- ^ ‘:#’* is valid.
+	| ColonDollarVarSymSansMinus                       annotation lexicalColon             lexicalDollar             (list symbol)
+	-- ^ ‘:$’* is valid.
+	| ColonPercentVarSymSansMinus                      annotation lexicalColon             lexicalPercent            (list symbol)
+	-- ^ ‘:%’* is valid.
+	| ColonAmpersandVarSymSansMinus                    annotation lexicalColon             lexicalAmpersand          (list symbol)
+	-- ^ ‘:&’* is valid.
+	| ColonAsteriskVarSymSansMinus                     annotation lexicalColon             lexicalAsterisk           (list symbol)
+	-- ^ ‘:*’* is valid.
+	| ColonPlusVarSymSansMinus                         annotation lexicalColon             lexicalPlus               (list symbol)
+	-- ^ ‘:+’* is valid.
+	| ColonDotVarSymSansMinus                          annotation lexicalColon             lexicalDot                (list symbol)
+	-- ^ ‘:.’* is valid.
+	| ColonSlashVarSymSansMinus                        annotation lexicalColon             lexicalSlash              (list symbol)
+	-- ^ ‘:/’* is valid.
+	| ColonLeftAngleBracketVarSymSansMinus             annotation lexicalColon             lexicalLeftAngleBracket   (list symbol)
+	-- ^ ‘:<’* is valid.
+	| ColonEqualsVarSymSansMinus                       annotation lexicalColon             lexicalEquals             (list symbol)
+	-- ^ ‘:=’* is valid.
+	| ColonRightAngleBracketVarSymSansMinus            annotation lexicalColon             lexicalRightAngleBracket  (list symbol)
+	-- ^ ‘:>’* is valid.
+	| ColonQuestionMarkVarSymSansMinus                 annotation lexicalColon             lexicalQuestionMark       (list symbol)
+	-- ^ ‘:?’* is valid.
+	| ColonAtVarSymSansMinus                           annotation lexicalColon             lexicalAt                 (list symbol)
+	-- ^ ‘:@’* is valid.
+	| ColonBackslashVarSymSansMinus                    annotation lexicalColon             lexicalBackslash          (list symbol)
+	-- ^ ‘:\’* is valid.
+	| ColonCaretVarSymSansMinus                        annotation lexicalColon             lexicalCaret              (list symbol)
+	-- ^ ‘:^’* is valid.
+	| ColonPipeVarSymSansMinus                         annotation lexicalColon             lexicalPipe               (list symbol)
+	-- ^ ‘:|’* is valid.
+	| ColonHyphenVarSymSansMinus                       annotation lexicalColon             lexicalHyphen             (list symbol)
+	-- ^ ‘:-’* is valid.
+	| ColonTildeVarSymSansMinus                        annotation lexicalColon             lexicalTilde              (list symbol)
+	-- ^ ‘:~’* is valid.
+	--ColonColonVarSymSansMinus
+	--   ‘::’ is not valid.
+
+	| DotDotVarSymSansMinus                            annotation lexicalDot               lexicalDot                symbol               (list symbol)
+	-- ^ ‘..’?* is valid.
+
+	| LeftAngleBracketHyphenVarSymSansMinus            annotation lexicalLeftAngleBracket  lexicalHyphen             symbol               (list symbol)
+	-- ^ ‘<-’?* is valid.
+
+	| EqualsRightAngleBracketVarSymSansMinus           annotation lexicalEquals            lexicalRightAngleBracket  symbol               (list symbol)
+	-- ^ ‘=>’?* is valid.
+
+	| HyphenRightAngleBracketVarSymSansMinus           annotation lexicalHyphen            lexicalRightAngleBracket  symbol               (list symbol)
+	-- ^ ‘->’?* is valid.
+
+	| HyphenHyphenVarSymSansMinus                      annotation lexicalHyphen            lexicalHyphen             (list lexicalHyphen) symbolSansHyphen (list symbol)
 	-- ^ ‘/---*[^-].*/’ is valid; there just needs to be at least one non-dash character.
 
 -- | A restricted 'symbol', without the colon, to help build 'ConSymBase'.

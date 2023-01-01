@@ -713,6 +713,8 @@ module Language.Haskell2010.Ahc.Syntax.Haskell2010.Simple.AST.DefaultLinking (
 	UniSymbolSansSpecialishHyphen,
 	VarSymF(MkVarSymF, _unVarSymF),
 	VarSym,
+	VarSymSansMinusF(MkVarSymSansMinusF, _unVarSymSansMinusF),
+	VarSymSansMinus,
 
 	SymbolSansColonF(MkSymbolSansColonF, _unSymbolSansColonF),
 	SymbolSansColon,
@@ -2027,6 +2029,10 @@ type UniSymbolSansSpecialishHyphen k z s l lexicalAnnotation annotation = Fixed.
 newtype VarSymF k z s l lexicalAnnotation annotation fixpoint = MkVarSymF { _unVarSymF :: (VarSymBase [] (SymbolSansAsc k z s l lexicalAnnotation lexicalAnnotation) (Symbol k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalExclamationKeyBase k z s)) (l (LexicalHashKeyBase k z s)) (l (LexicalDollarKeyBase k z s)) (l (LexicalPercentKeyBase k z s)) (l (LexicalAmpersandKeyBase k z s)) (l (LexicalAsteriskKeyBase k z s)) (l (LexicalPlusKeyBase k z s)) (l (LexicalDotKeyBase k z s)) (l (LexicalSlashKeyBase k z s)) (l (LexicalLeftAngleBracketKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) (l (LexicalQuestionMarkKeyBase k z s)) (l (LexicalCaretKeyBase k z s)) (l (LexicalHyphenKeyBase k z s)) (l (LexicalEqualsKeyBase k z s)) (l (LexicalAtKeyBase k z s)) (l (LexicalBackslashKeyBase k z s)) (l (LexicalPipeKeyBase k z s)) (l (LexicalTildeKeyBase k z s)) (l (LexicalColonKeyBase k z s)) (SymbolSansHyphen k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'VarSymF'
 type VarSym k z s l lexicalAnnotation annotation = Fixed.Fix (VarSymF k z s l lexicalAnnotation annotation)
+-- | 'VarSymSansMinusBase' with fewer unresolved variables, with default linking.
+newtype VarSymSansMinusF k z s l lexicalAnnotation annotation fixpoint = MkVarSymSansMinusF { _unVarSymSansMinusF :: (VarSymSansMinusBase [] (SymbolSansAsc k z s l lexicalAnnotation lexicalAnnotation) (Symbol k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalExclamationKeyBase k z s)) (l (LexicalHashKeyBase k z s)) (l (LexicalDollarKeyBase k z s)) (l (LexicalPercentKeyBase k z s)) (l (LexicalAmpersandKeyBase k z s)) (l (LexicalAsteriskKeyBase k z s)) (l (LexicalPlusKeyBase k z s)) (l (LexicalDotKeyBase k z s)) (l (LexicalSlashKeyBase k z s)) (l (LexicalLeftAngleBracketKeyBase k z s)) (l (LexicalRightAngleBracketKeyBase k z s)) (l (LexicalQuestionMarkKeyBase k z s)) (l (LexicalCaretKeyBase k z s)) (l (LexicalHyphenKeyBase k z s)) (l (LexicalEqualsKeyBase k z s)) (l (LexicalAtKeyBase k z s)) (l (LexicalBackslashKeyBase k z s)) (l (LexicalPipeKeyBase k z s)) (l (LexicalTildeKeyBase k z s)) (l (LexicalColonKeyBase k z s)) (SymbolSansHyphen k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
+-- | Fixpoint applied to 'VarSymSansMinusF'
+type VarSymSansMinus k z s l lexicalAnnotation annotation = Fixed.Fix (VarSymSansMinusF k z s l lexicalAnnotation annotation)
 -- | 'SymbolSansColonBase' with fewer unresolved variables, with default linking.
 newtype SymbolSansColonF k z s l lexicalAnnotation annotation fixpoint = MkSymbolSansColonF { _unSymbolSansColonF :: (SymbolSansColonBase (AscSymbolSansColon k z s l lexicalAnnotation lexicalAnnotation) (UniSymbolSansSpecialishColon k z s l lexicalAnnotation lexicalAnnotation) annotation fixpoint) }
 -- | Fixpoint applied to 'SymbolSansColonF'
