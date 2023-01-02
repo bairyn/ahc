@@ -755,7 +755,7 @@ $(BUILD_DIR)/direct-builddir/$(_DIRECT_BUILD_MAIN): $(_DIRECT_BUILD_LIB_OBJS) $(
 
 # Since we support building by hand, we must be aware of dependencies made
 # though ‘import’ statements.  For each intra-package import, we must add a
-# dependency rule in this section of the form: 
+# dependency rule in this section of the form:
 # 	$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/…Importer…$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/…Imported…$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Benchmark/Main$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Benchmark/Benchmark$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
