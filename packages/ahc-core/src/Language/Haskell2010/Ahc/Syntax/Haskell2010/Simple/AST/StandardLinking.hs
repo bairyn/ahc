@@ -970,7 +970,6 @@ newtype GraphicSansDoubleQuoteOrBackslashF k z s l lexicalAnnotation annotation 
 type GraphicSansDoubleQuoteOrBackslash k z s l lexicalAnnotation annotation = Fixed.Fix (GraphicSansDoubleQuoteOrBackslashF k z s l lexicalAnnotation annotation)
 -- | 'GraphicSansSymbolBase' with fewer unresolved variables, with standard linking.
 newtype GraphicSansSymbolF k z s l lexicalAnnotation annotation fixpoint = MkGraphicSansSymbolF { _unGraphicSansSymbolF :: (GraphicSansSymbolBase (Small k z s l lexicalAnnotation lexicalAnnotation) (Large k z s l lexicalAnnotation lexicalAnnotation) (Digit k z s l lexicalAnnotation lexicalAnnotation) (Special k z s l lexicalAnnotation lexicalAnnotation) (l (LexicalDoubleQuoteKeyBase k z s)) (l (LexicalSingleQuoteKeyBase k z s)) annotation fixpoint) }
--- ^^^ TODO update?
 -- | Fixpoint applied to 'GraphicSansSymbolF'
 type GraphicSansSymbol k z s l lexicalAnnotation annotation = Fixed.Fix (GraphicSansSymbolF k z s l lexicalAnnotation annotation)
 -- | 'GraphicSansNcBase' with fewer unresolved variables, with standard linking.
