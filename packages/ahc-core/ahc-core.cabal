@@ -43,7 +43,7 @@ license-file:      LICENSE
 author:            Byron Johnson
 maintainer:        byron@byronjohnson.net
 build-type:        Simple
-copyright:         2022, Byron Johnson
+copyright:         2022-2023, Byron Johnson
 
 extra-source-files:
 	README.md
