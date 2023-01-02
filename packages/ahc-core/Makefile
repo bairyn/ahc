@@ -776,7 +776,7 @@ $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/Base/ExclusionStructures$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
-$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/DefaultLinking$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/StandardLinking$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
+$(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/DefaultLinking$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/AliasLinking$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
 $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Syntax/Haskell2010/Simple/AST/StandardLinking$(_DIRECT_BUILD_ART_SUFF): $(BUILD_DIR)/direct-builddir/Language/Haskell2010/Ahc/Data/Fixed$(_DIRECT_BUILD_ART_SUFF) | $(BUILD_DIR)/direct-builddir build-direct-builddir-tree
 
