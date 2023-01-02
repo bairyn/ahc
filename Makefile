@@ -176,11 +176,11 @@ DEBUG_SHOW_PREVALIDATOR_SCRIPTS ?= 0
 # Configuration for ‘build-prevalidate-version-consistency’.
 BASH ?= bash
 
-# Use ‘bash -c’ or ‘echo -nE’?
+# Use ‘bash -c’ or ‘echo -E’?
 _CMD_BUILD_PREV_SHOW   = $(_CMD_BUILD_PREV_SHOW_$(DEBUG_SHOW_PREVALIDATOR_SCRIPTS))
 _CMD_BUILD_PREV_SHOW_0 = bash -c
 _CMD_BUILD_PREV_SHOW_  = $(_CMD_BUILD_PREV_SHOW_0)
-_CMD_BUILD_PREV_SHOW_1 = echo -nE
+_CMD_BUILD_PREV_SHOW_1 = echo -E
 
 _PREVALIDATE_VERSION_CONSISTENCY_DEPS = \
 	./CHANGELOG.md \
@@ -330,12 +330,11 @@ $$n\
 		} $$n$$n\
  $$n\
 		main \"\$$@\" $$n\
-	" | sed -nEe 's@^\t@@g; 1b; $$b; p' | xargs --null -- $(_CMD_BUILD_PREV_SHOW)
+	" | sed -nEe 's@^\t@@g; 1b; $$b; p' | xargs -I '{}' --null -- $(_CMD_BUILD_PREV_SHOW) '{}' prevalidate-version-consistency
 
 	touch -- "$@"
 
 # Configuration for ‘build-prevalidate-version-git-tag’.
-# TODO: embedded vars.  (Forced defaults until then.)
 GIT ?= git
 
 GIT_DIR ?= $(DEFAULT_GIT_DIR)
@@ -350,7 +349,6 @@ DEFAULT_GIT_DIR = .git
 # non-development release having a tag, that uniquely resolves to 1 commit), do
 # we also require that a version tag is of the specified-right form, e.g.
 # ‘v0.1.0’ for version ‘0.1.0’?
-# TODO: embedded vars.  (Forced defaults until then.)
 VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS ?= $(DEFAULT_VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS)
 
 DEFAULT_VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS = 1
@@ -383,12 +381,11 @@ $(BUILD_DIR)/prevalidate-version-git-tag.stamp: $(_PREVALIDATE_VERSION_GIT_TAG_D
 			local embedded_git=\"\" $$n\
 			local embedded_git_dir=\"\" $$n\
 			local embedded_git_no_path=\"\" $$n\
-			local embedded_tag_tag_require_tags_equals_version_forms=\"\" $$n\
-			# TODO; just use default values for now. $$n\
-			embedded_git=\"git\" $$n\
-			embedded_git_dir=\".git\" $$n\
-			embedded_git_no_path=\"_NOGIT\" $$n\
-			embedded_tag_tag_require_tags_equals_version_forms=\"1\" $$n\
+			local embedded_git_tag_require_tags_equals_version_forms=\"\" $$n\
+			embedded_git=\"\$${1:-\"git\"}\" $$n\
+			embedded_git_dir=\"\$${2:-\".git\"}\" $$n\
+			embedded_git_no_path=\"\$${3:-\"_NOGIT\"}\" $$n\
+			embedded_git_tag_require_tags_equals_version_forms=\"\$${4:-\"1\"}\" $$n\
  $$n\
 			# Skip if GIT_DIR is missing or if NOGIT exists. $$n\
 			if { ! [[ -e \"\$${embedded_git_dir}\" ]]; } || [[ -e \"\$${embedded_git_no_path}\" ]]; then $$n\
@@ -453,34 +450,37 @@ $(BUILD_DIR)/prevalidate-version-git-tag.stamp: $(_PREVALIDATE_VERSION_GIT_TAG_D
 					try_tagged_hash_or_empty=\"\$$(\"\$${embedded_git}\" show-ref --head --dereference --heads --tags --hash -- HEAD ||:)\" $$n\
 					try_head_hash_or_empty=\"\$$(\"\$${embedded_git}\" show-ref --dereference --heads --tags --hash -- \"\$${expected_head_tag}\" ||:)\" $$n\
 					tags_head_intersection=\"\$$(printf -- '%s\\n' \"\$${try_tagged_hash_or_empty}\" | grep -F -e \"\$${try_head_hash_or_empty}\")\" $$n\
-					if [[ -z \"\$${try_tagged_hash_or_empty}\" ]]; then $$n\
-						printf -- '%s\\n' \"Error: build-prevalidate-git-tag: [VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS] required form-conformance is enabled, and…\" 1>&2 $$n\
-						printf -- '%s\\n' \"	… the non-‘-dev’ version does have a uniquely identifying tag, but it is not of the right form,\" 1>&2 $$n\
-						printf -- '%s\\n' \"	of e.g. ‘v0.1.0’, or ‘v’ followed by the version.\" 1>&2 $$n\
-						printf -- '%s\\n' \"\" 1>&2 $$n\
-						printf -- '%s\\n' \"	Please ensure that the uniquely identifying git tag for this version has the required form,\" 1>&2 $$n\
-						printf -- '%s\\n' \"	or else disable this requirement with ‘VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS’.\" 1>&2 $$n\
-						printf -- '%s\\n' \"\" 1>&2 $$n\
-						printf -- '%s\\n' \"	head_tag          : \$$head_tag\" 1>&2 $$n\
-						printf -- '%s\\n' \"	expected_head_tag : \$$expected_head_tag\" 1>&2 $$n\
-						# Skip the default error printer, since we already $$n\
-						# printed one. $$n\
-						exec false $$n\
-					# And make sure that the tag resolves to the current (HEAD) $$n\
-					# commit. $$n\
-					elif [[ -z \"\$${tags_head_intersection}\" ]]; then $$n\
-						printf -- '%s\\n' \"Error: build-prevalidate-git-tag: [VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS] required form-conformance is enabled, and…\" 1>&2 $$n\
-						printf -- '%s\\n' \"	… the non-‘-dev’ version does have a uniquely identifying tag, but the tag of the right form,\" 1>&2 $$n\
-						printf -- '%s\\n' \"	e.g. ‘v0.1.0’, or ‘v’ followed by the version, does not resolve to the current commit.\" 1>&2 $$n\
-						printf -- '%s\\n' \"\" 1>&2 $$n\
-						printf -- '%s\\n' \"	Please ensure that the git tag for this version that has the required form resolved to the right commit,\" 1>&2 $$n\
-						printf -- '%s\\n' \"	or else disable this requirement with ‘VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS’.\" 1>&2 $$n\
-						printf -- '%s\\n' \"\" 1>&2 $$n\
-						printf -- '%s\\n' \"	head_tag          : \$$head_tag\" 1>&2 $$n\
-						printf -- '%s\\n' \"	expected_head_tag : \$$expected_head_tag\" 1>&2 $$n\
-						# Skip the default error printer, since we already $$n\
-						# printed one. $$n\
-						exec false $$n\
+					if [[ \"x\$${embedded_git_tag_require_tags_equals_version_forms}\" == \"x1\" ]]; then $$n\
+						if [[ -z \"\$${try_tagged_hash_or_empty}\" ]]; then $$n\
+							printf -- '%s\\n' \"Error: build-prevalidate-git-tag: [VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS] required form-conformance is enabled, and…\" 1>&2 $$n\
+							printf -- '%s\\n' \"	… the non-‘-dev’ version does have a uniquely identifying tag, but it is not of the right form,\" 1>&2 $$n\
+							printf -- '%s\\n' \"	of e.g. ‘v0.1.0’, or ‘v’ followed by the version.\" 1>&2 $$n\
+							printf -- '%s\\n' \"\" 1>&2 $$n\
+							printf -- '%s\\n' \"	Please ensure that the uniquely identifying git tag for this version has the required form,\" 1>&2 $$n\
+							printf -- '%s\\n' \"	or else disable this requirement with ‘VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS’.\" 1>&2 $$n\
+							printf -- '%s\\n' \"\" 1>&2 $$n\
+							printf -- '%s\\n' \"	head_tag          : \$$head_tag\" 1>&2 $$n\
+							printf -- '%s\\n' \"	expected_head_tag : \$$expected_head_tag\" 1>&2 $$n\
+							# Skip the default error printer, since we already $$n\
+							# printed one. $$n\
+							exec false $$n\
+						# And make sure that the tag resolves to the current (HEAD) $$n\
+						# commit.  (This only occurs when the randomly selected $$n\
+						# tag differs.) $$n\
+						elif [[ -z \"\$${tags_head_intersection}\" ]]; then $$n\
+							printf -- '%s\\n' \"Error: build-prevalidate-git-tag: [VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS] required form-conformance is enabled, and…\" 1>&2 $$n\
+							printf -- '%s\\n' \"	… the non-‘-dev’ version does have a uniquely identifying tag, but the tag of the right form,\" 1>&2 $$n\
+							printf -- '%s\\n' \"	e.g. ‘v0.1.0’, or ‘v’ followed by the version, does not resolve to the current commit.\" 1>&2 $$n\
+							printf -- '%s\\n' \"\" 1>&2 $$n\
+							printf -- '%s\\n' \"	Please ensure that the git tag for this version that has the required form resolved to the right commit,\" 1>&2 $$n\
+							printf -- '%s\\n' \"	or else disable this requirement with ‘VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS’.\" 1>&2 $$n\
+							printf -- '%s\\n' \"\" 1>&2 $$n\
+							printf -- '%s\\n' \"	head_tag          : \$$head_tag\" 1>&2 $$n\
+							printf -- '%s\\n' \"	expected_head_tag : \$$expected_head_tag\" 1>&2 $$n\
+							# Skip the default error printer, since we already $$n\
+							# printed one. $$n\
+							exec false $$n\
+						fi $$n\
 					fi $$n\
 				fi $$n\
 			fi $$n\
@@ -489,6 +489,6 @@ $(BUILD_DIR)/prevalidate-version-git-tag.stamp: $(_PREVALIDATE_VERSION_GIT_TAG_D
 		} $$n$$n\
  $$n\
 		main \"\$$@\" $$n\
-	" | sed -nEe 's@^\t@@g; 1b; $$b; p' | xargs --null -- $(_CMD_BUILD_PREV_SHOW)
+	" | sed -nEe 's@^\t@@g; 1b; $$b; p' | xargs -I '{}' --null -- $(_CMD_BUILD_PREV_SHOW) '{}' prevalidate-version-git-tag "$(GIT)" "$(GIT_DIR)" "$(GIT_NO_PATH)" "$(GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS)"
 
 	touch -- "$@"
