@@ -11,10 +11,10 @@
 
 {-# LANGUAGE Haskell2010 #-}
 
--- | Haskell2010 Simple syntax AST: default intra-module and inter-module
+-- | Haskell2010 Simple syntax AST: standard intra-module and inter-module
 -- linking.
 --
--- This module provides default intra-module AST instantiations and exports
+-- This module provides standard intra-module AST instantiations and exports
 -- these with type aliases.
 --
 -- This module additionally chooses Prelude attributes such as ‘Maybe’ to
