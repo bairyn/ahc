@@ -168,7 +168,7 @@ build-ahc-core: | build-dirs
 
 # Prevalidation.
 .PHONY: build-prevalidate
-build-prevalidate: build-prevalidate-version-consistency
+build-prevalidate: build-prevalidate-version-consistency build-prevalidate-version-git-tag
 
 # Configuration for ‘build-prevalidate’
 DEBUG_SHOW_PREVALIDATOR_SCRIPTS ?= 0
@@ -191,7 +191,7 @@ _PREVALIDATE_VERSION_CONSISTENCY_DEPS = \
 	$(EMPTY)
 
 # Fail if the versions are inconsistent in the 4 locations in which they are
-# found:
+# found (note the first is also used by ‘build-prevalidate-version-git-tag’):
 # 	- `CHANGELOG.md`
 # 	- `packages/ahc-core/CHANGELOG.md`
 # 	- `packages/ahc-core/ahc-core.cabal`
@@ -327,6 +327,131 @@ $$n\
 			done $$n\
  $$n\
 			: \"Passed version consistency check.  (No output.)\" $$n\
+		} $$n$$n\
+ $$n\
+		main \"\$$@\" $$n\
+	" | sed -nEe 's@^\t@@g; 1b; $$b; p' | xargs --null -- $(_CMD_BUILD_PREV_SHOW)
+
+	touch -- "$@"
+
+# Configuration for ‘build-prevalidate-version-git-tag’.
+# TODO: embedded vars.  (Forced defaults until then.)
+GIT ?= git
+
+GIT_DIR ?= $(DEFAULT_GIT_DIR)
+
+GIT_NO_PATH ?= $(DEFAULT_GIT_NO_PATH)
+
+DEFAULT_GIT_NO_PATH = _NOGIT
+
+DEFAULT_GIT_DIR = .git
+
+# When checking the current release's git tag, do we require (in addition to a
+# non-development release having a tag, that uniquely resolves to 1 commit), do
+# we also require that a version tag is of the specified-right form, e.g.
+# ‘v0.1.0’ for version ‘0.1.0’?
+# TODO: embedded vars.  (Forced defaults until then.)
+VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS ?= $(DEFAULT_VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS)
+
+DEFAULT_VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS = 1
+
+# (We only need just one of $(_PREVALIDATE_VERSION_CONSISTENCY_DEPS).)
+_PREVALIDATE_VERSION_GIT_TAG_DEPS = \
+	./CHANGELOG.md \
+ \
+	$(EMPTY)
+
+# Fail if this is not a ‘development’ tag, that is, it does not have a ‘-dev’
+# tag, and there is no git tag for it.  The main purpose of this is to
+# encourage non-development versions resolving to a unique hash.  Thus after a
+# release, immediately afterward a new commit that changes the version a
+# development version can be made, so that further development can happen until
+# a next release, rather than updating a version that has already been released.
+#
+# (Just for clarity, multiple tags resolving ot the same commit is fine.)
+.PHONY: build-prevalidate-version-git-tag
+build-prevalidate-version-git-tag: $(BUILD_DIR)/prevalidate-version-git-tag.stamp
+$(BUILD_DIR)/prevalidate-version-git-tag.stamp: $(_PREVALIDATE_VERSION_GIT_TAG_DEPS) | build-dirs
+	@# Print our script, then pipe it to run it.
+	@n=$$'\n' && printf -- '%s\n' " $$n\
+		#!/usr/bin/env bash $$n\
+		set -ueE -o pipefail $$n\
+		trap 'echo \"An error (code \$$?) occurred on line \$${LINENO:-} from ‘\$${BASH_SOURCE[0]:-}’; aborting…\" 1>&2' ERR $$n\
+ $$n\
+		main() { $$n\
+			# Get embedded vars. $$n\
+			local embedded_git=\"\" $$n\
+			local embedded_git_dir=\"\" $$n\
+			local embedded_git_no_path=\"\" $$n\
+			local embedded_tag_tag_require_tags_equals_version_forms=\"\" $$n\
+			# TODO; just use default values for now. $$n\
+			embedded_git=\"git\" $$n\
+			embedded_git_dir=\".git\" $$n\
+			embedded_git_no_path=\"_NOGIT\" $$n\
+			embedded_tag_tag_require_tags_equals_version_forms=\"1\" $$n\
+ $$n\
+			# Skip if GIT_DIR is missing or if NOGIT exists. $$n\
+			if { ! [[ -e \"\$${embedded_git_dir}\" ]]; } || [[ -e \"\$${embedded_git_no_path}\" ]]; then $$n\
+				: \"Skipping build-prevalidate-version-git-tag: not a git repo: GIT_DIR doesn't exist, or NOGIT (GIT_NO_PATH) does.  (No output.)\" $$n\
+			else $$n\
+				# Pre-initialize with ‘local’ with empty values separately so the $$n\
+				# exit code isn't disregarded. $$n\
+				local version_changelog=\"\" $$n\
+				local version_path_version_changelog=\"\" $$n\
+				local version_extractor_version_changelog=\"\" $$n\
+				local version_has_dev_tag=\"\" $$n\
+				local head_tag=\"\" $$n\
+ $$n\
+				local util_sed_n_independent=\"\" $$n\
+ $$n\
+				util_sed_n_independent=\"; d; b\" $$n\
+ $$n\
+				# Get the version. $$n\
+				version_path_version_changelog=\"./CHANGELOG.md\" $$n\
+				version_extractor_version_changelog='/^( ? ? ?\#\#\s*)([^[:space:]]+)(\s*.*)\$$/ { s//\2/g; p; q; }'\"\$$util_sed_n_independent\" $$n\
+				version_changelog=\"\$$(sed -nEe \"\$$version_extractor_version_changelog\" < \"\$$version_path_version_changelog\")\" $$n\
+ $$n\
+				# See if it has a dev tag. $$n\
+				version_has_dev_tag=\"\$$(printf -- '%s\\n' \"\$${version_changelog}\" | sed -nEe '2q; /^.*(-dev).*\$$/{s//1/g; p; d; b; }; s/^.*\$$/0/g; p; d')\" $$n\
+ $$n\
+				# See if HEAD has a tag (e.g. especially ‘v0.1.0’), or else get an $$n\
+				# empty string if not.  (Make sure it's not $$n\
+				# ‘.*\~[[:digit:]]+%(\^[[:digit:]]+)?\$$’ or ‘undefined’). $$n\
+				head_tag=\"\$$(git name-rev --tags HEAD | sed -nEe '/^HEAD\s+tags\\/([^~^]+)\$$/{s//\1/g; p; d}; s/^.*\$$//g; d; d')\" $$n\
+ $$n\
+				# Ensure non-‘-dev’ versions have a unique git tag. $$n\
+				if [[ \"x\$${version_has_dev_tag}\" != \"x1\" ]] && [[ -z \"\$${head_tag}\" ]]; then $$n\
+					printf -- '%s\\n' \"Error: build-prevalidate-git-tag: we detected a non-‘-dev’ version does not have a unique git tag.\" 1>&2 $$n\
+					printf -- '%s\\n' \"	Please ensure there is a unique git tag for this version,\" 1>&2 $$n\
+					printf -- '%s\\n' \"	if this validator is correctly this condition.\" 1>&2 $$n\
+					printf -- '%s\\n' \"\" 1>&2 $$n\
+					printf -- '%s\\n' \"	head_tag : \$$head_tag\" 1>&2 $$n\
+					# Skip the default error printer, since we already $$n\
+					# printed one. $$n\
+					exec false $$n\
+				fi $$n\
+ $$n\
+				# Ensure non-‘-dev’ versions have a unique git tag of the correct form. $$n\
+				local expected_head_tag=\"\" $$n\
+				expected_head_tag=\"v\$${version_changelog}\" $$n\
+				if [[ \"x\$${version_has_dev_tag}\" != \"x1\" ]] && [[ \"\$${head_tag}\" != \"\$${expected_head_tag}\" ]]; then $$n\
+					# TODO: handle multiple tags correctly, as the chosen may be different from the right one, which still exists. $$n\
+					printf -- '%s\\n' \"Error: build-prevalidate-git-tag: [VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS] required form-conformance is enabled, and…\" 1>&2 $$n\
+					printf -- '%s\\n' \"	… the non-‘-dev’ version does have a unique tag, but it is not of the right form,\" 1>&2 $$n\
+					printf -- '%s\\n' \"	of e.g. ‘v0.1.0’, or ‘v’ followed by the version.\" 1>&2 $$n\
+					printf -- '%s\\n' \"\" 1>&2 $$n\
+					printf -- '%s\\n' \"	Please ensure that the unique git tag for this version has the required form,\" 1>&2 $$n\
+					printf -- '%s\\n' \"	or else disable this requirement with ‘VERSION_GIT_TAG_REQUIRE_TAGS_EQUALS_VERSION_FORMS’.\" 1>&2 $$n\
+					printf -- '%s\\n' \"\" 1>&2 $$n\
+					printf -- '%s\\n' \"	head_tag          : \$$head_tag\" 1>&2 $$n\
+					printf -- '%s\\n' \"	expected_head_tag : \$$expected_head_tag\" 1>&2 $$n\
+					# Skip the default error printer, since we already $$n\
+					# printed one. $$n\
+					exec false $$n\
+				fi $$n\
+			fi $$n\
+ $$n\
+			: \"Passed version git tag check.  (No output.)\" $$n\
 		} $$n$$n\
  $$n\
 		main \"\$$@\" $$n\
